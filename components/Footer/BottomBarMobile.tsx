@@ -21,7 +21,6 @@ const MobileNavBar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isListOpen, setIsListOpen] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [dragHeight, setDragHeight] = useState(0);
 
   const t = useTranslations("footer");
   const locale = useLocale();
@@ -31,7 +30,6 @@ const MobileNavBar = () => {
     setIsExpanded(false);
     setIsListOpen(false);
     setIsModalVisible(false);
-    setDragHeight(0);
   }, [pathname]);
 
   const toggleModal = () => {
@@ -66,15 +64,11 @@ const MobileNavBar = () => {
 
   const closeSidebar = () => setIsListOpen(false);
 
-  const handleDragEnd = (event: any, info: any) => {
-    if (info.offset.y > 50) {
+  const handleSwipeEnd = (event: any, info: any) => {
+    const SWIPE_THRESHOLD = 100;
+    if (info.velocity.y > 0 && info.offset.y > SWIPE_THRESHOLD) {
       setIsExpanded(false);
-      setDragHeight(0);
     }
-  };
-
-  const handleDrag = (event: any, info: any) => {
-    setDragHeight(info.offset.y);
   };
 
   return (
@@ -87,7 +81,6 @@ const MobileNavBar = () => {
             setIsListOpen(false);
             setIsModalVisible(false);
             setIsExpanded(false);
-            setDragHeight(0);
           }}
         />
       )}
@@ -110,7 +103,7 @@ const MobileNavBar = () => {
             bg-charade-900 backdrop-blur-sm rounded-t-3xl transition-all shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-1px_rgba(0,0,0,0.06)]
           `}
           animate={{
-            height: isExpanded ? `calc(80vh - ${dragHeight}px)` : "70px",
+            height: isExpanded ? "75vh" : "70px",
           }}
           transition={{ type: "spring", damping: 20 }}
         >
@@ -121,11 +114,11 @@ const MobileNavBar = () => {
               dragConstraints={{ top: 0, bottom: 0 }}
               dragElastic={0.2}
               dragDirectionLock
-              onDragEnd={handleDragEnd}
-              onDrag={handleDrag}
+              onDragEnd={handleSwipeEnd}
+              whileDrag={{ scale: 1 }}
             >
               {/* Drag Handle */}
-              <div className="flex justify-center z-20 items-center w-full h-5 bg-charade-900 absolute top-0">
+              <div className="flex mt-2 justify-center z-20 items-center w-full h-5 bg-charade-900 absolute top-0">
                 <div className="absolute z-20 top-2 left-1/2 -translate-x-1/2 w-16 h-1.5 bg-gray-300 rounded-full cursor-grab" />
               </div>
 
