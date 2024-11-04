@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { ModeToggle } from "./ModeToggle";
 import User from "./User";
+import LangSwitcher from "@/components/Header/LangSwitcher";
 
 export default function MobileHeader() {
   const { theme, systemTheme } = useTheme();
@@ -67,7 +68,8 @@ export default function MobileHeader() {
           )}
         </div>
       </Link>
-      <div className="flex items-center gap-5 justify-center">
+      <div className="flex items-center gap-4 justify-center">
+        <LangSwitcher />
         <User />
         <ModeToggle />
       </div>

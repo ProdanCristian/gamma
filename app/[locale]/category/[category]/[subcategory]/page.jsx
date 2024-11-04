@@ -8,7 +8,6 @@ import {
 import SubSubCategoryCard from "@/components/CategoriesCards/SubSubCategoryCard";
 import { getTranslations } from "next-intl/server";
 
-
 const formatCategoryName = (slug) => {
   if (!slug) return "";
   return slug
@@ -20,9 +19,9 @@ const formatCategoryName = (slug) => {
 async function getSubcategoryNames(id) {
   try {
     const baseUrl = "http://localhost:3000";
-    const response = await fetch(
-      `${baseUrl}/api/catNames/subCat?id=${id}`, { revalidate: 3600 }
-    );
+    const response = await fetch(`${baseUrl}/api/catNames/subCat?id=${id}`, {
+      revalidate: 3600,
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -40,7 +39,8 @@ async function getSubSubCategories(categoryId, subcategoryId) {
   try {
     const baseUrl = "http://localhost:3000";
     const response = await fetch(
-      `${baseUrl}/api/subSubCategories?subcategoryId=${subcategoryId}`, { revalidate: 3600 }
+      `${baseUrl}/api/subSubCategories?subcategoryId=${subcategoryId}`,
+      { revalidate: 3600 }
     );
 
     if (!response.ok) {
@@ -120,7 +120,7 @@ export default async function SubcategoryPage(props) {
               dragFree: true,
             }}
           >
-            <CarouselContent className="-ml-2 md:-ml-4">
+            <CarouselContent className="-ml-2 md:-ml-4 w-[60%] md:w-full">
               {subSubCategories.map((subSubCategory) => (
                 <CarouselItem
                   key={subSubCategory.id}

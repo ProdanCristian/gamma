@@ -19,9 +19,9 @@ const formatCategoryName = (slug) => {
 async function getCategoryNames(id) {
   try {
     const baseUrl = "http://localhost:3000";
-    const response = await fetch(
-      `${baseUrl}/api/catNames/cat?id=${id}`, { revalidate: 3600 }
-    );
+    const response = await fetch(`${baseUrl}/api/catNames/cat?id=${id}`, {
+      revalidate: 3600,
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -39,7 +39,8 @@ async function getSubcategories(categoryId) {
   try {
     const baseUrl = "http://localhost:3000";
     const response = await fetch(
-      `${baseUrl}/api/subCategories?categoryId=${categoryId}`, { revalidate: 3600 }
+      `${baseUrl}/api/subCategories?categoryId=${categoryId}`,
+      { revalidate: 3600 }
     );
 
     if (!response.ok) {
@@ -105,7 +106,7 @@ export default async function CategoryPage(props) {
               dragFree: true,
             }}
           >
-            <CarouselContent className="-ml-2 md:-ml-4">
+            <CarouselContent className="-ml-2 md:-ml-4 w-[60%] md:w-full">
               {subcategories.map((subcategory) => (
                 <CarouselItem
                   key={subcategory.id}

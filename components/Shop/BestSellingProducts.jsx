@@ -55,7 +55,9 @@ const TopProductsCarousel = ({ marketingData }) => {
   return (
     <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-4 md:p-5 mt-10 max-w-[1250px] w-[90vw] mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">{t("discover_top_products")}!</h2>
+        <h2 className="text-2xl font-bold text-center w-full md:text-left">
+          {t("discover_top_products")}!
+        </h2>
       </div>
 
       <div className="block lg:flex gap-4">

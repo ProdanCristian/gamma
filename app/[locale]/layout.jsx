@@ -11,6 +11,7 @@ import AuthProvider from "@/components/Providers/SessionProvider";
 import { Toaster } from "@/components/ui/toaster";
 import BeforeFooter from "@/components/Footer/BeforeFooter";
 import Footer from "@/components/Footer/Footer";
+import BottomBarMobile from "@/components/Footer/BottomBarMobile";
 
 export default async function LocaleLayout({ children, params }) {
   const { locale } = await params;
@@ -43,6 +44,7 @@ export default async function LocaleLayout({ children, params }) {
               <BeforeFooter />
               <Footer />
               <Toaster />
+              <BottomBarMobile />
             </AuthProvider>
           </ThemeProvider>
         </NextIntlClientProvider>

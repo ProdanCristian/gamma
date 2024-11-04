@@ -55,7 +55,7 @@ const DiscountCarousel = ({ marketingData }) => {
   return (
     <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-4 md:p-5 max-w-[1250px] w-[90vw] mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">
+        <h2 className="text-2xl font-bold text-center md:text-left w-full">
           {t("discounted_products_title")}!
         </h2>
       </div>

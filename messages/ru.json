@@ -96,6 +96,8 @@
     "support_description": "Круглосуточная поддержка клиентов"
   },
   "footer": {
+    "back": "Назад",
+    "Wishlist": "Список желаний",
     "discount_offer": "Получите скидку 5%",
     "newsletter_description": "Получайте все последние новости о событиях, распродажах и предложениях",
     "email_placeholder": "Введите ваш email адрес",

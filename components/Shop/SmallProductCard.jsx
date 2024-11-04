@@ -95,7 +95,7 @@ const SmallProductCard = ({ product, loading = false }) => {
       >
         <div className="relative h-24 sm:h-32 flex items-center justify-center">
           {isFiftyPercentOff && (
-            <div className="absolute top-[-10px] right-[-10px] bg-red-500 text-white px-1.5 py-0.5 rounded-bl-lg text-[10px] font-bold z-10 group-hover:z-0">
+            <div className="absolute top-[-10px] right-[-10px] bg-red-500 text-white px-1.5 py-0.5 rounded-bl-lg text-[10px] font-bold z-[6] group-hover:z-0">
               {t("fifty_percent_off")}
             </div>
           )}

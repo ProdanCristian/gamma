@@ -96,6 +96,8 @@
     "support_description": "Suport clienți non-stop"
   },
   "footer": {
+    "back": "Înapoi",
+    "Wishlist": "Lista dorințelor",
     "discount_offer": "Obțineți 5% reducere",
     "newsletter_description": "Obțineți toate cele mai recente informații despre evenimente, vânzări și oferte",
     "email_placeholder": "Introdu adresa ta de e-mail",

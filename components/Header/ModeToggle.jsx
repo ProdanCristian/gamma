@@ -17,16 +17,12 @@ export function ModeToggle() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="default"
-          size="icon"
-          className="bg-accent rounded-full shadow-none border-none"
-        >
-          <PiSun className="h-52 w-52 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <PiMoon className="h-52 w-52 absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      <DropdownMenuTrigger asChild className=" -ml-4 mr-2  md:ml-0 md:mr-0">
+        <button className="h-8 w-8 rounded-full shadow-none border-none transition-colors duration-200 bg-accent dark:bg-transparent relative flex items-center justify-center">
+          <PiSun className="h-6 w-6 absolute rotate-0 scale-100 transition-all  text-black md:text-white dark:text-accent dark:-rotate-90 dark:scale-0" />
+          <PiMoon className="h-6 w-6 absolute scale-0 transition-all text-white dark:text-accent dark:scale-100" />
           <span className="sr-only">Toggle theme</span>
-        </Button>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"

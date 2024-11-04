@@ -33,7 +33,7 @@
     "app/[locale]/layout.jsx",
     "app/[locale]/product/[product]/page.jsx",
     "app/[locale]/dashboard/page.jsx",
-    "app/[locale]/whishlist/page.jsx",
+    "app/[locale]/wishlist/page.jsx",
     "app/[locale]/category/[category]/page.jsx",
     "app/[locale]/category/[category]/[subcategory]/[subsubcategory]/page.jsx",
     "app/[locale]/category/[category]/[subcategory]/page.jsx",
