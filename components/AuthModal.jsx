@@ -198,7 +198,7 @@ export default function AuthModal() {
   }
 
   return (
-    <div className="w-96 flex border border-gray-300 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-charade-900 justify-center flex-col">
+    <div className="w-[360px] flex border border-gray-300 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-charade-900 justify-center flex-col">
       <div className="flex justify-between mb-4 border-b border-gray-300 dark:border-gray-700">
         <button
           className={`w-full p-2 ${

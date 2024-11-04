@@ -58,7 +58,7 @@ export default function MobileHeader() {
   return (
     <div className="md:hidden flex justify-between items-center w-full h-[77px] border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-charade-950/80 backdrop-filter backdrop-blur-lg px-3 fixed top-0 z-20">
       <Link href="/">
-        <div className="h-12 w-[150px] ml-5">
+        <div className="h-12 w-[130px] ml-2">
           {blackLogo && lightLogo && (
             <img
               src={currentTheme === "dark" ? lightLogo : blackLogo}

@@ -10,6 +10,7 @@ import {
   PiDotsNineBold,
   PiList,
   PiHeart,
+  PiShoppingCart,
 } from "react-icons/pi";
 import CategoryList from "./CategoryList";
 import SearchModal from "@/components/Header/SearchModal";
@@ -26,7 +27,6 @@ const MobileNavBar = () => {
   const locale = useLocale();
   const pathname = usePathname();
 
-  // Reset all states when pathname changes
   useEffect(() => {
     setIsExpanded(false);
     setIsListOpen(false);
@@ -34,9 +34,36 @@ const MobileNavBar = () => {
     setDragHeight(0);
   }, [pathname]);
 
-  const toggleModal = () => setIsModalVisible(!isModalVisible);
-  const toggleExpand = () => setIsExpanded(!isExpanded);
-  const toggleList = () => setIsListOpen(!isListOpen);
+  const toggleModal = () => {
+    if (isModalVisible) {
+      setIsModalVisible(false);
+    } else {
+      setIsModalVisible(true);
+      setIsExpanded(false);
+      setIsListOpen(false);
+    }
+  };
+
+  const toggleExpand = () => {
+    if (isExpanded) {
+      setIsExpanded(false);
+    } else {
+      setIsExpanded(true);
+      setIsListOpen(false);
+      setIsModalVisible(false);
+    }
+  };
+
+  const toggleList = () => {
+    if (isListOpen) {
+      setIsListOpen(false);
+    } else {
+      setIsListOpen(true);
+      setIsExpanded(false);
+      setIsModalVisible(false);
+    }
+  };
+
   const closeSidebar = () => setIsListOpen(false);
 
   const handleDragEnd = (event: any, info: any) => {
@@ -83,7 +110,7 @@ const MobileNavBar = () => {
             bg-charade-900 backdrop-blur-sm rounded-t-3xl transition-all shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-1px_rgba(0,0,0,0.06)]
           `}
           animate={{
-            height: isExpanded ? `calc(85vh - ${dragHeight}px)` : "70px",
+            height: isExpanded ? `calc(80vh - ${dragHeight}px)` : "70px",
           }}
           transition={{ type: "spring", damping: 20 }}
         >
@@ -98,15 +125,16 @@ const MobileNavBar = () => {
               onDrag={handleDrag}
             >
               {/* Drag Handle */}
-              <div className="absolute z-20 top-2 left-1/2 -translate-x-1/2 w-16 h-1.5 bg-gray-300 rounded-full cursor-grab" />
+              <div className="flex justify-center z-20 items-center w-full h-5 bg-charade-900 absolute top-0">
+                <div className="absolute z-20 top-2 left-1/2 -translate-x-1/2 w-16 h-1.5 bg-gray-300 rounded-full cursor-grab" />
+              </div>
 
               {/* Category List */}
-              <div
-                className="absolute justify-center items-start top-0 left-0 w-full z-10 
-                text-white dark:bg-charade-900 overflow-auto p-8"
-                style={{ height: "100%" }}
-              >
-                <div className="mt-6">
+              <div className="absolute inset-0 flex justify-center items-center">
+                <div
+                  className="w-full max-h-[calc(75vh)] overflow-auto px-8 py-4 mb-[70px]
+                  text-white dark:bg-charade-900"
+                >
                   <CategoryList locale={locale} />
                 </div>
               </div>
@@ -114,11 +142,7 @@ const MobileNavBar = () => {
           )}
 
           {/* Bottom Bar Icons */}
-          <div
-            className={`flex items-end justify-between w-[90%] px-5 h-full pb-5 ${
-              isExpanded ? "opacity-0" : "opacity-100"
-            } transition-opacity duration-300`}
-          >
+          <div className="flex items-end pb-5 justify-between w-[90%] px-5 h-[70px] transition-opacity duration-300 absolute bottom-0 z-20 bg-charade-900">
             <PiPhone size={33} className="text-white" />
 
             <PiMagnifyingGlass
@@ -132,9 +156,12 @@ const MobileNavBar = () => {
               className={`
                 transition-transform duration-300
                 ${isExpanded ? "text-white scale-130" : "text-accent"}
+                cursor-pointer
               `}
               onClick={toggleExpand}
             />
+
+            <PiShoppingCart size={33} className="text-white cursor-pointer" />
 
             <PiList
               size={33}

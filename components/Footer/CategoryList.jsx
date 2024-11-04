@@ -6,7 +6,6 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { PiCaretRight, PiCaretLeft } from "react-icons/pi";
 import slugify from "slugify";
-import { Skeleton } from "@/components/ui/skeleton";
 import useSWR from "swr";
 import {
   PiForkKnife,
@@ -25,6 +24,7 @@ import {
   PiPaintBrushHousehold,
   PiWashingMachine,
 } from "react-icons/pi";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ICON_MAP = {
   "fork-knife": PiForkKnife,
@@ -55,7 +55,11 @@ const CategoryList = ({ locale }) => {
     fetcher
   );
 
-  const { data: subcategoriesData, error: subcategoriesError } = useSWR(
+  const {
+    data: subcategoriesData,
+    error: subcategoriesError,
+    isLoading,
+  } = useSWR(
     selectedCategory
       ? `/api/subCategories?categoryId=${selectedCategory.id}`
       : null,
@@ -81,11 +85,6 @@ const CategoryList = ({ locale }) => {
 
   const fetchSubcategories = async (category) => {
     setSelectedCategory(category);
-    const newImageLoaded = {};
-    subcategoriesData?.data?.forEach((subcategory) => {
-      newImageLoaded[subcategory.id] = false;
-    });
-    setImageLoaded(newImageLoaded);
   };
 
   const goBack = () => {
@@ -137,7 +136,7 @@ const CategoryList = ({ locale }) => {
 
   const renderIcon = (iconName) => {
     const IconComponent = ICON_MAP[iconName];
-    return IconComponent ? <IconComponent size={20} /> : null;
+    return IconComponent ? <IconComponent size={25} /> : null;
   };
 
   if (!selectedCategory) {
@@ -172,11 +171,42 @@ const CategoryList = ({ locale }) => {
     );
   }
 
+  if (isLoading) {
+    return (
+      <div>
+        <button
+          onClick={goBack}
+          className="mb-4 hover:underline flex items-center gap-2 mt-10"
+        >
+          <PiCaretLeft size={23} />
+          <p className="text-xl">{t("back")}</p>
+        </button>
+
+        <div className="gap-4 p-2 w-full overflow-y-auto">
+          {[1, 2, 3].map((index) => (
+            <div
+              key={index}
+              className="break-inside-avoid p-3 bg-[#3A3B4A] rounded-lg mb-4"
+            >
+              <Skeleton className="h-8 w-3/4 mb-4" />
+              <Skeleton className="h-48 w-full mb-4" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-2/3" />
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-4 w-3/4" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <button
         onClick={goBack}
-        className="mb-4 hover:underline flex items-center gap-2"
+        className="mb-4 hover:underline flex items-center gap-2 mt-10"
       >
         <PiCaretLeft size={23} />
         <p className="text-xl">{t("back")}</p>
@@ -203,12 +233,15 @@ const CategoryList = ({ locale }) => {
               >
                 {subcategory.images?.length > 0 && (
                   <Image
-                    src={`${subcategory.images[0]}`}
+                    src={subcategory.images[0]}
                     alt={getSubcategoryName(subcategory)}
                     width={400}
                     height={192}
-                    className="w-full h-48 object-cover rounded-md hover:opacity-80 transition-opacity"
+                    className={`w-full h-48 object-cover rounded-md hover:opacity-80 transition-opacity ${
+                      !imageLoaded[subcategory.id] ? "hidden" : ""
+                    }`}
                     priority
+                    onLoad={() => handleImageLoad(subcategory.id)}
                   />
                 )}
               </Link>
