@@ -231,8 +231,8 @@ export default async function ProductPage({ params, searchParams }) {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious className="hidden md:block" />
-              <CarouselNext className="hidden md:block" />
+              <CarouselPrevious className="hidden md:flex" />
+              <CarouselNext className="hidden md:flex" />
             </Carousel>
           </div>
         )}

@@ -5,16 +5,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { useLocale } from "next-intl";
 import slugify from "slugify";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SubcategoriesGrid({ categoryId, categorySlug }) {
   const [subcategories, setSubcategories] = useState(null);
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const locale = useLocale();
 
   useEffect(() => {
     const fetchSubcategories = async () => {
       if (!categoryId) return;
-
+      setIsLoading(true);
       try {
         const response = await fetch(
           `/api/subCategories?categoryId=${categoryId}`
@@ -29,6 +31,8 @@ export default function SubcategoriesGrid({ categoryId, categorySlug }) {
       } catch (error) {
         setError(error.message);
         setSubcategories(null);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -82,7 +86,7 @@ export default function SubcategoriesGrid({ categoryId, categorySlug }) {
     <div className="flex w-[calc(100%-314px)]">
       <div className="flex-1 p-2 overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 h-full overflow-y-auto">
-          {subcategories.map((subcategory) => (
+          {subcategories?.map((subcategory) => (
             <div
               key={subcategory.id}
               className="p-3 bg-gray-100 dark:bg-[#3A3B4A] rounded-md mb-4"
@@ -101,13 +105,17 @@ export default function SubcategoriesGrid({ categoryId, categorySlug }) {
                   href={generateSubcategoryLink(subcategory)}
                   className="block w-full h-48"
                 >
-                  {subcategory.images[0] && (
+                  {isLoading ? (
+                    <Skeleton className="w-full h-48 rounded-md" />
+                  ) : subcategory.images[0] ? (
                     <Image
                       src={subcategory.images[0]}
                       alt={getSubcategoryName(subcategory)}
                       fill
                       className="object-cover rounded-md hover:opacity-80 transition-opacity"
                     />
+                  ) : (
+                    <Skeleton className="w-full h-48 rounded-md" />
                   )}
                 </Link>
               </div>

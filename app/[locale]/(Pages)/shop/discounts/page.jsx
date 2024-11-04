@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import useSWR from "swr";
-import ProductCard from "@/components/Shop/ProductCard";
+import SmallProductCard from "@/components/Shop/SmallProductCard";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { PiArrowLeft, PiArrowRight } from "react-icons/pi";
@@ -38,15 +38,15 @@ const DiscountsPage = () => {
       <h1 className="text-3xl font-bold mb-8">{t("title")}</h1>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6">
         {isLoading
           ? Array(12)
               .fill(0)
               .map((_, index) => (
-                <ProductCard key={index} product={{}} loading />
+                <SmallProductCard key={index} product={{}} loading />
               ))
           : currentProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <SmallProductCard key={product.id} product={product} />
             ))}
       </div>
 
