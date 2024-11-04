@@ -1,7 +1,31 @@
 import type { NextConfig } from "next";
 
+const createNextIntlPlugin = require("next-intl/plugin");
+
+const withNextIntl = createNextIntlPlugin();
+
 const nextConfig: NextConfig = {
-  /* config options here */
+  serverExternalPackages: ["pg"],
+  images: {
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "193.160.119.179",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+      },
+      {
+        protocol: "https",
+        hostname: "platform-lookaside.fbsbx.com",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+    ],
+  },
 };
 
-export default nextConfig;
+module.exports = withNextIntl(nextConfig);

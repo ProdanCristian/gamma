@@ -1,0 +1,157 @@
+{
+  "category": {
+    "no_subcategories_found": "Не найдено подкатегорий",
+    "error_loading_category_data": "Ошибка при загрузке данных категории",
+    "invalid_category_id": "Неверный ID категории",
+    "check_url": "Пожалуйста, проверьте URL и попробуйте снова",
+    "please_try_again": "Пожалуйста, попробуйте позже"
+  },
+  "TopCategories": {
+    "title": "Категории Top",
+    "category": "Категория"
+  },
+  "navigation": {
+    "shop": "Магазин",
+    "discounts": "Скидки",
+    "about": "О нас",
+    "contact": "Контакты",
+    "delivery": "Доставка",
+    "bestsellers": "Хиты продаж"
+  },
+  "SearchBar": {
+    "title": "Поиск товаров"
+  },
+  "search": {
+    "searchPlaceholder": "Поиск товаров...",
+    "searchResults": "Результаты поиска"
+  },
+  "auth": {
+    "Welcome": "Добро пожаловать",
+    "Login": "Войти",
+    "Register": "Регистрация",
+    "Password": "Пароль",
+    "or": "или",
+    "Login with Google": "Войти через Google",
+    "Login with Facebook": "Войти через Facebook",
+    "Register with Google": "Реистрация через Google",
+    "Register with Facebook": "Регистрация через Facebook",
+    "Nume si Prenume": "Имя и Фамилия",
+    "Dashboard": "Панель управления",
+    "addresses_title": "Адреса",
+    "orders_title": "Заказы",
+    "Logout": "Выйти",
+    "user_registered_successfully": "Регистрация успешна",
+    "internal_error": "Произошла ошибка. Попробуйте еще раз.",
+    "invalid_credentials": "Неверный email или пароль",
+    "login_successful": "Вход выполнен успешно",
+    "email_already_exists": "Этот email уже зарегистрирован",
+    "invalid_email_format": "Неверный формат email",
+    "password_too_short": "Пароль должен содержать не менее 6 символов",
+    "name_required": "Имя и фамилия обязательны",
+    "email_required": "Email обязателен",
+    "password_required": "Пароль обязателен",
+    "profile_updated": "Профиль успешно обновлен",
+    "error_loading_data": "Не удалось загрузить данные",
+    "generic_error": "Произошла ошибка",
+    "profile": "Профиль"
+  },
+  "profile": {
+    "updating": "Обновление профиля...",
+    "profile_information": "Информация профиля",
+    "first_name": "Имя",
+    "last_name": "Фамилия",
+    "phone_number": "Номер телефона",
+    "phone_format": "Формат номера телефона",
+    "email": "Электронная почта",
+    "new_password": "Новый пароль",
+    "update_profile": "Обновить профиль",
+    "success": "Успех",
+    "profile_updated": "Профиль успешно обновлен",
+    "error": "Ошибка",
+    "generic_error": "Произошла ошибка при обновлении профиля",
+    "email_change_restricted": "Электронная почта не может быть изменена для аккаунтов Google или Facebook"
+  },
+  "contact": {
+    "contact_us": "Свяжитесь с нами",
+    "your_name": "Ваше имя",
+    "name": "Имя",
+    "phone_number": "Номер телефона",
+    "email_address": "Адрес электронной почты",
+    "message": "Сообщение",
+    "write_message_here": "Напишите ваше сообщение здесь...",
+    "message_sent_success": "Сообщение успешно отправлено!",
+    "message_error": "Произошла ошибка. Попробуйте еще раз.",
+    "sending": "Отправка...",
+    "send": "Отправить",
+    "contacts": "Контакты"
+  },
+  "benefits": {
+    "free_delivery_title": "Бесплатная доставка",
+    "free_delivery_description": "Бесплатная доставка по Кишинёву",
+    "satisfaction_title": "100% Удовлетворение",
+    "satisfaction_description": "Гарантия удовлетворения клиента",
+    "secure_payment_title": "Безопасные платежи",
+    "secure_payment_description": "Гарантированные безопасные транзакции",
+    "support_title": "Поддержка 24/7",
+    "support_description": "Круглосуточная поддержка клиентов"
+  },
+  "footer": {
+    "discount_offer": "Получите скидку 5%",
+    "newsletter_description": "Получайте все последние новости о событиях, распродажах и предложениях",
+    "email_placeholder": "Введите ваш email адрес",
+    "subscribe": "Подписаться",
+    "logo_alt": "Gamma Логотип",
+    "footer_description": "Всё, что вы ищете, в одном месте. Откройте для себя безграничные возможности!",
+    "menu": "Меню",
+    "customer_service": "Обслуживание клиентов",
+    "terms_conditions": "Условия использования",
+    "exchange_return": "Обмен и возврат",
+    "privacy_policy": "Политика конфиденциальности",
+    "warranty": "Гарантия",
+    "follow_us": "Следите за нами",
+    "payments_methods": "Методы оплаты",
+    "copyright": "copyright 2024",
+    "mobile_app": "Мобильное приложение",
+    "download_for_iphone": "Скачать для iPhone",
+    "download_for_android": "Скачать для Android",
+    "street": "Страда Святого Георгия 6, Кишинёв, Молдова",
+    "subscription_success_message": "Спасибо за подписку! Купон на скидку 5% отправлен на ваш email.",
+    "already_subscribed_message": "Этот email уже подписан на нашу рассылку.",
+    "subscription_error": "Ошибка при подписке. Пожалуйста, попробуйте позже."
+  },
+  "home": {
+    "discounted_products_title": "Неоспоримые скидки",
+    "view_all": "Посмотреть все",
+    "discover_top_products": "Популярные товары"
+  },
+  "productcard": {
+    "no_images_found": "Изображения не найдены",
+    "fifty_percent_off": "Скидка 50%",
+    "buy_now": "Купить сейчас",
+    "lei": "Лей"
+  },
+  "product": {
+    "buy_now": "Купить сейчас",
+    "lei": "Лей",
+    "select_variant": "Выберите вариант",
+    "choose_option": "Выберите опцию",
+    "select_color": "Выберите цвет",
+    "in_stock": "В наличии",
+    "out_of_stock": "Нет в наличии",
+    "units": "единиц",
+    "unit": "единица",
+    "quantity": "Количество"
+  },
+  "discounts": {
+    "title": "Товары со скидкой",
+    "previous": "Преддущий",
+    "next": "Следующий"
+  },
+  "Category": {
+    "invalidCategoryId": "Неверный идентификатор категории или подкатегории",
+    "checkUrlAndTryAgain": "Пожалуйста, проверьте URL и попробуйте снова",
+    "noSubSubCategories": "Подподкатегории не найдены",
+    "errorLoadingData": "Ошибка при загрузке данных подкатегории",
+    "tryAgainLater": "Пожалуйста, повторите попытку позже"
+  }
+}

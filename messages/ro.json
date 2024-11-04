@@ -1,0 +1,157 @@
+{
+  "category": {
+    "no_subcategories_found": "Nu s-au găsit subcategorii",
+    "error_loading_category_data": "Eroare la încărcarea datelor categoriei",
+    "invalid_category_id": "ID categorie invalid",
+    "check_url": "Vă rugăm să verificați URL-ul și să încercați din nou",
+    "please_try_again": "Vă rugăm să încercați din nou mai târziu"
+  },
+  "TopCategories": {
+    "title": "Categorii Top",
+    "category": "Categorie"
+  },
+  "navigation": {
+    "shop": "Magazin",
+    "discounts": "Reduceri",
+    "about": "Despre noi",
+    "contact": "Contacte",
+    "delivery": "Livrare",
+    "bestsellers": "Produse populare"
+  },
+  "SearchBar": {
+    "title": "Caută produse"
+  },
+  "search": {
+    "searchPlaceholder": "Caută produse...",
+    "searchResults": "Rezultate căutare"
+  },
+  "auth": {
+    "Welcome": "Bine ați venit",
+    "Login": "Autentificare",
+    "Register": "Înregistrare",
+    "Password": "Parola",
+    "or": "sau",
+    "Login with Google": "Autentificare cu Google",
+    "Login with Facebook": "Autentificare cu Facebook",
+    "Register with Google": "Înregistrare cu Google",
+    "Register with Facebook": "Înregistrare cu Facebook",
+    "Nume si Prenume": "Nume și Prenume",
+    "Dashboard": "Panou de control",
+    "addresses_title": "Adrese",
+    "orders_title": "Comenzi",
+    "Logout": "Deconectare",
+    "user_registered_successfully": "Înregistrare reușită",
+    "internal_error": "A apărut o eroare. Vă rugăm să încercați din nou.",
+    "invalid_credentials": "Email sau parolă invalide",
+    "login_successful": "Autentificare reușită",
+    "email_already_exists": "Acest email este deja înregistrat",
+    "invalid_email_format": "Format email invalid",
+    "password_too_short": "Parola trebuie să aibă cel puțin 6 caractere",
+    "name_required": "Numele și prenumele sunt obligatorii",
+    "email_required": "Emailul este obligatoriu",
+    "password_required": "Parola este obligatorie",
+    "profile_updated": "Profilul a fost actualizat cu succes",
+    "error_loading_data": "Nu s-au putut încărca datele",
+    "generic_error": "A apărut o eroare",
+    "profile": "Profil"
+  },
+  "profile": {
+    "updating": "Se actualizează profilul...",
+    "profile_information": "Informații profil",
+    "first_name": "Prenume",
+    "last_name": "Nume",
+    "phone_number": "Număr de telefon",
+    "phone_format": "Format număr de telefon",
+    "email": "Email",
+    "new_password": "Parolă nouă",
+    "update_profile": "Actualizare profil",
+    "success": "Succes",
+    "profile_updated": "Profilul a fost actualizat cu succes",
+    "error": "Eroare",
+    "generic_error": "A apărut o eroare la actualizarea profilului",
+    "email_change_restricted": "Emailul nu poate fi modificat pentru conturile Google sau Facebook"
+  },
+  "contact": {
+    "contact_us": "Contactează-ne",
+    "your_name": "Numele dumneavoastră",
+    "name": "Numele",
+    "phone_number": "Numărul de telefon",
+    "email_address": "Adresa de e-mail",
+    "message": "Mesaj",
+    "write_message_here": "Scrie mesajul aici...",
+    "message_sent_success": "Mesajul a fost trimis cu succes!",
+    "message_error": "A apărut o eroare. Încercați din nou.",
+    "sending": "Se trimite...",
+    "send": "Trimite",
+    "contacts": "Contacte"
+  },
+  "benefits": {
+    "free_delivery_title": "Livrare gratuită",
+    "free_delivery_description": "Livrare gratuită în Chișinău",
+    "satisfaction_title": "100% Satisfacție",
+    "satisfaction_description": "Garanția satisfacției clientului",
+    "secure_payment_title": "Plăți sigure",
+    "secure_payment_description": "Tranzacții securizate garantat",
+    "support_title": "Asistență 24/7",
+    "support_description": "Suport clienți non-stop"
+  },
+  "footer": {
+    "discount_offer": "Obțineți 5% reducere",
+    "newsletter_description": "Obțineți toate cele mai recente informații despre evenimente, vânzări și oferte",
+    "email_placeholder": "Introdu adresa ta de e-mail",
+    "subscribe": "Abonați-vă",
+    "logo_alt": "Gamma Logo",
+    "footer_description": "Tot ce cauți, într-un singur loc Descoperă posibilități nelimitate!",
+    "menu": "Meniu",
+    "customer_service": "Serviciul clientela",
+    "terms_conditions": "Termeni și condiții",
+    "exchange_return": "Schimb și returnare",
+    "privacy_policy": "Politica de confidentialitate",
+    "warranty": "Garantie",
+    "follow_us": "Follow us",
+    "payments_methods": "Metode de plată",
+    "copyright": "copyright 2024",
+    "mobile_app": "Aplicație mobilă",
+    "download_for_iphone": "Descarcă pentru iphone",
+    "download_for_android": "Descarcă pentru android",
+    "street": "Strada Sfîntul Gheorghe 6, Chișinău, Moldova",
+    "subscription_success_message": "Vă mulțumim pentru abonare! Un cupon de reducere de 5% a fost trimis pe email-ul dvs.",
+    "already_subscribed_message": "Acest email este deja abonat la newsletter-ul nostru.",
+    "subscription_error": "Eroare la abonare. Vă rugăm să încercați din nou mai târziu."
+  },
+  "home": {
+    "discounted_products_title": "Reduceri irezistibile",
+    "view_all": "Vezi toate",
+    "discover_top_products": "Descoperă produsele populare"
+  },
+  "productcard": {
+    "no_images_found": "Nu s-au găsit imagini",
+    "fifty_percent_off": "50% reducere",
+    "buy_now": "Cumpără acum",
+    "lei": "Lei"
+  },
+  "product": {
+    "buy_now": "Cumpără acum",
+    "lei": "Lei",
+    "select_variant": "Selectează variantă",
+    "choose_option": "Alegeți o variantă",
+    "select_color": "Selectează culoarea",
+    "in_stock": "În stoc",
+    "out_of_stock": "Stoc epuizat",
+    "units": "unități",
+    "unit": "unitate",
+    "quantity": "Cantitate"
+  },
+  "discounts": {
+    "title": "Produse cu reducere",
+    "previous": "Anterior",
+    "next": "Următor"
+  },
+  "Category": {
+    "invalidCategoryId": "ID categorie sau subcategorie invalid",
+    "checkUrlAndTryAgain": "Vă rugăm să verificați URL-ul și să încercați din nou",
+    "noSubSubCategories": "Nu s-au găsit sub-subcategorii",
+    "errorLoadingData": "Eroare la încărcarea datelor subcategoriei",
+    "tryAgainLater": "Vă rugăm să încercați mai târziu"
+  }
+}

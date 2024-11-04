@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light mode values remain the same */
+    --background: 220 33% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 222 47% 11%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 151 75% 58%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222 47% 11%;
+
+    --radius: 0.5rem;
+
+    --color-accent-rgb: #47e194;
+  }
+
+  .dark {
+    /* Using exact charade hex values */
+    --background: 224 13% 17%; /* #262833 (charade-950) */
+    --foreground: 228 14% 94%; /* #f6f7f9 (charade-50) */
+
+    --card: 225 13% 24%; /* #343746 (charade-900) */
+    --card-foreground: 228 14% 94%; /* #f6f7f9 (charade-50) */
+
+    --popover: 225 13% 24%; /* #343746 (charade-900) */
+    --popover-foreground: 228 14% 94%; /* #f6f7f9 (charade-50) */
+
+    --primary: 228 14% 94%; /* #f6f7f9 (charade-50) */
+    --primary-foreground: 225 13% 24%; /* #343746 (charade-900) */
+
+    --secondary: 224 14% 28%; /* #3b3f51 (charade-800) */
+    --secondary-foreground: 228 14% 94%; /* #f6f7f9 (charade-50) */
+
+    --muted: 224 14% 28%; /* #3b3f51 (charade-800) */
+    --muted-foreground: 226 16% 74%; /* #b1b7c8 (charade-300) */
+
+    --accent: 151 75% 58%; /* #47e194 (your accent green) */
+    --accent-foreground: 225 13% 24%; /* #343746 (charade-900) */
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 228 14% 94%; /* #f6f7f9 (charade-50) */
+
+    --border: 224 14% 28%; /* #3b3f51 (charade-800) */
+    --input: 224 14% 28%; /* #3b3f51 (charade-800) */
+    --ring: 226 16% 74%;
+
+    --color-accent-rgb: #47e194;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+  .dark body {
+    background-color: #262833;
+  }
+}
+
+.bg-hovered-category {
+  @apply bg-gray-100 dark:bg-[#4A4B59] transition-colors duration-200;
+}
+
+.dropdown-menu {
+  transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+}
