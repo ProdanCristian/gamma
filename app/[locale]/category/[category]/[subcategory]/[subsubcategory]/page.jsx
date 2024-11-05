@@ -11,10 +11,10 @@ const formatCategoryName = (slug) => {
 
 async function getSubSubCategoryNames(id) {
   try {
-    const baseUrl = "http://localhost:3000";
-    const response = await fetch(
-      `${baseUrl}/api/catNames/subSubCat?id=${id}`, { revalidate: 3600 }
-    );
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    const response = await fetch(`${baseUrl}/api/catNames/subSubCat?id=${id}`, {
+      revalidate: 3600,
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

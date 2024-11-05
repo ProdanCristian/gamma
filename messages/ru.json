@@ -1,4 +1,8 @@
 {
+  "wishlist": {
+    "title": "Список желаний",
+    "empty_wishlist": "Ваш список желаний пуст"
+  },
   "FastOrder": {
     "title": "Быстрый заказ",
     "name_placeholder": "Введите ваше имя",

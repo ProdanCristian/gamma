@@ -15,7 +15,7 @@ import ProductCard from "@/components/Shop/ProductCard";
 
 async function getProduct(productId) {
   try {
-    const baseUrl = "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     const res = await fetch(`${baseUrl}/api/products/product?id=${productId}`);
 
     if (!res.ok) {
@@ -31,7 +31,7 @@ async function getProduct(productId) {
 
 async function getProductVariants(variantId) {
   try {
-    const baseUrl = "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     const res = await fetch(
       `${baseUrl}/api/products/productVariants?id=${variantId}`
     );
@@ -49,7 +49,7 @@ async function getProductVariants(variantId) {
 
 async function getSimilarProducts(subSubCategoryId) {
   try {
-    const baseUrl = "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     const res = await fetch(
       `${baseUrl}/api/products/similarProducts?id=${subSubCategoryId}`
     );

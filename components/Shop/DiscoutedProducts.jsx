@@ -47,6 +47,10 @@ const DiscountCarousel = ({ marketingData }) => {
 
   const displayProducts = loading ? Array(20).fill({}) : products;
 
+  // Split products into two rows
+  const firstRow = displayProducts.slice(0, displayProducts.length / 2);
+  const secondRow = displayProducts.slice(displayProducts.length / 2);
+
   const computedBanner1Url =
     locale === "ro"
       ? marketingData?.Banner1_RO_?.[0]
@@ -86,12 +90,17 @@ const DiscountCarousel = ({ marketingData }) => {
             <CarouselNext className="absolute right-0 -top-7" />
           </div>
           <CarouselContent className="w-[80%] md:w-full">
-            {displayProducts.map((product, index) => (
+            {firstRow.map((product, index) => (
               <CarouselItem
-                key={index}
+                key={`row1-${index}`}
                 className="md:basis-1/2 lg:basis-1/3 xl:basis-1/5"
               >
-                <ProductCard product={product} loading={loading} />
+                <div className="space-y-4">
+                  <ProductCard product={product} loading={loading} />
+                  {secondRow[index] && (
+                    <ProductCard product={secondRow[index]} loading={loading} />
+                  )}
+                </div>
               </CarouselItem>
             ))}
           </CarouselContent>

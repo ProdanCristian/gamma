@@ -18,7 +18,7 @@ const formatCategoryName = (slug) => {
 
 async function getSubcategoryNames(id) {
   try {
-    const baseUrl = "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     const response = await fetch(`${baseUrl}/api/catNames/subCat?id=${id}`, {
       revalidate: 3600,
     });
@@ -37,7 +37,7 @@ async function getSubcategoryNames(id) {
 
 async function getSubSubCategories(categoryId, subcategoryId) {
   try {
-    const baseUrl = "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     const response = await fetch(
       `${baseUrl}/api/subSubCategories?subcategoryId=${subcategoryId}`,
       { revalidate: 3600 }

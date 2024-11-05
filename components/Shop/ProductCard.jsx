@@ -4,10 +4,15 @@ import { useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
-import { PiShoppingCartSimple, PiCursorClick } from "react-icons/pi";
+import {
+  PiShoppingCartSimple,
+  PiCursorClick,
+  PiHeartFill,
+} from "react-icons/pi";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { useFastOrderStore } from "@/lib/store/useFastOrderStore";
+import { useWishlist } from "@/lib/store/useWishlist";
 
 const ProductCard = ({ product, loading = false }) => {
   const t = useTranslations("productcard");
@@ -16,6 +21,7 @@ const ProductCard = ({ product, loading = false }) => {
   const apiUrl = "http://193.160.119.179";
 
   const setProduct = useFastOrderStore((state) => state.setProduct);
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
   const getImage = (objString) => {
     if (!objString || !apiUrl) return null;
@@ -25,6 +31,10 @@ const ProductCard = ({ product, loading = false }) => {
 
       const imagePath = images[0]?.path;
       if (!imagePath) return null;
+
+      if (imagePath.startsWith(apiUrl)) {
+        return imagePath;
+      }
 
       return `${apiUrl}/${
         imagePath.startsWith("/") ? imagePath.slice(1) : imagePath
@@ -99,6 +109,29 @@ const ProductCard = ({ product, loading = false }) => {
     );
   };
 
+  const toggleWishlist = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!productData) return;
+
+    const wishlistProduct = {
+      id: productData.id,
+      name: productData.name,
+      image: productData.image,
+      price: productData.price,
+      discount: productData.discount,
+      stock: productData.stock,
+      slug: productData.slug,
+    };
+
+    if (isInWishlist(productData.id)) {
+      removeFromWishlist(productData.id);
+    } else {
+      addToWishlist(wishlistProduct);
+    }
+  };
+
   if (loading) {
     return (
       <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden py-2 p-4 space-y-4">
@@ -152,7 +185,15 @@ const ProductCard = ({ product, loading = false }) => {
             <div className="w-20 h-auto" />
           )}
         </div>
-
+        <PiHeartFill
+          onClick={toggleWishlist}
+          className={`absolute top-2 left-2 hover:scale-110 transition-transform duration-200 ${
+            isInWishlist(productData.id)
+              ? "text-red-500"
+              : "text-gray-300 dark:text-gray-600"
+          }`}
+          size={30}
+        />
         <div className="space-y-3">
           <h2
             className="text-lg font-semibold line-clamp-1 relative group-hover:text-[#47e194] transition-colors duration-200 whitespace-nowrap overflow-hidden text-ellipsis"

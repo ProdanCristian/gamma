@@ -1,4 +1,8 @@
 {
+  "wishlist": {
+    "title": "Lista de dorințe",
+    "empty_wishlist": "Lista ta de dorințe este goală"
+  },
   "FastOrder": {
     "title": "Comandă rapidă",
     "name_placeholder": "Numele dumneavoastră",

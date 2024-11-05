@@ -6,7 +6,7 @@ import BestSellingProducts from "@/components/Shop/BestSellingProducts";
 
 async function getSliders() {
   try {
-    const baseUrl = "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     const res = await fetch(`${baseUrl}/api/marketingDesign`);
 
     if (!res.ok) {
@@ -24,7 +24,7 @@ async function getSliders() {
 
 async function getTopCategories() {
   try {
-    const baseUrl = "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     const response = await fetch(`${baseUrl}/api/topCategories`);
     const data = await response.json();
     return data.success ? data.categories : [];
