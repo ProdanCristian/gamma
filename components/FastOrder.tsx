@@ -11,6 +11,7 @@ import { useTranslations } from "next-intl";
 import { useFastOrderStore } from "@/lib/store/useFastOrderStore";
 import { PiSealPercentFill } from "react-icons/pi";
 import { useSession } from "next-auth/react";
+import { DeliveryZone, DELIVERY_RULES } from "@/lib/store/useCart";
 
 interface UserProfile {
   Nume: string;
@@ -23,6 +24,7 @@ export default function FastOrder() {
   const t = useTranslations("FastOrder");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("+373 ");
+  const [deliveryZone, setDeliveryZone] = useState<DeliveryZone>("in_city");
   const { data: session } = useSession();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
@@ -145,6 +147,18 @@ export default function FastOrder() {
     }
   };
 
+  const currentDeliveryRules = DELIVERY_RULES[deliveryZone];
+  const total = product
+    ? parseFloat(product.discount || product.price) * quantity
+    : 0;
+  const remainingForFreeDelivery = Math.max(
+    0,
+    currentDeliveryRules.freeDeliveryThreshold - total
+  );
+
+  const finalTotal =
+    total + (remainingForFreeDelivery > 0 ? currentDeliveryRules.cost : 0);
+
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
       <DialogContent
@@ -155,7 +169,7 @@ export default function FastOrder() {
         <DialogHeader className="flex w-full gap-4">
           <h1 className="text-2xl font-bold text-center">{t("title")}</h1>
           <div className="flex items-center justify-between gap-2 w-full">
-            <DialogTitle>{product?.name}</DialogTitle>
+            <DialogTitle className="text-left">{product?.name}</DialogTitle>
             <img
               src={product?.image}
               alt={product?.name}
@@ -166,79 +180,142 @@ export default function FastOrder() {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-2">
           {product && (
-            <div className="space-y-2">
-              <div className="flex items-center mb-6">
-                <span className="font-bold text-xl">
-                  {hasDiscount ? product.discount : product.price} {t("lei")}
-                </span>
-                {hasDiscount && (
-                  <>
-                    <s className="ml-5 text-gray-500 text-xl">
-                      {product.price} {t("lei")}
-                    </s>
-                    <div className="flex items-center ml-10">
-                      <span className="text-red-500 mr-2 text-xl">
-                        {getDiscountPercentage()}%
-                      </span>
-                      <PiSealPercentFill size={30} className="text-red-500" />
-                    </div>
-                  </>
-                )}
-              </div>
-
-              <div className="flex items-center gap-4">
-                <label className="text-sm text-gray-500">
-                  {t("quantity")}:
-                </label>
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center">
-                    <button
-                      type="button"
-                      onClick={() => handleQuantityChange(quantity - 1)}
-                      className="px-3 py-1 border border-gray-300 rounded-l-lg hover:bg-gray-100 
-                        dark:border-gray-600 dark:hover:bg-gray-700"
-                      disabled={quantity <= 1}
-                    >
-                      -
-                    </button>
-                    <input
-                      type="number"
-                      min="1"
-                      max={parseInt(product.stock)}
-                      value={quantity}
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value) || 1;
-                        const stockNum = parseInt(product.stock);
-                        if (val >= stockNum) {
-                          handleQuantityChange(stockNum);
-                        } else {
-                          handleQuantityChange(val);
-                        }
-                      }}
-                      className="w-16 text-center border-y border-gray-300 py-1 
-                        dark:border-gray-600 dark:bg-charade-800"
-                      tabIndex={-1}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleQuantityChange(quantity + 1)}
-                      className="px-3 py-1 border border-gray-300 rounded-r-lg hover:bg-gray-100 
-                        dark:border-gray-600 dark:hover:bg-gray-700"
-                      disabled={quantity >= parseInt(product.stock)}
-                    >
-                      +
-                    </button>
-                  </div>
-                  {quantity >= parseInt(product.stock) && (
-                    <span className="text-sm text-red-500">
-                      {product.stock}{" "}
-                      {product.stock === "1" ? t("unit") : t("units")}{" "}
-                      {t("in_stock")}
-                    </span>
+            <>
+              <div className="space-y-2">
+                <div className="flex items-center mb-6">
+                  <span className="font-bold text-xl">
+                    {hasDiscount ? product.discount : product.price} {t("lei")}
+                  </span>
+                  {hasDiscount && (
+                    <>
+                      <s className="ml-5 text-gray-500 text-xl">
+                        {product.price} {t("lei")}
+                      </s>
+                      <div className="flex items-center ml-10">
+                        <span className="text-red-500 mr-2 text-xl">
+                          {getDiscountPercentage()}%
+                        </span>
+                        <PiSealPercentFill size={30} className="text-red-500" />
+                      </div>
+                    </>
                   )}
                 </div>
+
+                <div className="flex items-center gap-4">
+                  <label className="text-sm text-gray-500">
+                    {t("quantity")}:
+                  </label>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center">
+                      <button
+                        type="button"
+                        onClick={() => handleQuantityChange(quantity - 1)}
+                        className="px-3 py-1 border border-gray-300 rounded-l-lg hover:bg-gray-100 
+                          dark:border-gray-600 dark:hover:bg-gray-700"
+                        disabled={quantity <= 1}
+                      >
+                        -
+                      </button>
+                      <input
+                        type="number"
+                        min="1"
+                        max={parseInt(product.stock)}
+                        value={quantity}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value) || 1;
+                          const stockNum = parseInt(product.stock);
+                          if (val >= stockNum) {
+                            handleQuantityChange(stockNum);
+                          } else {
+                            handleQuantityChange(val);
+                          }
+                        }}
+                        className="w-16 text-center border-y border-gray-300 py-1 
+                          dark:border-gray-600 dark:bg-charade-800"
+                        tabIndex={-1}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleQuantityChange(quantity + 1)}
+                        className="px-3 py-1 border border-gray-300 rounded-r-lg hover:bg-gray-100 
+                          dark:border-gray-600 dark:hover:bg-gray-700"
+                        disabled={quantity >= parseInt(product.stock)}
+                      >
+                        +
+                      </button>
+                    </div>
+                    {quantity >= parseInt(product.stock) && (
+                      <span className="text-sm text-red-500">
+                        {product.stock}{" "}
+                        {product.stock === "1" ? t("unit") : t("units")}{" "}
+                        {t("in_stock")}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
+
+              <div className="space-y-3 mt-4">
+                <div className="flex justify-between items-center">
+                  <label className="text-sm font-medium">
+                    {t("delivery_zone")}:
+                  </label>
+                  <select
+                    value={deliveryZone}
+                    onChange={(e) =>
+                      setDeliveryZone(e.target.value as DeliveryZone)
+                    }
+                    className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm"
+                  >
+                    <option value="in_city">{t("in_city_Chisinau")}</option>
+                    <option value="outside_city">
+                      {t("outside_city_Chisinau")}
+                    </option>
+                  </select>
+                </div>
+
+                <div className="bg-gray-50 dark:bg-gray-800/50 p-2.5 rounded-lg space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600 dark:text-gray-300">
+                      {t("subtotal")}:
+                    </span>
+                    <span>
+                      {total.toFixed(2)} {t("currency")}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600 dark:text-gray-300">
+                      {t("delivery")}:
+                    </span>
+                    {remainingForFreeDelivery > 0 ? (
+                      <span>
+                        {currentDeliveryRules.cost} {t("currency")}
+                      </span>
+                    ) : (
+                      <span className="text-green-500">
+                        {t("free_delivery")}
+                      </span>
+                    )}
+                  </div>
+
+                  {remainingForFreeDelivery > 0 && (
+                    <div className="text-xs text-gray-500">
+                      {t("add_more_for_free_delivery", {
+                        amount: remainingForFreeDelivery.toFixed(2),
+                      })}
+                    </div>
+                  )}
+
+                  <div className="flex justify-between font-medium pt-2 border-t dark:border-gray-700">
+                    <span>{t("total_with_delivery")}:</span>
+                    <span>
+                      {finalTotal.toFixed(2)} {t("currency")}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
           <div className="grid gap-2 mt-4">
             <input

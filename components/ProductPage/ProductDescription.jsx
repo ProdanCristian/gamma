@@ -10,6 +10,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useFastOrderStore } from "@/lib/store/useFastOrderStore";
+import { useCartStore } from "@/lib/store/useCart";
 
 const BASE_URL = "http://193.160.119.179";
 
@@ -138,6 +139,29 @@ const ProductDescription = ({
       stock: currentProduct.Stock,
       quantity: quantity,
     });
+  };
+
+  const addItem = useCartStore((state) => state.addItem);
+
+  const handleAddToCart = () => {
+    const item = {
+      id: currentProduct.id,
+      name:
+        locale === "ru"
+          ? currentProduct.Nume_Produs_RU
+          : currentProduct.Nume_Produs_RO,
+      price: parseFloat(currentProduct.Pret_Standard),
+      discountPrice: currentProduct.Pret_Redus
+        ? parseFloat(currentProduct.Pret_Redus)
+        : undefined,
+      quantity: quantity,
+      image: currentProduct.Imagine_Principala
+        ? `${BASE_URL}/${JSON.parse(currentProduct.Imagine_Principala)[0].path}`
+        : null,
+      stock: currentProduct.Stock,
+    };
+
+    addItem(item);
   };
 
   return (
@@ -297,8 +321,8 @@ const ProductDescription = ({
           <button
             disabled={currentProduct.Stock <= 0}
             onClick={handleOrderNow}
-            className={`dark:bg-accent bg-accent dark:hover:bg-charade-900 
-              hover:bg-charade-900 py-[8px] text-charade-950 hover:text-white dark:text-white text-sm font-semibold px-4 rounded-lg flex
+            className={`dark:bg-accent bg-accent dark:hover:bg-gray-100
+              hover:bg-charade-900 py-[8px] text-charade-950 hover:text-white dark:text-charade-950 text-sm font-semibold px-4 rounded-lg flex
               items-center justify-center content-center w-full transition-colors duration-200
               ${
                 currentProduct.Stock <= 0 ? "opacity-50 cursor-not-allowed" : ""
@@ -309,12 +333,7 @@ const ProductDescription = ({
           </button>
           <button
             disabled={currentProduct.Stock <= 0}
-            onClick={() => {
-              console.log("Add to cart:", {
-                product: currentProduct,
-                quantity,
-              });
-            }}
+            onClick={handleAddToCart}
             className={`hover:text-[#47e194] transition-colors duration-200
               ${
                 currentProduct.Stock <= 0 ? "opacity-50 cursor-not-allowed" : ""

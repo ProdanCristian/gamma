@@ -1,7 +1,7 @@
 "use client";
 
 import { PiShoppingCart } from "react-icons/pi";
-import { useCart } from "@/lib/store/useCart";
+import { useCartStore } from "@/lib/store/useCart";
 
 interface CartIconProps {
   size?: number;
@@ -9,7 +9,7 @@ interface CartIconProps {
 }
 
 export default function CartIcon({ size, marginRight }: CartIconProps) {
-  const openCart = useCart((state) => state.openCart);
+  const openCart = useCartStore((state) => state.openCart);
 
   return (
     <PiShoppingCart

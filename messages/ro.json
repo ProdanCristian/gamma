@@ -15,10 +15,36 @@
     "units": "unități",
     "in_stock": "în stoc",
     "unit": "unitate",
-    "phone_format": "Format: +373 XXXXXXXX"
+    "phone_format": "Format: +373 XXXXXXXX",
+    "delivery_zone": "Zonă de livrare",
+    "in_city_Chisinau": "În orașul Chișinău",
+    "outside_city_Chisinau": "În afara orașului Chișinău",
+    "subtotal": "Subtotal",
+    "delivery": "Livrare",
+    "free_delivery": "Livrare gratuită",
+    "total_with_delivery": "Total cu livrare",
+    "add_more_for_free_delivery": "Adaugă încă {{amount}} lei pentru livrare gratuită",
+    "currency": "lei"
   },
   "Cart": {
-    "title": "Coș de cumpărături"
+    "title": "Coșul meu",
+    "total": "Total",
+    "checkout": "Finalizare comandă",
+    "unit": "unitate",
+    "units": "unități",
+    "in_stock": "în stoc",
+    "add_more_for_free_delivery": "Adaugă încă {{amount}} lei pentru livrare gratuită",
+    "free_delivery_eligible": "Felicitări! Beneficiezi de livrare gratuită",
+    "total_discount": "Economisești",
+    "currency": "lei",
+    "subtotal": "Subtotal",
+    "delivery_cost": "Cost livrare",
+    "free_delivery": "Livrare gratuită",
+    "total_with_delivery": "Total cu livrare",
+    "finalize_order": "Finalizează comanda",
+    "delivery_zone": "Zonă de livrare",
+    "in_city_Chisinau": "În orașul Chișinău",
+    "outside_city_Chisinau": "În afara orașului Chișinău"
   },
   "category": {
     "no_subcategories_found": "Nu s-au găsit subcategorii",

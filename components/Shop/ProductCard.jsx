@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 import { useFastOrderStore } from "@/lib/store/useFastOrderStore";
 import { useWishlist } from "@/lib/store/useWishlist";
+import { useCartStore } from "@/lib/store/useCart";
 
 const ProductCard = ({ product, loading = false }) => {
   const t = useTranslations("productcard");
@@ -22,6 +23,7 @@ const ProductCard = ({ product, loading = false }) => {
 
   const setProduct = useFastOrderStore((state) => state.setProduct);
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const addItem = useCartStore((state) => state.addItem);
 
   const getImage = (objString) => {
     if (!objString || !apiUrl) return null;
@@ -76,7 +78,20 @@ const ProductCard = ({ product, loading = false }) => {
     e.preventDefault();
     e.stopPropagation();
     if (isOutOfStock) return;
-    console.log("Adding to cart:", productData);
+
+    const item = {
+      id: product.id,
+      name: locale === "ru" ? product.Nume_Produs_RU : product.Nume_Produs_RO,
+      price: parseFloat(product.Pret_Standard),
+      discountPrice: product.Pret_Redus
+        ? parseFloat(product.Pret_Redus)
+        : undefined,
+      quantity: 1,
+      image: productData.image,
+      stock: parseInt(product.Stock),
+    };
+
+    addItem(item);
   };
 
   const buyNow = (e) => {
