@@ -11,7 +11,7 @@ export default function User() {
     <div className="flex items-center justify-normal">
       <PiUser
         size={26}
-        className="text-charade-950 dark:text-white md:text-white  mr-4 cursor-pointer hover:opacity-80 transition-opacity"
+        className="text-charade-950 dark:text-white md:text-white  mr-4 cursor-pointer hover:text-accent transition-colors"
         onClick={() => setIsOpen(!isOpen)}
       />
       {isOpen && (

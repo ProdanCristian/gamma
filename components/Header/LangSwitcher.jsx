@@ -30,7 +30,7 @@ export default function LangSwitcher() {
         <button className="flex items-center gap-2">
           <span className="sr-only">Toggle language</span>
           <span className="ml-2 hidden md:block">{languages[locale]}</span>
-          <PiGlobe className="h-6 w-6 md:h-[1.2rem] md:w-[1.2rem]" />
+          <PiGlobe className="h-7 w-7 md:h-[1.2rem] md:w-[1.2rem] hover:text-accent transition-colors" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent

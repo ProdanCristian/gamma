@@ -45,7 +45,10 @@ export default async function HeaderDesktop() {
           <CartIcon size={26} marginRight="mr-4" />
           <User />
           <Link href={`/${locale}/wishlist`}>
-            <PiHeart size={26} className="mr-4 cursor-pointer" />
+            <PiHeart
+              size={26}
+              className="mr-4 cursor-pointer text-white hover:text-accent transition-colors"
+            />
           </Link>
           <ModeToggle />
         </div>
