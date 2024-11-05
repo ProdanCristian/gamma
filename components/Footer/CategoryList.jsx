@@ -171,37 +171,6 @@ const CategoryList = ({ locale }) => {
     );
   }
 
-  if (isLoading) {
-    return (
-      <div>
-        <button
-          onClick={goBack}
-          className="mb-4 hover:underline flex items-center gap-2 mt-10"
-        >
-          <PiCaretLeft size={23} />
-          <p className="text-xl">{t("back")}</p>
-        </button>
-
-        <div className="gap-4 p-2 w-full overflow-y-auto">
-          {[1, 2, 3].map((index) => (
-            <div
-              key={index}
-              className="break-inside-avoid p-3 bg-[#3A3B4A] rounded-lg mb-4"
-            >
-              <Skeleton className="h-8 w-3/4 mb-4" />
-              <Skeleton className="h-48 w-full mb-4" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-2/3" />
-                <Skeleton className="h-4 w-1/2" />
-                <Skeleton className="h-4 w-3/4" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div>
       <button
@@ -213,53 +182,71 @@ const CategoryList = ({ locale }) => {
       </button>
 
       <div className="gap-4 p-2 w-full overflow-y-auto">
-        {subcategories.map((subcategory) => (
-          <div
-            key={subcategory.id}
-            className="break-inside-avoid p-3 bg-[#3A3B4A] rounded-lg mb-4"
-          >
-            <h3 className="text-xl font-semibold">
-              <Link
-                href={generateSubcategoryLink(subcategory)}
-                className="cursor-pointer hover:text-accent"
+        {isLoading
+          ? [1, 2, 3].map((index) => (
+              <div
+                key={index}
+                className="break-inside-avoid p-3 bg-[#3A3B4A] rounded-lg mb-4"
               >
-                {getSubcategoryName(subcategory)}
-              </Link>
-            </h3>
-            <div className="my-2">
-              <Link
-                href={generateSubcategoryLink(subcategory)}
-                className="block w-full"
+                <Skeleton className="h-8 w-3/4 mb-4" />
+                <Skeleton className="h-48 w-full mb-4" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-2/3" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-4 w-3/4" />
+                </div>
+              </div>
+            ))
+          : subcategories.map((subcategory) => (
+              <div
+                key={subcategory.id}
+                className="break-inside-avoid p-3 bg-[#3A3B4A] rounded-lg mb-4"
               >
-                {subcategory.images?.length > 0 && (
-                  <Image
-                    src={subcategory.images[0]}
-                    alt={getSubcategoryName(subcategory)}
-                    width={400}
-                    height={192}
-                    className={`w-full h-48 object-cover rounded-md hover:opacity-80 transition-opacity ${
-                      !imageLoaded[subcategory.id] ? "hidden" : ""
-                    }`}
-                    priority
-                    onLoad={() => handleImageLoad(subcategory.id)}
-                  />
-                )}
-              </Link>
-            </div>
-            <ul>
-              {subcategory.subSubcategories?.map((subsub) => (
-                <li key={subsub.id} className="text-base text-gray-300 my-1">
+                <h3 className="text-xl font-semibold">
                   <Link
-                    href={generateSubsubcategoryLink(subcategory, subsub)}
+                    href={generateSubcategoryLink(subcategory)}
                     className="cursor-pointer hover:text-accent"
                   >
-                    {getSubsubName(subsub)}
+                    {getSubcategoryName(subcategory)}
                   </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+                </h3>
+                <div className="my-2">
+                  <Link
+                    href={generateSubcategoryLink(subcategory)}
+                    className="block w-full"
+                  >
+                    {subcategory.images?.length > 0 && (
+                      <Image
+                        src={subcategory.images[0]}
+                        alt={getSubcategoryName(subcategory)}
+                        width={400}
+                        height={192}
+                        className={`w-full h-48 object-cover rounded-md hover:opacity-80 transition-opacity ${
+                          !imageLoaded[subcategory.id] ? "hidden" : ""
+                        }`}
+                        priority
+                        onLoad={() => handleImageLoad(subcategory.id)}
+                      />
+                    )}
+                  </Link>
+                </div>
+                <ul>
+                  {subcategory.subSubcategories?.map((subsub) => (
+                    <li
+                      key={subsub.id}
+                      className="text-base text-gray-300 my-1"
+                    >
+                      <Link
+                        href={generateSubsubcategoryLink(subcategory, subsub)}
+                        className="cursor-pointer hover:text-accent"
+                      >
+                        {getSubsubName(subsub)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
       </div>
     </div>
   );

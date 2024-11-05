@@ -16,7 +16,10 @@ export default function Cart() {
 
   return (
     <Sheet open={isOpen} onOpenChange={closeCart}>
-      <SheetContent side="right" className="w-full sm:w-[400px] border-none">
+      <SheetContent
+        side="right"
+        className="w-full sm:w-[400px] border-none dark:bg-charade-900"
+      >
         <SheetHeader>
           <SheetTitle>{t("title")}</SheetTitle>
         </SheetHeader>

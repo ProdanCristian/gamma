@@ -148,7 +148,9 @@ const MobileNavBar = () => {
 
           {/* Bottom Bar Icons */}
           <div className="flex items-end pb-5 justify-between w-[90%] px-5 h-[70px] transition-opacity duration-300 absolute bottom-0 z-20 bg-charade-900">
-            <PiPhone size={33} className="text-white" />
+            <a href="tel:079867092">
+              <PiPhone size={33} className="text-white cursor-pointer" />
+            </a>
 
             <PiMagnifyingGlass
               size={33}
@@ -166,7 +168,7 @@ const MobileNavBar = () => {
               onClick={toggleExpand}
             />
 
-            <CartIcon />
+            <CartIcon size={33} marginRight="mr-0" />
 
             <PiList
               size={33}

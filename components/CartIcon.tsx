@@ -5,19 +5,17 @@ import { useCart } from "@/lib/store/useCart";
 
 interface CartIconProps {
   size?: number;
-  className?: string;
+  marginRight?: string;
 }
 
-export default function CartIcon({
-  size = 26,
-  className = "text-white mr-4",
-}: CartIconProps) {
+export default function CartIcon({ size, marginRight }: CartIconProps) {
   const openCart = useCart((state) => state.openCart);
 
   return (
     <PiShoppingCart
       size={size}
-      className={`${className} cursor-pointer hover:text-accent transition-colors`}
+      className={`text-white cursor-pointer hover:text-accent transition-colors ${marginRight}
+      }`}
       onClick={openCart}
     />
   );
