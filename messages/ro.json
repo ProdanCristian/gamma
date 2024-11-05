@@ -4,10 +4,13 @@
     "name_placeholder": "Numele dumneavoastră",
     "phone_placeholder": "Numărul de telefon",
     "price": "Preț",
-    "stock_available": "Stoc disponibil",
+    "stock": "Stoc",
     "get_call_now": "Solicită apel",
     "lei": "Lei",
-    "quantity": "Cantitate"
+    "quantity": "Cantitate",
+    "units": "unități",
+    "in_stock": "în stoc",
+    "unit": "unitate"
   },
   "Cart": {
     "title": "Coș de cumpărături"

@@ -86,15 +86,18 @@ const ProductDescription = ({
     }
   }, [currentProduct]);
 
-  const hasDiscount =
+  const hasDiscount = Boolean(
     currentProduct.Pret_Redus &&
-    currentProduct.Pret_Redus < currentProduct.Pret_Standard;
+      parseFloat(currentProduct.Pret_Redus) <
+        parseFloat(currentProduct.Pret_Standard)
+  );
 
   const getDiscountPercentage = () => {
     if (!hasDiscount) return 0;
     return Math.round(
-      ((currentProduct.Pret_Standard - currentProduct.Pret_Redus) /
-        currentProduct.Pret_Standard) *
+      ((parseFloat(currentProduct.Pret_Standard) -
+        parseFloat(currentProduct.Pret_Redus)) /
+        parseFloat(currentProduct.Pret_Standard)) *
         100
     );
   };

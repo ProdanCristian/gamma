@@ -6,10 +6,13 @@
     "phone": "Номер телефона",
     "name": "Имя",
     "price": "Цена",
-    "stock_available": "В наличии",
+    "stock": "В наличии",
     "get_call_now": "Получить звонок",
     "lei": "Лей",
-    "quantity": "Количество"
+    "quantity": "Количество",
+    "units": "единиц",
+    "in_stock": "в наличии",
+    "unit": "единица"
   },
   "Cart": {
     "title": "Корзина"
@@ -145,7 +148,7 @@
     "out_of_stock": "Нет в наличии",
     "no_images_found": "Изображения не найдены",
     "fifty_percent_off": "Скидка 50%",
-    "buy_now": "Купить сейчас",
+    "order_now": "Заказать сейчас",
     "lei": "Лей"
   },
   "product": {

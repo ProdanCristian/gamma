@@ -21,7 +21,7 @@ export default function FastOrder() {
 
   useEffect(() => {
     if (product?.quantity) {
-      setQuantity(product.quantity);
+      setQuantity(parseInt(product.quantity));
     } else {
       setQuantity(1);
     }
@@ -29,16 +29,21 @@ export default function FastOrder() {
 
   const handleQuantityChange = (value: number) => {
     if (!product) return;
-    const newQuantity = Math.max(1, Math.min(value, product.stock));
+    const stockNum = parseInt(product.stock);
+    const newQuantity = Math.max(1, Math.min(value, stockNum));
     setQuantity(newQuantity);
   };
 
-  const hasDiscount = product?.discount && product?.discount < product?.price;
+  const hasDiscount =
+    product?.discount &&
+    parseFloat(product.discount) < parseFloat(product.price);
 
   const getDiscountPercentage = () => {
     if (!hasDiscount) return 0;
     return Math.round(
-      ((product!.price - product!.discount!) / product!.price) * 100
+      ((parseFloat(product!.price) - parseFloat(product!.discount!)) /
+        parseFloat(product!.price)) *
+        100
     );
   };
 
@@ -48,7 +53,7 @@ export default function FastOrder() {
 
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[425px] dark:bg-charade-950 bg-white border-none">
+      <DialogContent className="sm:max-w-[425px] max-w-[90vw] dark:bg-charade-950 bg-white border-none rounded-xl">
         <DialogHeader className="flex w-full gap-4">
           <h1 className="text-2xl font-bold text-center">{t("title")}</h1>
           <div className="flex items-center justify-between gap-2 w-full">
@@ -56,8 +61,8 @@ export default function FastOrder() {
             <img
               src={product?.image}
               alt={product?.name}
-              width={200}
-              height={200}
+              width={160}
+              height={160}
             />
           </div>
         </DialogHeader>
@@ -87,39 +92,52 @@ export default function FastOrder() {
                 <label className="text-sm text-gray-500">
                   {t("quantity")}:
                 </label>
-                <div className="flex items-center">
-                  <button
-                    type="button"
-                    onClick={() => handleQuantityChange(quantity - 1)}
-                    className="px-3 py-1 border border-gray-300 rounded-l-lg hover:bg-gray-100 
-                      dark:border-gray-600 dark:hover:bg-gray-700"
-                    disabled={quantity <= 1}
-                  >
-                    -
-                  </button>
-                  <input
-                    type="number"
-                    min="1"
-                    max={product.stock}
-                    value={quantity}
-                    onChange={(e) =>
-                      handleQuantityChange(parseInt(e.target.value) || 1)
-                    }
-                    className="w-16 text-center border-y border-gray-300 py-1 
-                      dark:border-gray-600 dark:bg-charade-800"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleQuantityChange(quantity + 1)}
-                    className="px-3 py-1 border border-gray-300 rounded-r-lg hover:bg-gray-100 
-                      dark:border-gray-600 dark:hover:bg-gray-700"
-                    disabled={quantity >= product.stock}
-                  >
-                    +
-                  </button>
-                </div>
-                <div className="text-sm text-gray-500">
-                  {t("stock_available")}: {product.stock}
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center">
+                    <button
+                      type="button"
+                      onClick={() => handleQuantityChange(quantity - 1)}
+                      className="px-3 py-1 border border-gray-300 rounded-l-lg hover:bg-gray-100 
+                        dark:border-gray-600 dark:hover:bg-gray-700"
+                      disabled={quantity <= 1}
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      max={parseInt(product.stock)}
+                      value={quantity}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value) || 1;
+                        const stockNum = parseInt(product.stock);
+                        if (val >= stockNum) {
+                          handleQuantityChange(stockNum);
+                        } else {
+                          handleQuantityChange(val);
+                        }
+                      }}
+                      className="w-16 text-center border-y border-gray-300 py-1 
+                        dark:border-gray-600 dark:bg-charade-800"
+                      tabIndex={-1}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleQuantityChange(quantity + 1)}
+                      className="px-3 py-1 border border-gray-300 rounded-r-lg hover:bg-gray-100 
+                        dark:border-gray-600 dark:hover:bg-gray-700"
+                      disabled={quantity >= parseInt(product.stock)}
+                    >
+                      +
+                    </button>
+                  </div>
+                  {quantity >= parseInt(product.stock) && (
+                    <span className="text-sm text-red-500">
+                      {product.stock}{" "}
+                      {product.stock === "1" ? t("unit") : t("units")}{" "}
+                      {t("in_stock")}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

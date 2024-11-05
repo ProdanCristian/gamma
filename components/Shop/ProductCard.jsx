@@ -122,6 +122,10 @@ const ProductCard = ({ product, loading = false }) => {
 
   if (!productData) return null;
 
+  const isValidDiscount =
+    productData.discount &&
+    parseFloat(productData.discount) < parseFloat(productData.price);
+
   return (
     <div className="group relative border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden py-2 p-4 space-y-4 hover:border-[#47e194] dark:hover:border-[#47e194] transition-colors duration-200">
       <Link
@@ -159,12 +163,12 @@ const ProductCard = ({ product, loading = false }) => {
           <div className="flex justify-between">
             <span
               className={`text-lg ${
-                productData.discount ? "line-through text-gray-500" : ""
+                isValidDiscount ? "line-through text-gray-500" : ""
               }`}
             >
               {productData.price} {t("lei")}
             </span>
-            {productData.discount && (
+            {isValidDiscount && (
               <span className="text-lg font-semibold text-red-500">
                 {productData.discount} {t("lei")}
               </span>
