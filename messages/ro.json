@@ -1,4 +1,14 @@
 {
+  "FastOrder": {
+    "title": "Comandă rapidă",
+    "name_placeholder": "Numele dumneavoastră",
+    "phone_placeholder": "Numărul de telefon",
+    "price": "Preț",
+    "stock_available": "Stoc disponibil",
+    "get_call_now": "Solicită apel",
+    "lei": "Lei",
+    "quantity": "Cantitate"
+  },
   "Cart": {
     "title": "Coș de cumpărături"
   },
@@ -130,13 +140,14 @@
     "discover_top_products": "Descoperă produsele populare"
   },
   "productcard": {
+    "out_of_stock": "Stoc epuizat",
     "no_images_found": "Nu s-au găsit imagini",
     "fifty_percent_off": "50% reducere",
-    "buy_now": "Cumpără acum",
+    "order_now": "Comandă acum",
     "lei": "Lei"
   },
   "product": {
-    "buy_now": "Cumpără acum",
+    "order_now": "Comandă acum",
     "lei": "Lei",
     "select_variant": "Selectează variantă",
     "choose_option": "Alegeți o variantă",

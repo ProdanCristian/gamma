@@ -9,6 +9,7 @@ import {
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useFastOrderStore } from "@/lib/store/useFastOrderStore";
 
 const BASE_URL = "http://193.160.119.179";
 
@@ -101,6 +102,25 @@ const ProductDescription = ({
   const handleQuantityChange = (value) => {
     const newQuantity = Math.max(1, Math.min(value, currentProduct.Stock));
     setQuantity(newQuantity);
+  };
+
+  const setProduct = useFastOrderStore((state) => state.setProduct);
+
+  const handleOrderNow = () => {
+    setProduct({
+      id: currentProduct.id,
+      name:
+        locale === "ru"
+          ? currentProduct.Nume_Produs_RU
+          : currentProduct.Nume_Produs_RO,
+      image: currentProduct.Imagine_Principala
+        ? `${BASE_URL}/${JSON.parse(currentProduct.Imagine_Principala)[0].path}`
+        : null,
+      price: currentProduct.Pret_Standard,
+      discount: currentProduct.Pret_Redus,
+      stock: currentProduct.Stock,
+      quantity: quantity,
+    });
   };
 
   return (
@@ -262,9 +282,7 @@ const ProductDescription = ({
         <div className="flex items-center gap-4 w-full sm:w-full">
           <button
             disabled={currentProduct.Stock <= 0}
-            onClick={() => {
-              console.log("Buy now:", { product: currentProduct, quantity });
-            }}
+            onClick={handleOrderNow}
             className={`dark:bg-accent bg-accent dark:hover:bg-charade-900 
               hover:bg-charade-900 py-[8px] text-charade-950 hover:text-white dark:text-white text-sm font-semibold px-4 rounded-lg flex
               items-center justify-center content-center w-full transition-colors duration-200
@@ -272,7 +290,7 @@ const ProductDescription = ({
                 currentProduct.Stock <= 0 ? "opacity-50 cursor-not-allowed" : ""
               }`}
           >
-            {t("buy_now")}
+            {t("order_now")}
             <PiCursorClick className="ml-2" size={30} />
           </button>
           <button

@@ -1,4 +1,16 @@
 {
+  "FastOrder": {
+    "title": "Быстрый заказ",
+    "name_placeholder": "Введите ваше имя",
+    "phone_placeholder": "Введите ваш номер телефона",
+    "phone": "Номер телефона",
+    "name": "Имя",
+    "price": "Цена",
+    "stock_available": "В наличии",
+    "get_call_now": "Получить звонок",
+    "lei": "Лей",
+    "quantity": "Количество"
+  },
   "Cart": {
     "title": "Корзина"
   },
@@ -130,6 +142,7 @@
     "discover_top_products": "Популярные товары"
   },
   "productcard": {
+    "out_of_stock": "Нет в наличии",
     "no_images_found": "Изображения не найдены",
     "fifty_percent_off": "Скидка 50%",
     "buy_now": "Купить сейчас",

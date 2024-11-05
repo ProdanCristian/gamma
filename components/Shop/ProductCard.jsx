@@ -7,12 +7,15 @@ import { useTranslations, useLocale } from "next-intl";
 import { PiShoppingCartSimple, PiCursorClick } from "react-icons/pi";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
+import { useFastOrderStore } from "@/lib/store/useFastOrderStore";
 
 const ProductCard = ({ product, loading = false }) => {
   const t = useTranslations("productcard");
   const locale = useLocale();
   const router = useRouter();
   const apiUrl = "http://193.160.119.179";
+
+  const setProduct = useFastOrderStore((state) => state.setProduct);
 
   const getImage = (objString) => {
     if (!objString || !apiUrl) return null;
@@ -42,6 +45,7 @@ const ProductCard = ({ product, loading = false }) => {
       image: getImage(product.Imagine_Principala),
       discount: product.Pret_Redus,
       price: product.Pret_Standard,
+      stock: product.Stock,
     };
   }, [product, loading, locale]);
 
@@ -52,16 +56,32 @@ const ProductCard = ({ product, loading = false }) => {
     return (originalPrice - discountPrice) / originalPrice >= 0.5;
   }, [productData]);
 
+  const isOutOfStock = useMemo(() => {
+    if (!productData) return true;
+    const stockValue = parseInt(productData.stock);
+    return isNaN(stockValue) || stockValue <= "0";
+  }, [productData]);
+
   const addToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    if (isOutOfStock) return;
     console.log("Adding to cart:", productData);
   };
 
   const buyNow = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("Buying now:", productData);
+    if (isOutOfStock) return;
+
+    setProduct({
+      id: product.id,
+      name: locale === "ru" ? product.Nume_Produs_RU : product.Nume_Produs_RO,
+      image: productData.image,
+      price: product.Pret_Standard,
+      discount: product.Pret_Redus,
+      stock: product.Stock,
+    });
   };
 
   const handleNavigation = (e) => {
@@ -155,14 +175,24 @@ const ProductCard = ({ product, loading = false }) => {
       <div className="flex items-center gap-2">
         <button
           onClick={buyNow}
-          className="dark:bg-gray-500 bg-gray-600 hover:bg-charade-900 dark:hover:bg-charade-900 py-[2px] text-white text-sm font-semibold px-4 rounded-lg flex items-center justify-center content-center w-full transition-colors duration-200"
+          disabled={isOutOfStock}
+          className={`dark:bg-gray-500 bg-gray-600 hover:bg-charade-900 dark:hover:bg-charade-900 py-[2px] text-white text-sm font-semibold px-4 rounded-lg flex items-center justify-center content-center w-full transition-colors duration-200 ${
+            isOutOfStock
+              ? "opacity-50 cursor-not-allowed hover:bg-gray-600 dark:hover:bg-gray-500"
+              : ""
+          }`}
         >
-          {t("buy_now")}
+          {isOutOfStock ? t("out_of_stock") : t("order_now")}
           <PiCursorClick className="ml-2" size={30} />
         </button>
         <button
           onClick={addToCart}
-          className="transition-colors duration-200 hover:text-[#47e194]"
+          disabled={isOutOfStock}
+          className={`transition-colors duration-200 hover:text-[#47e194] ${
+            isOutOfStock
+              ? "opacity-50 cursor-not-allowed hover:text-current"
+              : ""
+          }`}
         >
           <PiShoppingCartSimple size={35} />
         </button>

@@ -13,7 +13,7 @@ import BeforeFooter from "@/components/Footer/BeforeFooter";
 import Footer from "@/components/Footer/Footer";
 import BottomBarMobile from "@/components/Footer/BottomBarMobile";
 import Cart from "@/components/Cart";
-
+import FastOrder from "@/components/FastOrder";
 export default async function LocaleLayout({ children, params }) {
   const { locale } = await params;
 
@@ -47,6 +47,7 @@ export default async function LocaleLayout({ children, params }) {
               <Toaster />
               <BottomBarMobile />
               <Cart />
+              <FastOrder />
             </AuthProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
