@@ -10,12 +10,12 @@ import {
   PiDotsNineBold,
   PiList,
   PiHeart,
-  PiShoppingCart,
 } from "react-icons/pi";
 import CategoryList from "./CategoryList";
 import SearchModal from "@/components/Header/SearchModal";
 import VerticalMenu from "@/components/VerticalMenu";
 import { usePathname } from "next/navigation";
+import CartIcon from "../CartIcon";
 
 const MobileNavBar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -31,6 +31,18 @@ const MobileNavBar = () => {
     setIsListOpen(false);
     setIsModalVisible(false);
   }, [pathname]);
+
+  useEffect(() => {
+    if (isExpanded || isListOpen || isModalVisible) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isExpanded, isListOpen, isModalVisible]);
 
   const toggleModal = () => {
     if (isModalVisible) {
@@ -99,7 +111,7 @@ const MobileNavBar = () => {
         <motion.div
           initial={false}
           className={`
-            md:hidden z-10 flex overflow-hidden justify-center fixed bottom-0 w-full 
+            md:hidden z-10  flex overflow-hidden justify-center fixed bottom-0 w-full 
             bg-charade-900 backdrop-blur-sm rounded-t-3xl transition-all shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-1px_rgba(0,0,0,0.06)]
           `}
           animate={{
@@ -109,7 +121,7 @@ const MobileNavBar = () => {
         >
           {isExpanded && (
             <motion.div
-              className="absolute w-full h-full"
+              className="absolute w-full h-[calc(100%-70px)]"
               drag="y"
               dragConstraints={{ top: 0, bottom: 0 }}
               dragElastic={0.2}
@@ -118,14 +130,14 @@ const MobileNavBar = () => {
               whileDrag={{ scale: 1 }}
             >
               {/* Drag Handle */}
-              <div className="flex mt-2 justify-center z-20 items-center w-full h-5 bg-charade-900 absolute top-0">
-                <div className="absolute z-20 top-2 left-1/2 -translate-x-1/2 w-16 h-1.5 bg-gray-300 rounded-full cursor-grab" />
+              <div className="flex justify-center z-20 items-center w-full h-10 bg-charade-900 absolute top-0">
+                <div className="relative  w-16 h-1.5 bg-gray-300 rounded-full cursor-grab" />
               </div>
 
               {/* Category List */}
               <div className="absolute inset-0 flex justify-center items-center">
                 <div
-                  className="w-full max-h-[calc(75vh)] overflow-auto px-8 py-4 mb-[70px]
+                  className="w-full max-h-[calc(75vh-70px)] overflow-auto px-8 py-4
                   text-white dark:bg-charade-900"
                 >
                   <CategoryList locale={locale} />
@@ -154,7 +166,7 @@ const MobileNavBar = () => {
               onClick={toggleExpand}
             />
 
-            <PiShoppingCart size={33} className="text-white cursor-pointer" />
+            <CartIcon />
 
             <PiList
               size={33}

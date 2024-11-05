@@ -1,4 +1,7 @@
 {
+  "Cart": {
+    "title": "Корзина"
+  },
   "category": {
     "no_subcategories_found": "Не найдено подкатегорий",
     "error_loading_category_data": "Ошибка при загрузке данных категории",

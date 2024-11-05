@@ -3,7 +3,7 @@ import { ModeToggle } from "./ModeToggle";
 import SearchBar from "./SearchBar";
 import User from "./User";
 import Link from "next/link";
-
+import CartIcon from "../CartIcon";
 async function getLogo() {
   try {
     const baseUrl = "http://localhost:3000";
@@ -24,6 +24,7 @@ async function getLogo() {
 
 export default async function HeaderDesktop() {
   const logoUrl = await getLogo();
+
   return (
     <div className="hidden md:flex justify-between items-center h-[75px] bg-charade-900 max-w-[1350px] w-[95%] rounded-2xl mx-auto mt-2 z-50 sticky top-3">
       <div className="flex justify-between items-center w-full">
@@ -38,7 +39,7 @@ export default async function HeaderDesktop() {
         </div>
         <SearchBar />
         <div className="flex items-center mr-5">
-          <PiShoppingCart size={26} className="text-white mr-4" />
+          <CartIcon />
           <User />
           <PiHeart size={26} className="text-white mr-4" />
           <ModeToggle />

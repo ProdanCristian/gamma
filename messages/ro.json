@@ -1,4 +1,7 @@
 {
+  "Cart": {
+    "title": "Coș de cumpărături"
+  },
   "category": {
     "no_subcategories_found": "Nu s-au găsit subcategorii",
     "error_loading_category_data": "Eroare la încărcarea datelor categoriei",
