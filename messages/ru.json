@@ -16,7 +16,8 @@
     "quantity": "Количество",
     "units": "единиц",
     "in_stock": "в наличии",
-    "unit": "единица"
+    "unit": "единица",
+    "phone_format": "Формат: +373 XXXXXXXX"
   },
   "Cart": {
     "title": "Корзина"
@@ -156,7 +157,7 @@
     "lei": "Лей"
   },
   "product": {
-    "buy_now": "Купить сейчас",
+    "order_now": "Купить сейчас",
     "lei": "Лей",
     "select_variant": "Выберите вариант",
     "choose_option": "Выберите опцию",

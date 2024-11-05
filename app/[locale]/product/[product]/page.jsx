@@ -131,7 +131,7 @@ export default async function ProductPage({ params, searchParams }) {
           <div className="lg:w-[40%]">
             <ProductCarousel images={allImages} />
             {videos.length > 0 && (
-              <div className="mt-20 space-y-4 pt-16 border-t border-charade-700">
+              <div className="mt-20 space-y-4 pt-16 border-t border-gray-200 dark:border-charade-700">
                 {videos.map((videoUrl, index) => {
                   const videoId = videoUrl.split("v=")[1];
                   return (

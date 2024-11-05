@@ -10,14 +10,85 @@ import {
 import { useTranslations } from "next-intl";
 import { useFastOrderStore } from "@/lib/store/useFastOrderStore";
 import { PiSealPercentFill } from "react-icons/pi";
+import { useSession } from "next-auth/react";
+
+interface UserProfile {
+  Nume: string;
+  Prenume: string;
+  Numar_Telefon: string;
+  Provider?: string;
+}
 
 export default function FastOrder() {
   const t = useTranslations("FastOrder");
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState("+373 ");
+  const { data: session } = useSession();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   const { isOpen, product, setOpen } = useFastOrderStore();
   const [quantity, setQuantity] = useState(1);
+
+  const formatPhoneNumber = (phone: string) => {
+    const prefix = "+373 ";
+    const numbers = phone.replace(/\D/g, "");
+
+    if (!numbers) return prefix;
+
+    const normalizedNumbers = numbers.startsWith("373")
+      ? numbers.slice(3)
+      : numbers;
+
+    const trimmedNumbers = normalizedNumbers.slice(0, 8);
+    return `${prefix}${trimmedNumbers}`;
+  };
+
+  const stripPhonePrefix = (phone: string) => {
+    return phone.replace(/\D/g, "").replace(/^373/, "");
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedPhone = formatPhoneNumber(e.target.value);
+    setPhone(formattedPhone);
+  };
+
+  const handlePhoneKeyDown = (e: React.KeyboardEvent) => {
+    if (
+      [46, 8, 9, 27, 13, 110, 190].indexOf(e.keyCode) !== -1 ||
+      (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+      (e.keyCode === 67 && (e.ctrlKey === true || e.metaKey === true)) ||
+      (e.keyCode === 86 && (e.ctrlKey === true || e.metaKey === true)) ||
+      (e.keyCode >= 35 && e.keyCode <= 40) ||
+      (e.keyCode >= 48 && e.keyCode <= 57) ||
+      (e.keyCode >= 96 && e.keyCode <= 105)
+    ) {
+      return;
+    }
+
+    e.preventDefault();
+  };
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (session?.user?.email) {
+        try {
+          const response = await fetch("/api/auth/profile");
+          if (response.ok) {
+            const data = await response.json();
+            setUserProfile(data.user);
+            setName(`${data.user.Nume} ${data.user.Prenume}`.trim());
+            setPhone(formatPhoneNumber(data.user.Numar_Telefon || ""));
+          }
+        } catch (error) {
+          console.error("Error fetching user profile:", error);
+        }
+      }
+    };
+
+    if (session?.user) {
+      fetchUserProfile();
+    }
+  }, [session]);
 
   useEffect(() => {
     if (product?.quantity) {
@@ -47,13 +118,40 @@ export default function FastOrder() {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (session?.user && (!userProfile?.Numar_Telefon || !userProfile?.Nume)) {
+      try {
+        const [firstName, ...restName] = name.trim().split(" ");
+        const lastName = restName.join(" ");
+
+        await fetch("/api/auth/update-profile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            Nume: lastName || firstName,
+            Prenume: lastName ? firstName : "",
+            Numar_Telefon: stripPhonePrefix(phone),
+            Email: session.user.email,
+            Provider: userProfile?.Provider || "credentials",
+          }),
+        });
+      } catch (error) {
+        console.error("Error updating profile:", error);
+      }
+    }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[425px] max-w-[90vw] dark:bg-charade-950 bg-white border-none rounded-xl">
+      <DialogContent
+        className="sm:max-w-[425px] max-w-[90vw] dark:bg-charade-950 bg-white border-none rounded-xl"
+        onInteractOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
         <DialogHeader className="flex w-full gap-4">
           <h1 className="text-2xl font-bold text-center">{t("title")}</h1>
           <div className="flex items-center justify-between gap-2 w-full">
@@ -150,6 +248,7 @@ export default function FastOrder() {
               placeholder={t("name_placeholder")}
               className="dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full"
               required
+              autoFocus={false}
             />
           </div>
           <div className="grid gap-2">
@@ -157,11 +256,17 @@ export default function FastOrder() {
               id="phone"
               type="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={handlePhoneChange}
+              onKeyDown={handlePhoneKeyDown}
+              maxLength={13}
               placeholder={t("phone_placeholder")}
               className="dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full"
               required
+              autoFocus={false}
             />
+            <p className="text-sm text-gray-500">
+              {t("phone_format", { fallback: "Format: +373 XXXXXXXX" })}
+            </p>
           </div>
           <button
             type="submit"

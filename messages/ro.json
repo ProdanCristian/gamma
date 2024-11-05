@@ -14,7 +14,8 @@
     "quantity": "Cantitate",
     "units": "unități",
     "in_stock": "în stoc",
-    "unit": "unitate"
+    "unit": "unitate",
+    "phone_format": "Format: +373 XXXXXXXX"
   },
   "Cart": {
     "title": "Coș de cumpărături"

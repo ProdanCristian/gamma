@@ -42,6 +42,20 @@ const ProductDescription = ({
     return acc;
   }, {});
 
+  const getVariantImage = (variants) => {
+    if (selectedColor) {
+      const colorVariant = variants.find(
+        (v) => v.nc_pka4___Culori_id === selectedColor
+      );
+      if (colorVariant?.Imagine_Principala) {
+        return JSON.parse(colorVariant.Imagine_Principala)[0];
+      }
+    }
+    return variants[0].Imagine_Principala
+      ? JSON.parse(variants[0].Imagine_Principala)[0]
+      : null;
+  };
+
   const availableColors = variantsData
     .filter((v) => v.Valoare_Atribut === selectedModel)
     .filter((v) => v.nc_pka4___Culori_id)
@@ -158,10 +172,7 @@ const ProductDescription = ({
           <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
             {Object.entries(modelVariantsWithImages).map(
               ([model, variants]) => {
-                const variant = variants[0];
-                const mainImage = variant.Imagine_Principala
-                  ? JSON.parse(variant.Imagine_Principala)[0]
-                  : null;
+                const mainImage = getVariantImage(variants);
                 const imagePath = mainImage
                   ? `${BASE_URL}/${mainImage.path}`
                   : null;
@@ -184,7 +195,7 @@ const ProductDescription = ({
                       {imagePath && (
                         <Image
                           src={imagePath}
-                          alt={variant.Nume_Produs_RO}
+                          alt={variants[0].Nume_Produs_RO}
                           fill
                           className="object-cover rounded-lg"
                         />
