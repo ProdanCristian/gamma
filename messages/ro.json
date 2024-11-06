@@ -24,7 +24,11 @@
     "free_delivery": "Livrare gratuită",
     "total_with_delivery": "Total cu livrare",
     "add_more_for_free_delivery": "Adaugă încă {{amount}} lei pentru livrare gratuită",
-    "currency": "lei"
+    "currency": "lei",
+    "order_success": "Comandă plasată cu succes",
+    "order_success_description": "Veți fi contactat în curând pentru confirmare",
+    "order_error": "Eroare",
+    "order_error_description": "Nu am putut plasa comanda. Încercați din nou."
   },
   "Cart": {
     "title": "Coșul meu",
@@ -203,5 +207,23 @@
     "noSubSubCategories": "Nu s-au găsit sub-subcategorii",
     "errorLoadingData": "Eroare la încărcarea datelor subcategoriei",
     "tryAgainLater": "Vă rugăm să încercați mai târziu"
+  },
+  "Checkout": {
+    "order_confirmation": "Confirmare comandă",
+    "order_details": "Detalii comandă",
+    "order_number": "Număr comandă",
+    "status": "Status",
+    "customer_details": "Detalii client",
+    "name": "Nume",
+    "phone": "Telefon",
+    "product_details": "Detalii produs",
+    "quantity": "Cantitate",
+    "currency": "lei",
+    "subtotal": "Subtotal",
+    "delivery": "Livrare",
+    "free_delivery": "Livrare gratuită",
+    "total": "Total",
+    "product_image": "Imagine produs",
+    "go_back": "Înapoi"
   }
 }

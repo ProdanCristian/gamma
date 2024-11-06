@@ -124,7 +124,7 @@ export default function Cart() {
                 onChange={(e) =>
                   setDeliveryZone(e.target.value as DeliveryZone)
                 }
-                className="bg-gray-50 dark:bg-charade-950 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm"
+                className="bg-gray-50 dark:bg-charade-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm"
               >
                 <option value="in_city">{t("in_city_Chisinau")}</option>
                 <option value="outside_city">

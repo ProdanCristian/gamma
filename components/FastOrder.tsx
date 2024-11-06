@@ -12,12 +12,16 @@ import { useFastOrderStore } from "@/lib/store/useFastOrderStore";
 import { PiSealPercentFill } from "react-icons/pi";
 import { useSession } from "next-auth/react";
 import { DeliveryZone, DELIVERY_RULES } from "@/lib/store/useCart";
+import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useOrderStore } from "@/lib/store/useOrderStore";
 
 interface UserProfile {
   Nume: string;
   Prenume: string;
   Numar_Telefon: string;
   Provider?: string;
+  nc_pka4___Adrese_id?: number;
 }
 
 export default function FastOrder() {
@@ -30,6 +34,9 @@ export default function FastOrder() {
 
   const { isOpen, product, setOpen } = useFastOrderStore();
   const [quantity, setQuantity] = useState(1);
+
+  const router = useRouter();
+  const params = useParams();
 
   const formatPhoneNumber = (phone: string) => {
     const prefix = "+373 ";
@@ -120,8 +127,12 @@ export default function FastOrder() {
     );
   };
 
+  const setOrderData = useOrderStore((state) => state.setOrderData);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!product) return;
 
     if (session?.user && (!userProfile?.Numar_Telefon || !userProfile?.Nume)) {
       try {
@@ -144,6 +155,58 @@ export default function FastOrder() {
       } catch (error) {
         console.error("Error updating profile:", error);
       }
+    }
+
+    const total = product
+      ? parseFloat(product.discount || product.price) * quantity
+      : 0;
+    const currentDeliveryRules = DELIVERY_RULES[deliveryZone];
+    const isFreeDelivery = total >= currentDeliveryRules.freeDeliveryThreshold;
+
+    try {
+      const response = await fetch("/api/orders/fastOrder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: session?.user?.id,
+          numePrenume: name,
+          numarTelefon: stripPhonePrefix(phone),
+          productId: product.id,
+          quantity: quantity,
+          deliveryZone: deliveryZone,
+          isFreeDelivery,
+          existingAddressId: userProfile?.nc_pka4___Adrese_id,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setOpen(false);
+
+        setOrderData({
+          id: data.orderId,
+          Status: "De Confirmat",
+          Nume_Prenume: name,
+          Numar_telefon: stripPhonePrefix(phone),
+          Pret_Livrare: isFreeDelivery
+            ? "Gratis"
+            : DELIVERY_RULES[deliveryZone].cost.toString(),
+          Cantitate: quantity,
+          Produs_Id: product.id,
+          Nume_Produs: product.name,
+          Pret_Standard: product.price,
+          Pret_Redus: product.discount || null,
+          Imagine_Principala: product.image,
+        });
+
+        router.push(`/${params.locale}/checkout/order/${data.orderId}`);
+      } else {
+        throw new Error("Failed to create order");
+      }
+    } catch (error) {
+      console.error("Error creating order:", error);
     }
   };
 
@@ -265,7 +328,7 @@ export default function FastOrder() {
                     onChange={(e) =>
                       setDeliveryZone(e.target.value as DeliveryZone)
                     }
-                    className="bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm"
+                    className="bg-gray-50 dark:bg-charade-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm"
                   >
                     <option value="in_city">{t("in_city_Chisinau")}</option>
                     <option value="outside_city">
@@ -274,7 +337,7 @@ export default function FastOrder() {
                   </select>
                 </div>
 
-                <div className="bg-gray-50 dark:bg-gray-800/50 p-2.5 rounded-lg space-y-2">
+                <div className="bg-gray-50 dark:bg-charade-950 p-2.5 rounded-lg space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600 dark:text-gray-300">
                       {t("subtotal")}:
@@ -347,7 +410,7 @@ export default function FastOrder() {
           </div>
           <button
             type="submit"
-            className="w-full bg-accent hover:bg-charade-900 text-white font-bold py-2 px-4 rounded-lg mt-4
+            className="w-full bg-accent hover:bg-charade-900 text-white font-bold py-2 px-4 rounded-lg 
               dark:bg-accent dark:hover:bg-charade-900"
           >
             {t("get_call_now")}

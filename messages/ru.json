@@ -26,7 +26,11 @@
     "free_delivery": "Бесплатная доставка",
     "total_with_delivery": "Итого с доставкой",
     "add_more_for_free_delivery": "Добавьте еще {{amount}} лей для бесплатной доставки",
-    "currency": "лей"
+    "currency": "лей",
+    "order_success": "Заказ успешно размещен",
+    "order_success_description": "Мы свяжемся с вами в ближайшее время для подтверждения",
+    "order_error": "Ошибка",
+    "order_error_description": "Не удалось разместить заказ. Пожалуйста, попробуйте еще раз."
   },
   "Cart": {
     "title": "Моя корзина",
@@ -71,7 +75,7 @@
     "title": "Поиск товаров"
   },
   "search": {
-    "searchPlaceholder": "Поиск товаров...",
+    "searchPlaceholder": "Поиск товаов...",
     "searchResults": "Результаты поиска"
   },
   "auth": {
@@ -95,11 +99,11 @@
     "login_successful": "Вход выполнен успешно",
     "email_already_exists": "Этот email уже зарегистрирован",
     "invalid_email_format": "Неверный формат email",
-    "password_too_short": "Пароль должен содержать не менее 6 символов",
+    "password_too_short": "Пароль должен содерать не менее 6 символов",
     "name_required": "Имя и фамилия обязательны",
     "email_required": "Email обязателен",
     "password_required": "Пароль обязателен",
-    "profile_updated": "Профиль успешно обновл��н",
+    "profile_updated": "Профиль успешно обновлн",
     "error_loading_data": "Не удалось загрузить данные",
     "generic_error": "Произошла ошибка",
     "profile": "Профиль"
@@ -118,14 +122,14 @@
     "profile_updated": "Профиль успешно обновлен",
     "error": "Ошибка",
     "generic_error": "Произошла ошибка при обновлении профиля",
-    "email_change_restricted": "Электронная почта не может быть изменена для аккаунтов Google или Facebook"
+    "email_change_restricted": "Электронная почта не может быть изменена д��я аккаунтов Google или Facebook"
   },
   "contact": {
     "contact_us": "Свяжитесь с нами",
     "your_name": "Ваше имя",
     "name": "Имя",
     "phone_number": "Номер телефона",
-    "email_address": "Адр��с электронной почты",
+    "email_address": "Адрс электронной почты",
     "message": "Сообщение",
     "write_message_here": "Напишите ваше сообщение здесь...",
     "message_sent_success": "Сообщение успешно отправлено!",
@@ -141,7 +145,7 @@
     "satisfaction_description": "Гарантия удовлетворения клиента",
     "secure_payment_title": "Безопасные платежи",
     "secure_payment_description": "Гарантированные безопасные транзакции",
-    "support_title": "Поддержка 24/7",
+    "support_title": "П��д��ержка 24/7",
     "support_description": "Круглосуточная поддержка клиентов"
   },
   "footer": {
@@ -162,7 +166,7 @@
     "follow_us": "Следите за нами",
     "payments_methods": "Методы оплаты",
     "copyright": "copyright 2024",
-    "mobile_app": "Мобильное приложение",
+    "mobile_app": "Моильное приложение",
     "download_for_iphone": "Скачать для iPhone",
     "download_for_android": "Скачать для Android",
     "street": "Страда Святого Георгия 6, Кишинёв, Молдова",
@@ -205,5 +209,23 @@
     "noSubSubCategories": "Подподкатегории не найдены",
     "errorLoadingData": "Ошибка при загрузке данных подкатегории",
     "tryAgainLater": "Пожалуйста, повторите попытку позже"
+  },
+  "Checkout": {
+    "order_confirmation": "Подтверждение заказа",
+    "order_details": "Детали заказа",
+    "order_number": "Номер заказа",
+    "status": "Статус",
+    "customer_details": "Данные клиента",
+    "name": "Имя",
+    "phone": "Телефон",
+    "product_details": "Детали товара",
+    "quantity": "Количество",
+    "currency": "лей",
+    "subtotal": "Промежуточный итог",
+    "delivery": "Доставка",
+    "free_delivery": "Бесплатная доставка",
+    "total": "Итого",
+    "product_image": "Изображение товара",
+    "go_back": "Назад"
   }
 }
