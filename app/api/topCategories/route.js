@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import db from "@/lib/db";
 
 export async function GET() {
-  const NOCODB_BASE_URL = process.env.NOCODB_BASE_URL;
+  const NEXT_PUBLIC_MEDIA_URL = process.env.NEXT_PUBLIC_MEDIA_URL;
 
   try {
     const query = `
@@ -33,7 +33,7 @@ export async function GET() {
         nameRo: row.Nume_SubCategorie_RO,
         nameRu: row.Nume__SubCategorie_RU,
         imagePath: imagePath
-          ? `${NOCODB_BASE_URL}${
+          ? `${NEXT_PUBLIC_MEDIA_URL}${
               imagePath.startsWith("/") ? "" : "/"
             }${imagePath}`
           : "",

@@ -10,10 +10,6 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "http",
-        hostname: "193.160.119.179",
-      },
-      {
-        protocol: "http",
         hostname: "localhost",
       },
       {
