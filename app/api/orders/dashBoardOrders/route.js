@@ -53,7 +53,7 @@ export async function GET() {
         try {
           const imageData = JSON.parse(order.Imagine_Principala);
           if (Array.isArray(imageData) && imageData[0]?.path) {
-            order.Imagine_Principala = `http://193.160.119.179/${imageData[0].path}`;
+            order.Imagine_Principala = `${process.env.NEXT_PUBLIC_MEDIA_URL}/${imageData[0].path}`;
           }
         } catch (e) {
           console.error("Error parsing image data:", e);

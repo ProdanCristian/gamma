@@ -12,7 +12,7 @@ import Image from "next/image";
 import { useFastOrderStore } from "@/lib/store/useFastOrderStore";
 import { useCartStore } from "@/lib/store/useCart";
 
-const BASE_URL = "http://193.160.119.179";
+const BASE_URL = process.env.NEXT_PUBLIC_MEDIA_URL;
 
 const ProductDescription = ({
   productData,

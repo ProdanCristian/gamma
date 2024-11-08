@@ -48,7 +48,7 @@ export default function ProductCarousel({ images }) {
               <Card className="bg-white dark:bg-charade-950 border-gray-200 dark:border-charade-700 h-full">
                 <CardContent className="flex aspect-square items-center justify-center p-2">
                   <Image
-                    src={`${"http://193.160.119.179"}/${image.path}`}
+                    src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${image.path}`}
                     alt={image.title || `Product image ${index + 1}`}
                     width={600}
                     height={600}
@@ -86,7 +86,7 @@ export default function ProductCarousel({ images }) {
                 )}
               >
                 <Image
-                  src={`${"http://193.160.119.179"}/${image.path}`}
+                  src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${image.path}`}
                   alt={image.title || `Thumbnail ${index + 1}`}
                   width={150}
                   height={150}

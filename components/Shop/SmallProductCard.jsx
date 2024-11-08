@@ -19,7 +19,7 @@ const SmallProductCard = ({ product, loading = false }) => {
   const t = useTranslations("productcard");
   const locale = useLocale();
   const router = useRouter();
-  const apiUrl = "http://193.160.119.179";
+  const apiUrl = process.env.NEXT_PUBLIC_MEDIA_URL;
   const setProduct = useFastOrderStore((state) => state.setProduct);
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const addItem = useCartStore((state) => state.addItem);
