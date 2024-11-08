@@ -1,10 +1,10 @@
 import { create } from "zustand";
 
 interface OrderData {
-  id: number;
+  id?: number;
   Status: string;
   Nume_Prenume: string;
-  Numar_telefon: string;
+  Numar_telefon: number;
   Pret_Livrare: string;
   Cantitate: number;
   Produs_Id: number;

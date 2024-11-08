@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
 import { ProfileTab } from "@/components/Dashboard/ProfileTab";
+import { AddressTab } from "@/components/Dashboard/AdressTab";
+import OrdersTab from "@/components/Dashboard/OrdersTab";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -99,9 +101,9 @@ export default function DashboardPage() {
         {selectedTab === "addresses" && (
           <div className="p-6 border-gray-200 dark:border-gray-700 dark:bg-charade-900 rounded-lg bg-gray-100">
             <h2 className="text-xl font-semibold mb-4 dark:text-white text-gray-700">
-              {t("auth.addresses_title")}
+              {t("address.delivery_address")}
             </h2>
-            {/* Address content */}
+            <AddressTab />
           </div>
         )}
 
@@ -110,7 +112,7 @@ export default function DashboardPage() {
             <h2 className="text-xl font-semibold mb-4 dark:text-white text-gray-700">
               {t("auth.orders_title")}
             </h2>
-            {/* Orders content */}
+            <OrdersTab />
           </div>
         )}
       </div>

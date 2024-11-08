@@ -1,0 +1,15 @@
+{
+  "name": "moldova-address-validator",
+  "version": "1.0.0",
+  "description": "Validator and formatter for Moldovan addresses with Romanian and Russian language support",
+  "main": "index.js",
+  "keywords": [
+    "moldova",
+    "address",
+    "validation",
+    "russian",
+    "romanian"
+  ],
+  "author": "Cristian",
+  "license": "MIT"
+}

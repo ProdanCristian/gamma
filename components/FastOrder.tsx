@@ -53,7 +53,7 @@ export default function FastOrder() {
   };
 
   const stripPhonePrefix = (phone: string) => {
-    return phone.replace(/\D/g, "").replace(/^373/, "");
+    return parseInt(phone.replace(/\D/g, "").replace(/^373/, ""));
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -201,7 +201,7 @@ export default function FastOrder() {
           Imagine_Principala: product.image,
         });
 
-        router.push(`/${params.locale}/checkout/order/${data.orderId}`);
+        router.push(`/${params.locale}/checkout/order`);
       } else {
         throw new Error("Failed to create order");
       }

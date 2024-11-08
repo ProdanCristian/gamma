@@ -1,4 +1,61 @@
 {
+  "address": {
+    "suburban": "Пригород",
+    "locality": "Населенный пункт",
+    "search_locality": "Поиск населенного пункта...",
+    "delivery_address": "Адрес доставки",
+    "edit_address": "Изменить адрес",
+    "city": "Город",
+    "search_city": "Поиск города...",
+    "street_type": "Тип улицы",
+    "street": "Улица",
+    "avenue": "Проспект",
+    "lane": "Переулок",
+    "alley": "Аллея",
+    "square": "Площадь",
+    "street_name": "Название улицы",
+    "house_number": "Номер дома",
+    "postal_code": "Почтовый индекс",
+    "save_address": "Сохранить адрес",
+    "saving": "Сохранение...",
+    "cancel": "Отмена",
+    "success": "Успешно",
+    "address_updated": "Адрес успешно обновлен",
+    "error": "Ошибка",
+    "update_failed": "Не удалось обновить адре��",
+    "generic_error": "Что-то пошло не так",
+    "please_login": "Пожалуйста, войдите в систему для управления адресом",
+    "no_address": "Не добавлен адрес доставки",
+    "add_address": "Добавить адрес",
+    "building_type": "Тип здания",
+    "private_house": "Частный дом",
+    "apartment_building": "Жилой дом",
+    "required_field": "Это поле обязательно",
+    "district": "Район",
+    "search_district": "Поиск района...",
+    "select_district_first": "Сначала выберите район",
+    "location_type": "Тип населенного пункта",
+    "city_type": "Город",
+    "village_type": "Село",
+    "village": "Село",
+    "search_village": "Поиск села...",
+    "district_prefix": "Район ",
+    "municipality": "Муниципий",
+    "house": "Дом",
+    "building": "Дом",
+    "apartment": "Квартира",
+    "entrance": "Подъезд",
+    "floor": "Этаж",
+    "select_location_type": "Выберите тип населенного пункта",
+    "select_city_village": "Выберите город/село",
+    "address_form": "Форма адреса",
+    "address_details": "Детали адреса",
+    "search_locality_in_district": "Поиск населенного пункта в...",
+    "fetch_error": "Ошибка при загрузке адреса",
+    "office": "Офис",
+    "sector": "Сектор",
+    "search_sector": "Поиск сектора..."
+  },
   "wishlist": {
     "title": "Список желаний",
     "empty_wishlist": "Ваш список желаний пуст"
@@ -46,7 +103,7 @@
     "subtotal": "Промежуточный итог",
     "delivery_cost": "Стоимость доставки",
     "free_delivery": "Бесплатная доставка",
-    "total_with_delivery": "Итого с доставкой",
+    "total_with_delivery": "Иого с доставкой",
     "finalize_order": "Оформить заказ",
     "delivery_zone": "Зона доставки",
     "in_city_Chisinau": "В городе Кишинёв",
@@ -76,7 +133,7 @@
   },
   "search": {
     "searchPlaceholder": "Поиск товаов...",
-    "searchResults": "Результаты поиска"
+    "searchResults": "Резуьтаты поиска"
   },
   "auth": {
     "Welcome": "Добро пожаловать",
@@ -119,10 +176,10 @@
     "new_password": "Новый пароль",
     "update_profile": "Обновить профиль",
     "success": "Успех",
-    "profile_updated": "Профиль успешно обновлен",
+    "profile_updated": "Профиль успешно обновл��н",
     "error": "Ошибка",
     "generic_error": "Произошла ошибка при обновлении профиля",
-    "email_change_restricted": "Электронная почта не может быть изменена д��я аккаунтов Google или Facebook"
+    "email_change_restricted": "Электронная почта не может быть изменена дя аккаунтов Google или Facebook"
   },
   "contact": {
     "contact_us": "Свяжитесь с нами",
@@ -145,7 +202,7 @@
     "satisfaction_description": "Гарантия удовлетворения клиента",
     "secure_payment_title": "Безопасные платежи",
     "secure_payment_description": "Гарантированные безопасные транзакции",
-    "support_title": "П��д��ержка 24/7",
+    "support_title": "Пдержка 24/7",
     "support_description": "Круглосуточная поддержка клиентов"
   },
   "footer": {
@@ -177,7 +234,7 @@
   "home": {
     "discounted_products_title": "Неоспоримые скидки",
     "view_all": "Посмотреть все",
-    "discover_top_products": "Популярные товары"
+    "discover_top_products": "П��пулярные товары"
   },
   "productcard": {
     "out_of_stock": "Нет в наличии",
@@ -193,7 +250,7 @@
     "choose_option": "Выберите опцию",
     "select_color": "Выберите цвет",
     "in_stock": "В наличии",
-    "out_of_stock": "Нет в наличии",
+    "out_of_stock": "Нет в наличи",
     "units": "единиц",
     "unit": "единица",
     "quantity": "Количество"
@@ -221,11 +278,33 @@
     "product_details": "Детали товара",
     "quantity": "Количество",
     "currency": "лей",
-    "subtotal": "Промежуточный итог",
+    "subtotal": "Промежуточый итог",
     "delivery": "Доставка",
     "free_delivery": "Бесплатная доставка",
     "total": "Итого",
     "product_image": "Изображение товара",
     "go_back": "Назад"
+  },
+  "Order": {
+    "order_confirmation": "Подтверждение заказа",
+    "order_details": "Детали заказа",
+    "quantity": "Количество",
+    "subtotal": "Промежуточный итог",
+    "delivery": "Доставка",
+    "total": "Итого",
+    "order_success_message": "Ваш заказ успешно размещен. Мы свяжемся с вами в ближайшее время для подтверждения.",
+    "my_orders": "Мои заказы",
+    "no_orders_found": "Заказы не найдены",
+    "product_name_not_available": "Название продукта недоступно",
+    "Status": "Статус",
+    "delivery_price": "Стоимость доставки",
+    "currency": "лей",
+    "error": "Ошибка",
+    "failed_to_load": "Не удалось загрузить заказы",
+    "status": {
+      "pending": "Ожидает подтверждения",
+      "confirmed": "Подтвержден",
+      "cancelled": "Отменен"
+    }
   }
 }

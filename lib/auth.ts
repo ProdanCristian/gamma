@@ -5,7 +5,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import db from "@/lib/db";
 
-// Type declarations
 declare module "next-auth" {
   interface User {
     firstName?: string;

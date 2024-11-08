@@ -186,7 +186,7 @@ export default function AuthModal() {
           </Link>
 
           <button
-            className="bg-red-600 text-white p-2 rounded-lg flex items-center justify-center gap-2"
+            className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg flex items-center justify-center gap-2"
             onClick={() => signOut()}
           >
             <PiSignOut size={25} />

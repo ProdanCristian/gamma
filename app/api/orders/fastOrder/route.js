@@ -42,21 +42,22 @@ export async function POST(request) {
         : DELIVERY_RULES[deliveryZone].cost;
       const total = subtotal + deliveryPrice;
 
+      // Get current time in Chisinau timezone
+      const chisinauTime = new Date().toLocaleString("en-US", {
+        timeZone: "Europe/Chisinau",
+      });
+      const chisinauDate = new Date(chisinauTime);
+
       const orderResult = await db.query(
-        `INSERT INTO "nc_pka4___Comenzi" (
-          "nc_pka4___Utilizatori_id",
-          "Nume_Prenume",
-          "Numar_telefon",
-          "nc_pka4__Produse_id",
-          "Status",
-          "Cantitate",
-          "Pret_Livrare",
-          "Total"
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING "id"`,
+        `INSERT INTO "nc_pka4___Comenzi" 
+        ("nc_pka4___Utilizatori_id", "Nume_Prenume", "Numar_telefon", "nc_pka4___produse_copy_id", 
+         "Status", "Cantitate", "Pret_Livrare", "Total", "created_at") 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+        RETURNING id`,
         [
           userId || null,
           numePrenume,
-          numarTelefon,
+          parseInt(numarTelefon),
           productId,
           "De Confirmat",
           quantity,
@@ -64,6 +65,7 @@ export async function POST(request) {
             ? "Gratis"
             : DELIVERY_RULES[deliveryZone].cost.toString(),
           total.toFixed(2),
+          chisinauDate,
         ]
       );
 
