@@ -179,7 +179,7 @@ export function ProfileTab({ userData, refetchData }) {
   }
 
   return (
-    <div className="border-gray-200 dark:border-gray-700 dark:bg-charade-900 rounded-lg bg-gray-100 p-6">
+    <div className="border-gray-200 dark:border-gray-700 dark:bg-charade-900 rounded-lg bg-white p-6">
       <h2 className="text-xl font-semibold mb-4 dark:text-white text-gray-700">
         {t("profile.profile_information")}
       </h2>
@@ -195,7 +195,7 @@ export function ProfileTab({ userData, refetchData }) {
             onChange={handleInputChange}
             type="text"
             required
-            className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            className="p-2 dark:bg-[#4A4B59] bg-gray-100 mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
           />
         </div>
 
@@ -209,7 +209,7 @@ export function ProfileTab({ userData, refetchData }) {
             onChange={handleInputChange}
             type="text"
             required
-            className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            className="p-2 dark:bg-[#4A4B59] bg-gray-100 mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
           />
         </div>
 
@@ -224,7 +224,7 @@ export function ProfileTab({ userData, refetchData }) {
             onKeyDown={handlePhoneKeyDown}
             type="text"
             maxLength={13}
-            className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            className="p-2 dark:bg-[#4A4B59] bg-gray-100 mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
           />
           <p className="text-sm text-gray-500 mt-1">
             {t("profile.phone_format")} +373 XXXXXXXX
@@ -245,7 +245,7 @@ export function ProfileTab({ userData, refetchData }) {
               profileForm.provider === "google" ||
               profileForm.provider === "facebook"
             }
-            className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+            className="p-2 dark:bg-[#4A4B59] bg-gray-100 mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
           />
           {(profileForm.provider === "google" ||
             profileForm.provider === "facebook") && (
@@ -265,7 +265,7 @@ export function ProfileTab({ userData, refetchData }) {
               value={profileForm.password}
               onChange={handleInputChange}
               type="password"
-              className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              className="p-2 dark:bg-[#4A4B59] bg-gray-100 mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
           </div>
         )}
@@ -273,7 +273,7 @@ export function ProfileTab({ userData, refetchData }) {
         <button
           type="submit"
           disabled={isLoading}
-          className={`bg-gray-500 hover:bg-charade-800 text-white px-4 py-2 rounded-lg w-full transition-colors duration-200 ${
+          className={`bg-gray-500 hover:bg-charade-800 text-white px-4 py-2 rounded-lg  transition-colors duration-200 ${
             isLoading ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >

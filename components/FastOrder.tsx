@@ -15,6 +15,11 @@ import { DeliveryZone, DELIVERY_RULES } from "@/lib/store/useCart";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 import { useOrderStore } from "@/lib/store/useOrderStore";
+import {
+  formatPhoneNumber,
+  stripPhonePrefix,
+  handlePhoneKeyDown,
+} from "@/lib/utils/phoneUtils";
 
 interface UserProfile {
   Nume: string;
@@ -38,43 +43,9 @@ export default function FastOrder() {
   const router = useRouter();
   const params = useParams();
 
-  const formatPhoneNumber = (phone: string) => {
-    const prefix = "+373 ";
-    const numbers = phone.replace(/\D/g, "");
-
-    if (!numbers) return prefix;
-
-    const normalizedNumbers = numbers.startsWith("373")
-      ? numbers.slice(3)
-      : numbers;
-
-    const trimmedNumbers = normalizedNumbers.slice(0, 8);
-    return `${prefix}${trimmedNumbers}`;
-  };
-
-  const stripPhonePrefix = (phone: string) => {
-    return parseInt(phone.replace(/\D/g, "").replace(/^373/, ""));
-  };
-
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedPhone = formatPhoneNumber(e.target.value);
     setPhone(formattedPhone);
-  };
-
-  const handlePhoneKeyDown = (e: React.KeyboardEvent) => {
-    if (
-      [46, 8, 9, 27, 13, 110, 190].indexOf(e.keyCode) !== -1 ||
-      (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
-      (e.keyCode === 67 && (e.ctrlKey === true || e.metaKey === true)) ||
-      (e.keyCode === 86 && (e.ctrlKey === true || e.metaKey === true)) ||
-      (e.keyCode >= 35 && e.keyCode <= 40) ||
-      (e.keyCode >= 48 && e.keyCode <= 57) ||
-      (e.keyCode >= 96 && e.keyCode <= 105)
-    ) {
-      return;
-    }
-
-    e.preventDefault();
   };
 
   useEffect(() => {
@@ -225,7 +196,7 @@ export default function FastOrder() {
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
       <DialogContent
-        className="sm:max-w-[425px] max-w-[90vw] dark:bg-charade-950 bg-white border-none rounded-xl"
+        className="sm:max-w-[425px] max-w-[90vw] dark:bg-charade-900 bg-white border-none rounded-xl"
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >

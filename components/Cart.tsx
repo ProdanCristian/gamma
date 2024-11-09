@@ -19,9 +19,11 @@ import {
 } from "react-icons/pi";
 import { useCallback, useMemo, useEffect, useState } from "react";
 import { DeliveryZone, DELIVERY_RULES } from "@/lib/store/useCart";
+import { useRouter, useParams } from "next/navigation";
 
 export default function Cart() {
   const t = useTranslations("Cart");
+  const params = useParams();
   const [mounted, setMounted] = useState(false);
   const items = useCartStore((state) => state.items);
   const isOpen = useCartStore((state) => state.isOpen);
@@ -30,6 +32,29 @@ export default function Cart() {
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const deliveryZone = useCartStore((state) => state.deliveryZone);
   const setDeliveryZone = useCartStore((state) => state.setDeliveryZone);
+  const router = useRouter();
+
+  // Move useCallback before any conditional returns
+  const handleQuantityChange = useCallback(
+    (itemId: number, currentQuantity: number, change: number) => {
+      const newQuantity = currentQuantity + change;
+      const item = items.find((i) => i.id === itemId);
+      if (item && newQuantity >= 1 && newQuantity <= item.stock) {
+        updateQuantity(itemId, newQuantity);
+      }
+    },
+    [items, updateQuantity]
+  );
+
+  // Effect to manage component mount state
+  useEffect(() => {
+    let mounted = true;
+    if (mounted) setMounted(true);
+    return () => {
+      mounted = false;
+      setMounted(false);
+    };
+  }, []);
 
   // Calculate totals and discounts
   const { total, regularTotal, totalDiscount, discountPercentage } =
@@ -44,9 +69,9 @@ export default function Cart() {
 
       const calculatedTotals = items.reduce(
         (acc, item) => {
-          const regularPrice = item.price * item.quantity; // Calculate regular price
+          const regularPrice = item.price * item.quantity;
           const discountedPrice =
-            (item.discountPrice || item.price) * item.quantity; // Calculate discounted price
+            (item.discountPrice || item.price) * item.quantity;
 
           return {
             total: acc.total + discountedPrice,
@@ -82,28 +107,13 @@ export default function Cart() {
     (total / currentDeliveryRules.freeDeliveryThreshold) * 100
   );
 
-  // Effect to manage component mount state
-  useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
+  // Prevent any rendering before mounting
+  if (!mounted) return null;
 
-  // Handle quantity changes for items in the cart
-  const handleQuantityChange = useCallback(
-    (itemId: number, currentQuantity: number, change: number) => {
-      const newQuantity = currentQuantity + change; // Calculate new quantity
-      const item = items.find((i) => i.id === itemId);
-      if (item && newQuantity >= 1 && newQuantity <= item.stock) {
-        updateQuantity(itemId, newQuantity); // Update quantity if valid
-      }
-    },
-    [items, updateQuantity]
-  );
-
-  // Prevent rendering if not mounted
-  if (!mounted) {
-    return null;
-  }
+  const handleCheckout = () => {
+    closeCart();
+    router.push(`/${params.locale}/checkout`);
+  };
 
   return (
     <Sheet open={isOpen} onOpenChange={closeCart}>
@@ -113,56 +123,50 @@ export default function Cart() {
       >
         <SheetHeader className="flex-shrink-0">
           <SheetTitle>{t("title")}</SheetTitle>
-          <div className="mt-4">
-            {/* Delivery zone selection */}
-            <div className="flex justify-between items-center mb-3">
-              <label className="text-sm font-medium">
-                {t("delivery_zone")}:
-              </label>
-              <select
-                value={deliveryZone}
-                onChange={(e) =>
-                  setDeliveryZone(e.target.value as DeliveryZone)
-                }
-                className="bg-gray-50 dark:bg-charade-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm"
-              >
-                <option value="in_city">{t("in_city_Chisinau")}</option>
-                <option value="outside_city">
-                  {t("outside_city_Chisinau")}
-                </option>
-              </select>
-            </div>
-            {total > 0 && (
-              <div className="space-y-3">
-                {/* Free delivery progress indicator */}
-                <div className="flex items-center gap-2 text-sm">
-                  <PiTruck className="text-accent" size={20} />
-                  {remainingForFreeDelivery > 0 ? (
-                    <span>
-                      {t("add_more_for_free_delivery", {
-                        amount: remainingForFreeDelivery.toFixed(2),
-                      })}
-                    </span>
-                  ) : (
-                    <span className="text-green-500">
-                      {t("free_delivery_eligible")}
-                    </span>
-                  )}
-                </div>
-                <div className="w-full h-2 bg-gray-200 rounded-full dark:bg-gray-700">
-                  <div
-                    className="h-2 bg-accent rounded-full transition-all duration-300"
-                    style={{ width: `${progressPercentage}%` }}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
         </SheetHeader>
+
+        <div className="mt-4">
+          {/* Delivery zone selection */}
+          <div className="flex justify-between items-center mb-3">
+            <label className="text-sm font-medium">{t("delivery_zone")}:</label>
+            <select
+              value={deliveryZone}
+              onChange={(e) => setDeliveryZone(e.target.value as DeliveryZone)}
+              className="bg-gray-50 dark:bg-charade-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm"
+            >
+              <option value="in_city">{t("in_city_Chisinau")}</option>
+              <option value="outside_city">{t("outside_city_Chisinau")}</option>
+            </select>
+          </div>
+
+          {total > 0 && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm">
+                <PiTruck className="text-accent" size={20} />
+                {remainingForFreeDelivery > 0 ? (
+                  <span>
+                    {t("add_more_for_free_delivery", {
+                      amount: remainingForFreeDelivery.toFixed(2),
+                    })}
+                  </span>
+                ) : (
+                  <span className="text-green-500">
+                    {t("free_delivery_eligible")}
+                  </span>
+                )}
+              </div>
+              <div className="w-full h-2 bg-gray-200 rounded-full dark:bg-gray-700">
+                <div
+                  className="h-2 bg-accent rounded-full transition-all duration-300"
+                  style={{ width: `${progressPercentage}%` }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="flex-1 overflow-y-auto py-4">
           <div className="flex flex-col gap-4">
-            {/* Cart items list */}
             {items.map((item) => (
               <div
                 key={item.id}
@@ -240,7 +244,7 @@ export default function Cart() {
           </div>
         </div>
 
-        <div className="flex-shrink-0 rounded-lg  space-y-3">
+        <div className="flex-shrink-0 space-y-3">
           {totalDiscount > 0 && (
             <div className="flex items-center justify-between text-xs bg-red-50 dark:bg-red-900/10 p-2.5 rounded-lg">
               <div className="flex items-center gap-2">
@@ -276,7 +280,6 @@ export default function Cart() {
             </div>
 
             <div className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-              {/* Delivery cost display */}
               {remainingForFreeDelivery > 0 ? (
                 <span>
                   {t("delivery_cost")}: {currentDeliveryRules.cost}{" "}
@@ -301,10 +304,10 @@ export default function Cart() {
             </div>
           </div>
 
-          {/* Finalize order button */}
           <Button
             className="w-full bg-accent hover:bg-charade-900 hover:text-white text-charade-900 dark:hover:bg-gray-100 dark:hover:text-charade-900 h-10 text-sm font-semibold"
             disabled={items.length === 0}
+            onClick={handleCheckout}
           >
             {t("finalize_order")}
           </Button>

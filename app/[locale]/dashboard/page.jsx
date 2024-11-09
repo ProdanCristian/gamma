@@ -99,7 +99,7 @@ export default function DashboardPage() {
         )}
 
         {selectedTab === "addresses" && (
-          <div className="p-6 border-gray-200 dark:border-gray-700 dark:bg-charade-900 rounded-lg bg-gray-100">
+          <div className="p-6 border-gray-200 dark:border-gray-700 dark:bg-charade-900 rounded-lg bg-white">
             <h2 className="text-xl font-semibold mb-4 dark:text-white text-gray-700">
               {t("address.delivery_address")}
             </h2>
@@ -108,7 +108,7 @@ export default function DashboardPage() {
         )}
 
         {selectedTab === "orders" && (
-          <div className="p-6 border-gray-200 dark:border-gray-700 dark:bg-charade-900 rounded-lg bg-gray-100">
+          <div className="p-6 border-gray-200 dark:border-gray-700 dark:bg-charade-900 rounded-lg bg-white">
             <h2 className="text-xl font-semibold mb-4 dark:text-white text-gray-700">
               {t("auth.orders_title")}
             </h2>

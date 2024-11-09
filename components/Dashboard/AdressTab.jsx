@@ -11,7 +11,11 @@ import useSWR, { mutate } from "swr";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
-export const AddressTab = () => {
+export const AddressTab = ({
+  onAddressChange,
+  isCheckout = false,
+  guestMode = false,
+}) => {
   const { data: session } = useSession();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -57,11 +61,22 @@ export const AddressTab = () => {
   const [sectorSearch, setSectorSearch] = useState("");
   const [sectorSuggestions, setSectorSuggestions] = useState([]);
 
+  const [showAddressForm, setShowAddressForm] = useState(false);
+
   useEffect(() => {
+    if (guestMode) {
+      setShowAddressForm(true);
+      return;
+    }
+
     if (addressData?.exists && addressData?.address) {
       setAddress(addressData.address);
+      onAddressChange?.(addressData.address);
+      setShowAddressForm(false);
+    } else if (session) {
+      setShowAddressForm(true);
     }
-  }, [addressData]);
+  }, [addressData, onAddressChange, guestMode, session]);
 
   const getDistricts = () => {
     return Array.from(validator.data.districtsMap.entries()).map(
@@ -220,31 +235,44 @@ export const AddressTab = () => {
     try {
       const formattedAddress = formatAddressToString(formData);
 
-      const response = await fetch("/api/address", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          address: formattedAddress,
-        }),
-      });
+      if (guestMode) {
+        onAddressChange?.(formattedAddress);
+        setAddress(formattedAddress);
+        setShowAddressForm(false);
+        toast({
+          title: t("address.success"),
+          description: t("address.address_updated"),
+          variant: "default",
+          duration: 3000,
+        });
+      } else {
+        const response = await fetch("/api/address", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            address: formattedAddress,
+          }),
+        });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || t("address.update_failed"));
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || t("address.update_failed"));
+        }
+
+        setAddress(data.address);
+        onAddressChange?.(data.address);
+        setShowAddressForm(false);
+        mutate("/api/address");
+
+        toast({
+          title: t("address.success"),
+          description: t("address.address_updated"),
+          variant: "default",
+          duration: 3000,
+        });
       }
-
-      setAddress(data.address);
-      setShowAddressForm(false);
-      mutate("/api/address");
-
-      toast({
-        title: t("address.success"),
-        description: t("address.address_updated"),
-        variant: "default",
-        duration: 3000,
-      });
     } catch (error) {
       setError(error);
       toast({
@@ -258,8 +286,6 @@ export const AddressTab = () => {
       setIsLoading(false);
     }
   };
-
-  const [showAddressForm, setShowAddressForm] = useState(false);
 
   const isFormValid = () => {
     if (!formData.city || !formData.street) return false;
@@ -350,10 +376,6 @@ export const AddressTab = () => {
     );
   };
 
-  if (!session) {
-    return <div>{t("address.please_login")}</div>;
-  }
-
   if (addressError) {
     toast({
       title: t("address.error"),
@@ -363,7 +385,7 @@ export const AddressTab = () => {
   }
 
   return (
-    <div className="border-gray-200 dark:border-gray-700 dark:bg-charade-900 rounded-lg bg-gray-100">
+    <div className="border-gray-200 dark:border-gray-700 dark:bg-charade-900 rounded-lg bg-white">
       {!validator ? (
         <div className="p-4">
           <Skeleton className="h-6 w-3/4" />
@@ -371,7 +393,7 @@ export const AddressTab = () => {
       ) : !showAddressForm ? (
         <div className="space-y-4">
           {address ? (
-            <div className="p-4 bg-white dark:bg-[#4A4B59] rounded-lg ">
+            <div className="p-4 bg-gray-100 dark:bg-[#4A4B59] rounded-lg ">
               <p className="text-gray-700 dark:text-gray-300 mb-4">{address}</p>
               <Button
                 onClick={() => setShowAddressForm(true)}
@@ -398,7 +420,16 @@ export const AddressTab = () => {
           )}
         </div>
       ) : (
-        <form onSubmit={handleAddressSubmit} className="space-y-4">
+        <form
+          onSubmit={handleAddressSubmit}
+          onChange={(e) => {
+            if (guestMode) {
+              const formattedAddress = formatAddressToString(formData);
+              onAddressChange?.(formattedAddress);
+            }
+          }}
+          className="space-y-4"
+        >
           <div className="autocomplete-wrapper">
             <label className="block text-sm font-medium dark:text-white text-gray-700">
               {t("address.district")}:<span className="text-red-500">*</span>
@@ -410,7 +441,7 @@ export const AddressTab = () => {
                 onChange={(e) => handleDistrictSearch(e.target.value)}
                 onKeyDown={handleDistrictKeyDown}
                 placeholder={t("address.search_district")}
-                className="p-2 dark:dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                className="p-2 dark:dark:bg-[#4A4B59] bg-gray-100 mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
               />
               {districtSuggestions.length > 0 && (
                 <div className="absolute z-10 w-full bg-white dark:bg-charade-950 shadow-lg rounded-b-md max-h-60 overflow-y-auto">
@@ -445,7 +476,7 @@ export const AddressTab = () => {
                       })
                     : t("address.search_locality")
                 }
-                className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                className="p-2 dark:bg-[#4A4B59] bg-gray-100 mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
               />
               {citySuggestions.length > 0 && (
                 <div className="absolute z-10 w-full bg-white dark:bg-charade-950 shadow-lg rounded-b-md max-h-60 overflow-y-auto">
@@ -483,7 +514,7 @@ export const AddressTab = () => {
                   onChange={(e) => handleSectorSearch(e.target.value)}
                   onKeyDown={handleSectorKeyDown}
                   placeholder={t("address.search_sector")}
-                  className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                  className="p-2 dark:bg-[#4A4B59] bg-gray-100 mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                 />
                 {sectorSuggestions.length > 0 && (
                   <div className="absolute z-10 w-full bg-white dark:bg-charade-950 shadow-lg rounded-b-md max-h-60 overflow-y-auto">
@@ -511,7 +542,7 @@ export const AddressTab = () => {
                 name="streetType"
                 value={formData.streetType}
                 onChange={handleInputChange}
-                className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                className="p-2 dark:bg-[#4A4B59] bg-gray-100 mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
               >
                 <option value="street">{t("address.street")}</option>
                 <option value="avenue">{t("address.avenue")}</option>
@@ -525,7 +556,7 @@ export const AddressTab = () => {
                   name="street"
                   value={formData.street}
                   onChange={handleInputChange}
-                  className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                  className="p-2 dark:bg-[#4A4B59] bg-gray-100 mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                 />
               </div>
             </div>
@@ -585,7 +616,7 @@ export const AddressTab = () => {
                     name="building"
                     value={formData.building}
                     onChange={handleInputChange}
-                    className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                    className="p-2 dark:bg-[#4A4B59] bg-gray-100 mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                   />
                 </div>
                 <div>
@@ -598,7 +629,7 @@ export const AddressTab = () => {
                     name="apartment"
                     value={formData.apartment}
                     onChange={handleInputChange}
-                    className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                    className="p-2 dark:bg-[#4A4B59] bg-gray-100 mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                   />
                 </div>
               </div>
@@ -612,7 +643,7 @@ export const AddressTab = () => {
                     name="entrance"
                     value={formData.entrance}
                     onChange={handleInputChange}
-                    className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                    className="p-2 dark:bg-[#4A4B59] bg-gray-100 mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                   />
                 </div>
                 <div>
@@ -624,7 +655,7 @@ export const AddressTab = () => {
                     name="floor"
                     value={formData.floor}
                     onChange={handleInputChange}
-                    className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                    className="p-2 dark:bg-[#4A4B59] bg-gray-100 mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                   />
                 </div>
               </div>
@@ -640,7 +671,7 @@ export const AddressTab = () => {
                 name="houseNumber"
                 value={formData.houseNumber}
                 onChange={handleInputChange}
-                className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                className="p-2 dark:bg-[#4A4B59] bg-gray-100 mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
               />
             </div>
           )}
@@ -655,48 +686,50 @@ export const AddressTab = () => {
               value={formData.postalCode}
               onChange={handleInputChange}
               placeholder="MD-2001"
-              className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              className="p-2 dark:bg-[#4A4B59] bg-gray-100 mt-1 block w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
           </div>
 
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={isLoading || !isFormValid()}
-              className={`bg-gray-500 hover:bg-charade-800 text-white px-4 py-2 rounded-lg w-full transition-colors duration-200 ${
-                isLoading || !isFormValid()
-                  ? "opacity-50 cursor-not-allowed"
-                  : ""
-              }`}
-            >
-              {isLoading ? t("address.saving") : t("address.save_address")}
-            </button>
+          {!guestMode && (
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                disabled={isLoading || !isFormValid()}
+                className={`bg-gray-500 hover:bg-charade-800 text-white px-4 py-2 rounded-lg w-full transition-colors duration-200 ${
+                  isLoading || !isFormValid()
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+              >
+                {isLoading ? t("address.saving") : t("address.save_address")}
+              </button>
 
-            <button
-              onClick={() => {
-                setShowAddressForm(false);
-                setFormData({
-                  streetType: "street",
-                  street: "",
-                  houseNumber: "",
-                  building: "",
-                  entrance: "",
-                  floor: "",
-                  apartment: "",
-                  office: "",
-                  city: "",
-                  sector: "",
-                  district: "",
-                  postalCode: "",
-                });
-                setCitySearch("");
-                setCitySuggestions([]);
-              }}
-              className="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
-            >
-              {t("address.cancel")}
-            </button>
-          </div>
+              <button
+                onClick={() => {
+                  setShowAddressForm(false);
+                  setFormData({
+                    streetType: "street",
+                    street: "",
+                    houseNumber: "",
+                    building: "",
+                    entrance: "",
+                    floor: "",
+                    apartment: "",
+                    office: "",
+                    city: "",
+                    sector: "",
+                    district: "",
+                    postalCode: "",
+                  });
+                  setCitySearch("");
+                  setCitySuggestions([]);
+                }}
+                className="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+              >
+                {t("address.cancel")}
+              </button>
+            </div>
+          )}
         </form>
       )}
 

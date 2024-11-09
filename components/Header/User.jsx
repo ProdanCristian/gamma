@@ -2,7 +2,7 @@
 
 import { PiUser } from "react-icons/pi";
 import { useState } from "react";
-import AuthModal from "@/components/AuthModal";
+import AuthModal from "@/components/auth/AuthModal";
 
 export default function User() {
   const [isOpen, setIsOpen] = useState(false);

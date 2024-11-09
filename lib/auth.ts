@@ -38,6 +38,14 @@ export const authOptions: AuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+          redirect_uri: "https://ecommband.com/api/auth/callback/google",
+        },
+      },
       profile(profile) {
         return {
           id: profile.sub,
@@ -55,6 +63,7 @@ export const authOptions: AuthOptions = {
       authorization: {
         params: {
           scope: "email,public_profile",
+          redirect_uri: "https://ecommband.com/api/auth/callback/facebook",
         },
       },
       profile(profile) {
@@ -212,5 +221,14 @@ export const authOptions: AuthOptions = {
 
       return session;
     },
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) {
+        return `${baseUrl}${url}`;
+      } else if (url.startsWith("https://ecommband.com")) {
+        return url;
+      }
+      return baseUrl;
+    },
   },
+  secret: process.env.NEXTAUTH_SECRET,
 };
