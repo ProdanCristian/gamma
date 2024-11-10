@@ -57,7 +57,6 @@ export async function PUT(request) {
       );
     }
 
-    // Using raw SQL query to update the address
     const query = {
       text: 'UPDATE "nc_pka4___Utilizatori" SET "Adresa" = $1 WHERE id = $2 RETURNING "Adresa"',
       values: [body.address, session.user.id],

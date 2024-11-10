@@ -48,7 +48,7 @@
     "floor": "Этаж",
     "select_location_type": "Выберите тип населенного пункта",
     "select_city_village": "Выберите город/село",
-    "address_form": "Форма адреа",
+    "address_form": "Форма адре",
     "address_details": "Детали адреса",
     "search_locality_in_district": "Поиск населенного пункта в...",
     "fetch_error": "Ошибка при загрузке адреса",
@@ -154,7 +154,7 @@
     "internal_error": "Произошла ошибка. Попробуйте еще раз.",
     "invalid_credentials": "Неверный email или пароль",
     "login_successful": "Вход выполнен успешно",
-    "email_already_exists": "т email уже заргстрирован",
+    "email_already_exists": "т email уже заргстирован",
     "invalid_email_format": "Неверный формат email",
     "password_too_short": "Пароль должен содерать не менее 6 символов",
     "name_required": "Имя и фамилия обязательны",
@@ -178,7 +178,7 @@
     "success": "Успех",
     "profile_updated": "Профиль успешно обновлн",
     "error": "Ошибка",
-    "generic_error": "Произошла ошибка при обновлении профиля",
+    "generic_error": "Поизошла ошибка при обновлении профиля",
     "email_change_restricted": "Электронная почта не может быть изменена дя аккаунтов Google или Facebook"
   },
   "contact": {
@@ -200,9 +200,9 @@
     "free_delivery_description": "Бесплатная доставка по Кишинёву",
     "satisfaction_title": "100% Удовлетворение",
     "satisfaction_description": "Гарантия удовлетворения клиента",
-    "secure_payment_title": "Безопасны платежи",
+    "secure_payment_title": "Безопасные платежи",
     "secure_payment_description": "Гарантированные безопасные транзакции",
-    "support_title": "Пдержка 24/7",
+    "support_title": "Поддержка 24/7",
     "support_description": "Круглосуточная поддержка клиентов"
   },
   "footer": {
@@ -220,7 +220,7 @@
     "exchange_return": "Обмен и возврат",
     "privacy_policy": "Политика конфиденциальности",
     "warranty": "Гарантия",
-    "follow_us": "Следите за нами",
+    "follow_us": "Следит за нами",
     "payments_methods": "Методы оплаты",
     "copyright": "copyright 2024",
     "mobile_app": "Моильное приложение",
@@ -244,7 +244,7 @@
     "lei": "Лей"
   },
   "product": {
-    "order_now": "Купить сейчас",
+    "order_now": "Заказать сейчас",
     "lei": "Лей",
     "select_variant": "Выберите вариант",
     "choose_option": "Выберите опцию",
@@ -286,6 +286,10 @@
     "go_back": "Назад"
   },
   "Order": {
+    "view_orders_in_dashboard": "Посмотреть заказы в панели управления",
+    "coupon_discount": "Скидка по купону",
+    "free": "Бесплатно",
+    "delivery_address": "Адрес",
     "order_confirmation": "Подтверждение заказа",
     "order_details": "Детали заказа",
     "quantity": "Количество",
@@ -305,7 +309,12 @@
       "pending": "Ожидает подтверждения",
       "confirmed": "Подтвержден",
       "cancelled": "Отменен"
-    }
+    },
+    "no_order_data": "Детали заказа не найдены",
+    "product_price": "Цена товара",
+    "coupon_applied": "Применен купон",
+    "no_orders": "У вас нет заказов",
+    "payment_method": "Способ оплаты"
   },
   "checkout": {
     "title": "Оформление заказа",
@@ -314,19 +323,17 @@
     "delivery_address": "Адрес доставки",
     "guest_information": "Информация о клиенте",
     "name": "Имя и фамилия",
-    "email": "Эл. почта",
-    "phone": "Телефон",
     "address": "Адрес",
     "payment_method": "Способ оплаты",
     "cash_on_delivery": "Оплата при доставке",
-    "subtotal": "Подытог",
+    "subtotal": "Промежуточный итог",
     "delivery": "Доставка",
     "total": "Итого",
     "free": "Бесплатно",
     "total_discount": "Общая скидка",
     "empty_cart": "Ваша корзина пуста",
     "processing": "Обработка...",
-    "place_order": "Оформить заказ",
+    "place_order": "Разместить заказ",
     "error": "Ошибка",
     "success": "Успешно",
     "fill_all_fields": "Пожалуйста, заполните все обязательные поля",
@@ -334,7 +341,7 @@
     "invalid_phone": "Неверный номер телефона",
     "order_failed": "Не удалось разместить заказ",
     "order_placed": "Ваш заказ успешно размещен",
-    "generic_error": "Произошла ошибка. Пожалуйста, попробуйте еще раз",
+    "generic_error": "Произошла ошибка. Пожалуйста, попробуйте снова",
     "address_fetch_error": "Не удалось загрузить адрес",
     "no_address": "У вас нет сохраненного адреса",
     "add_address": "Добавить адрес",
@@ -350,14 +357,22 @@
     "login_button": "Войти",
     "address_required": "Пожалуйста, добавьте адрес доставки",
     "have_account": "Уже есть аккаунт?",
-    "login_to_save_address": "Войдите, чтобы сохранить адрес для будущих заказов",
+    "login_to_save_address": "Войдите в систему, чтобы сохранить адрес для будущих заказов",
     "address_placeholder": "Улица, номер дома/квартиры, подъезд, этаж",
     "first_name": "Имя Фамилия",
     "first_name_placeholder": "Введите имя и фамилию",
-
-    "email_placeholder": "Введите email адрес",
-
+    "email": "Email",
+    "email_placeholder": "Введите адрес электронной почты",
+    "phone": "Телефон",
     "phone_format": "Формат: +373 XXXXXXXX",
-    "user_info": "Информация о пользователе"
+    "user_info": "Информация о пользователе",
+    "applying": "Применение...",
+    "coupon_applied": "Купон успешно применен",
+    "enter_valid_coupon": "Введите действительный код купона",
+    "coupon_invalid": "Недействительный код купона",
+    "coupon_expired": "Срок действия купона истек",
+    "coupon_already_used": "Этот купон уже использован",
+    "coupon_discount": "Скидка по купону",
+    "coupon_discount_value": "Скидка по купону"
   }
 }

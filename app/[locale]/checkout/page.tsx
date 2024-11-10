@@ -13,8 +13,21 @@ import { LoginForm } from "@/components/auth/LoginForm";
 import { CouponSection } from "@/components/Checkout/CouponSection";
 import { UserInfoForm } from "@/components/Checkout/UserInfoForm";
 
+interface ExtendedUser {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+  provider?: string;
+  phone?: string;
+}
+
+interface ExtendedSession {
+  user?: ExtendedUser;
+}
+
 const CheckoutPage = () => {
-  const { data: session } = useSession();
+  const { data: session } = useSession() as { data: ExtendedSession | null };
   const router = useRouter();
   const t = useTranslations();
   const { toast } = useToast();
@@ -29,6 +42,17 @@ const CheckoutPage = () => {
   const [guestName, setGuestName] = useState("");
   const [userAddress, setUserAddress] = useState<string | null>(null);
   const [showLoginForm, setShowLoginForm] = useState(false);
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [appliedCouponName, setAppliedCouponName] = useState<string | null>(
+    null
+  );
+  const [paymentMethod, setPaymentMethod] = useState(
+    params.locale === "ro"
+      ? "Plata la livrare"
+      : params.locale === "ru"
+      ? "Оплата при доставке"
+      : "cash_on_delivery"
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -39,43 +63,81 @@ const CheckoutPage = () => {
     };
   }, []);
 
-  const { subtotal, deliveryCost, total, discountPercentage } =
-    React.useMemo(() => {
-      if (!mounted)
-        return {
-          subtotal: 0,
-          deliveryCost: 0,
-          total: 0,
-          discountPercentage: 0,
-        };
+  useEffect(() => {
+    if (session?.user) {
+      setGuestName(session.user.name || "");
+      setGuestPhone(session.user.phone || "");
+      setGuestEmail(session.user.email || "");
+    }
+  }, [session]);
 
-      const subtotal = items.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0
-      );
+  const {
+    subtotal,
+    deliveryCost,
+    total,
+    discountPercentage,
+    couponDiscountAmount,
+    finalSubtotal,
+  } = React.useMemo(() => {
+    if (!mounted)
+      return {
+        subtotal: 0,
+        deliveryCost: 0,
+        total: 0,
+        discountPercentage: 0,
+        couponDiscountAmount: 0,
+        finalSubtotal: 0,
+      };
 
-      const discountedSubtotal = items.reduce(
-        (sum, item) => sum + (item.discountPrice || item.price) * item.quantity,
-        0
-      );
+    const subtotal = items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
 
-      const deliveryRules = DELIVERY_RULES[deliveryZone];
-      const deliveryCost =
-        discountedSubtotal >= deliveryRules.freeDeliveryThreshold
-          ? 0
-          : deliveryRules.cost;
-      const total = discountedSubtotal + deliveryCost;
+    const discountedSubtotal = items.reduce(
+      (sum, item) => sum + (item.discountPrice || item.price) * item.quantity,
+      0
+    );
 
-      const discountPercentage =
-        subtotal > 0
-          ? Math.round(((subtotal - discountedSubtotal) / subtotal) * 100)
-          : 0;
+    const deliveryRules = DELIVERY_RULES[deliveryZone];
+    const deliveryCost =
+      discountedSubtotal >= deliveryRules.freeDeliveryThreshold
+        ? 0
+        : deliveryRules.cost;
 
-      return { subtotal, deliveryCost, total, discountPercentage };
-    }, [items, deliveryZone, mounted]);
+    const couponDiscountAmount =
+      couponDiscount > 0 ? discountedSubtotal * (couponDiscount / 100) : 0;
+
+    const finalSubtotal = discountedSubtotal - couponDiscountAmount;
+
+    const total = finalSubtotal + deliveryCost;
+
+    const discountPercentage =
+      subtotal > 0
+        ? Math.round(((subtotal - discountedSubtotal) / subtotal) * 100)
+        : 0;
+
+    return {
+      subtotal,
+      deliveryCost,
+      total,
+      discountPercentage,
+      couponDiscountAmount,
+      finalSubtotal,
+    };
+  }, [items, deliveryZone, mounted, couponDiscount]);
 
   const handleAddressChange = (newAddress: string) => {
-    setUserAddress(newAddress);
+    if (session) {
+      setUserAddress(newAddress);
+    } else {
+      setGuestAddress(newAddress);
+    }
+  };
+
+  const handleCouponApplied = (discount: number, couponName: string) => {
+    setCouponDiscount(discount);
+    setAppliedCouponName(couponName);
   };
 
   const handlePlaceOrder = async () => {
@@ -121,26 +183,59 @@ const CheckoutPage = () => {
 
     setIsLoading(true);
     try {
+      if (session?.user?.id) {
+        const shouldUpdateProfile =
+          session.user.name !== guestName || session.user.phone !== guestPhone;
+
+        if (shouldUpdateProfile) {
+          const [firstName, ...lastNameParts] = guestName.trim().split(" ");
+          const lastName = lastNameParts.join(" ");
+
+          await fetch("/api/auth/update-profile", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              Nume: lastName || firstName,
+              Prenume: lastNameParts.length > 0 ? firstName : "",
+              Numar_Telefon: guestPhone
+                .replace(/\s/g, "")
+                .replace(/^\+373/, "")
+                .replace(/^373/, ""),
+              Provider: session.user.provider || "credentials",
+            }),
+          });
+        }
+      }
+
+      const products = items.map((item) => ({
+        id: item.id,
+        quantity: item.quantity,
+      }));
+
+      const formattedPhone = guestPhone
+        .replace(/\s/g, "")
+        .replace(/^\+373/, "")
+        .replace(/^373/, "");
+
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          items,
-          deliveryAddress: session ? userAddress : guestAddress,
+          userId: session?.user?.id || null,
+          numePrenume: guestName,
+          numarTelefon: formattedPhone,
+          products: products,
           deliveryZone,
-          subtotal,
-          deliveryCost,
-          total,
-          paymentMethod: "cash_on_delivery",
-          guestInfo: !session
-            ? {
-                name: guestName,
-                email: guestEmail,
-                phone: guestPhone,
-              }
-            : undefined,
+          isFreeDelivery: deliveryCost === 0,
+          address: session ? userAddress : guestAddress,
+          couponCode: appliedCouponName,
+          couponDiscount: couponDiscount,
+          total: total,
+          paymentMethod,
         }),
       });
 
@@ -151,11 +246,29 @@ const CheckoutPage = () => {
       const data = await response.json();
       clearCart();
 
-      if (session) {
-        router.push(`/${params.locale}/dashboard?tab=orders`);
-      } else {
-        router.push(`/${params.locale}/order-confirmation/${data.orderId}`);
-      }
+      const orderConfirmationData = {
+        products: items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          image: item.image,
+          quantity: item.quantity,
+          price: item.price,
+          discountPrice: item.discountPrice,
+        })),
+        deliveryCost,
+        total,
+        couponDiscount,
+        address: session ? userAddress : guestAddress,
+        orderIds: data.orderIds,
+        paymentMethod,
+      };
+
+      localStorage.setItem(
+        "orderConfirmation",
+        JSON.stringify(orderConfirmationData)
+      );
+
+      router.push(`/${params.locale}/checkout/order`);
 
       toast({
         title: t("checkout.success"),
@@ -238,8 +351,23 @@ const CheckoutPage = () => {
             ))}
 
             <div className="mt-4 space-y-3">
-              {/* Discount section */}
-              {subtotal !== total - deliveryCost && (
+              {couponDiscountAmount > 0 && (
+                <div className="flex items-center justify-between text-xs bg-green-50 dark:bg-green-900/10 p-2.5 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <PiSealPercentFill className="text-green-500" size={18} />
+                    <span className="font-medium">
+                      {t("checkout.coupon_discount", {})} ({couponDiscount}%)
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="text-green-500">
+                      -{couponDiscountAmount.toFixed(2)}{" "}
+                      {t("checkout.currency")}
+                    </span>
+                  </div>
+                </div>
+              )}
+              {subtotal !== finalSubtotal && (
                 <div className="flex items-center justify-between text-xs bg-red-50 dark:bg-red-900/10 p-2.5 rounded-lg">
                   <div className="flex items-center gap-2">
                     <PiSealPercentFill className="text-red-500" size={18} />
@@ -249,14 +377,13 @@ const CheckoutPage = () => {
                   </div>
                   <div className="flex flex-col items-end">
                     <span className="text-red-500">
-                      -{(subtotal - (total - deliveryCost)).toFixed(2)}{" "}
+                      -{(subtotal - finalSubtotal).toFixed(2)}{" "}
                       {t("checkout.currency")}
                     </span>
                   </div>
                 </div>
               )}
 
-              {/* Summary section */}
               <div className="bg-white dark:bg-charade-950 p-2.5 rounded-lg">
                 <div className="space-y-2">
                   <div className="flex justify-between">
@@ -345,15 +472,29 @@ const CheckoutPage = () => {
                 type="radio"
                 id="cash"
                 name="payment"
-                checked
-                readOnly
+                value={
+                  params.locale === "ro"
+                    ? "Plata la livrare"
+                    : params.locale === "ru"
+                    ? "Оплата при доставке"
+                    : "cash_on_delivery"
+                }
+                checked={
+                  paymentMethod ===
+                  (params.locale === "ro"
+                    ? "Plata la livrare"
+                    : params.locale === "ru"
+                    ? "Оплата при доставке"
+                    : "cash_on_delivery")
+                }
+                onChange={(e) => setPaymentMethod(e.target.value)}
                 className="form-radio"
               />
               <label htmlFor="cash">{t("checkout.cash_on_delivery")}</label>
             </div>
           </div>
 
-          <CouponSection />
+          <CouponSection onDiscountApplied={handleCouponApplied} />
 
           <Button
             onClick={handlePlaceOrder}

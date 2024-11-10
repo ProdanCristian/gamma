@@ -43,7 +43,7 @@ export const authOptions: AuthOptions = {
           prompt: "consent",
           access_type: "offline",
           response_type: "code",
-          redirect_uri: "https://ecommband.com/api/auth/callback/google",
+          redirect_uri: `${process.env.NEXTAUTH_URL}/api/auth/callback/google`,
         },
       },
       profile(profile) {
@@ -63,7 +63,7 @@ export const authOptions: AuthOptions = {
       authorization: {
         params: {
           scope: "email,public_profile",
-          redirect_uri: "https://ecommband.com/api/auth/callback/facebook",
+          redirect_uri: `${process.env.NEXTAUTH_URL}/api/auth/callback/facebook`,
         },
       },
       profile(profile) {
@@ -175,20 +175,14 @@ export const authOptions: AuthOptions = {
             const result = await db.query(
               `UPDATE "nc_pka4___Utilizatori" 
                SET "${providerIdField}" = $1,
-                   "Provider" = $2,
-                   "Nume" = $3,
-                   "Prenume" = $4
-               WHERE "Email" = $5 
+                   "Provider" = $2
+               WHERE "Email" = $3 
                RETURNING *`,
-              [
-                account.providerAccountId,
-                account.provider,
-                firstName,
-                lastName,
-                user.email,
-              ]
+              [account.providerAccountId, account.provider, user.email]
             );
             user.id = result.rows[0].id.toString();
+            user.firstName = result.rows[0].Nume;
+            user.lastName = result.rows[0].Prenume;
           }
         }
         return true;
@@ -224,7 +218,7 @@ export const authOptions: AuthOptions = {
     async redirect({ url, baseUrl }) {
       if (url.startsWith("/")) {
         return `${baseUrl}${url}`;
-      } else if (url.startsWith("https://ecommband.com")) {
+      } else if (new URL(url).hostname === new URL(baseUrl).hostname) {
         return url;
       }
       return baseUrl;

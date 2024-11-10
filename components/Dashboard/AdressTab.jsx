@@ -6,8 +6,8 @@ import { useSession } from "next-auth/react";
 import { MoldovaAddressValidator } from "@/lib/moldova-address-validator";
 import { useTranslations } from "next-intl";
 import { useToast } from "@/hooks/use-toast";
-import { Skeleton } from "../ui/skeleton";
 import useSWR, { mutate } from "swr";
+import { useLocale } from "next-intl";
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
@@ -16,6 +16,7 @@ export const AddressTab = ({
   isCheckout = false,
   guestMode = false,
 }) => {
+  const locale = useLocale();
   const { data: session } = useSession();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -38,7 +39,6 @@ export const AddressTab = ({
     entrance: "",
     floor: "",
     apartment: "",
-    office: "",
     city: "",
     sector: "",
     district: "",
@@ -51,8 +51,11 @@ export const AddressTab = ({
   const [validator, setValidator] = useState(null);
 
   useEffect(() => {
-    setValidator(new MoldovaAddressValidator(t.locale || "ro"));
-  }, [t.locale]);
+    console.log("Current locale:", locale);
+    const validator = new MoldovaAddressValidator(locale);
+    console.log("Validator created with language:", validator.language);
+    setValidator(validator);
+  }, [locale]);
 
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [districtSearch, setDistrictSearch] = useState("");
@@ -69,20 +72,23 @@ export const AddressTab = ({
       return;
     }
 
-    if (addressData?.exists && addressData?.address) {
-      setAddress(addressData.address);
-      onAddressChange?.(addressData.address);
-      setShowAddressForm(false);
-    } else if (session) {
-      setShowAddressForm(true);
+    if (addressData) {
+      if (addressData.exists && addressData.address) {
+        setAddress(addressData.address);
+        onAddressChange?.(addressData.address);
+        setShowAddressForm(false);
+      } else {
+        setShowAddressForm(true);
+      }
     }
-  }, [addressData, onAddressChange, guestMode, session]);
+  }, [addressData, onAddressChange, guestMode]);
 
   const getDistricts = () => {
     return Array.from(validator.data.districtsMap.entries()).map(
       ([ro, ru]) => ({
-        name: validator.language === "ro" ? ro : ru,
+        name: locale === "ru" ? ru : ro,
         nameRo: ro,
+        nameRu: ru,
       })
     );
   };
@@ -107,15 +113,25 @@ export const AddressTab = ({
     setDistrictSuggestions([]);
     setCitySearch("");
     setCitySuggestions([]);
-    setFormData((prev) => ({
-      ...prev,
+
+    const updatedFormData = {
+      ...formData,
       city: "",
       district: district.nameRo,
-    }));
+    };
+    setFormData(updatedFormData);
+
+    if (guestMode) {
+      const formattedAddress = formatAddressToString(updatedFormData);
+      onAddressChange?.(formattedAddress);
+    }
   };
 
   const handleCitySearch = (value) => {
     if (!validator) return;
+
+    console.log("Current validator language:", validator.language);
+    console.log("Current locale:", locale);
 
     setCitySearch(value);
     if (!value.trim()) {
@@ -132,6 +148,8 @@ export const AddressTab = ({
         type: "city",
         district: selectedDistrict,
       });
+
+      console.log("City results:", cityResults);
 
       const suburbanResults = validator.autocompleteLocality(value, {
         threshold: 0.3,
@@ -163,28 +181,67 @@ export const AddressTab = ({
   };
 
   const handleCitySelect = (suggestion) => {
-    setFormData((prev) => ({
-      ...prev,
-      city: suggestion.name,
+    const cityNameRo = suggestion.translations?.ro || suggestion.name;
+    const cityNameRu = suggestion.translations?.ru || suggestion.name;
+
+    const updatedFormData = {
+      ...formData,
+      city: cityNameRo,
       district: selectedDistrict,
       sector: "",
-    }));
-    setCitySearch(suggestion.name);
+    };
+    setFormData(updatedFormData);
+    setCitySearch(locale === "ru" ? cityNameRu : cityNameRo);
     setCitySuggestions([]);
     setSectorSearch("");
     setSectorSuggestions([]);
+
+    if (guestMode) {
+      const formattedAddress = formatAddressToString(updatedFormData);
+      onAddressChange?.(formattedAddress);
+    }
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
+    const updatedFormData = {
+      ...formData,
       [name]: value,
-    }));
+    };
+    setFormData(updatedFormData);
+
+    if (guestMode) {
+      const formattedAddress = formatAddressToString(updatedFormData);
+      onAddressChange?.(formattedAddress);
+    }
   };
 
   const formatAddressToString = (formData) => {
     const parts = [];
+
+    if (formData.district) {
+      const districtName =
+        locale === "ru"
+          ? validator.data.districtsMap.get(formData.district)
+          : formData.district;
+      parts.push(districtName);
+    }
+
+    if (formData.city) {
+      const cityName =
+        locale === "ru"
+          ? validator.data.citiesMap.get(formData.city) || formData.city
+          : formData.city;
+      parts.push(cityName);
+    }
+
+    if (formData.sector && isChisinauSelected()) {
+      const sectorName =
+        locale === "ru"
+          ? validator.data.chisinauSectorsMap.get(formData.sector)
+          : formData.sector;
+      parts.push(`${t("address.sector")} ${sectorName}`);
+    }
 
     const streetTypes = {
       street: t("address.street"),
@@ -213,13 +270,6 @@ export const AddressTab = ({
       parts.push(`${t("address.house")} ${formData.houseNumber}`);
     }
 
-    if (formData.sector && isChisinauSelected()) {
-      parts.push(`${t("address.sector")} ${formData.sector}`);
-    }
-
-    if (formData.city) {
-      parts.push(formData.city);
-    }
     if (formData.postalCode) {
       parts.push(formData.postalCode);
     }
@@ -352,12 +402,20 @@ export const AddressTab = ({
   };
 
   const handleSectorSelect = (sector) => {
-    setFormData((prev) => ({
-      ...prev,
+    const updatedFormData = {
+      ...formData,
       sector: sector.translations.ro,
-    }));
-    setSectorSearch(sector.name);
+    };
+    setFormData(updatedFormData);
+    setSectorSearch(
+      locale === "ru" ? sector.translations.ru : sector.translations.ro
+    );
     setSectorSuggestions([]);
+
+    if (guestMode) {
+      const formattedAddress = formatAddressToString(updatedFormData);
+      onAddressChange?.(formattedAddress);
+    }
   };
 
   const handleSectorKeyDown = (e) => {
@@ -370,10 +428,8 @@ export const AddressTab = ({
   };
 
   const isChisinauSelected = () => {
-    return (
-      formData.city.toLowerCase() === "chișinău" ||
-      formData.city.toLowerCase() === "кишинёв"
-    );
+    const chisinauNames = ["chișinău", "кишинёв"];
+    return chisinauNames.includes(formData.city.toLowerCase());
   };
 
   if (addressError) {
@@ -386,38 +442,20 @@ export const AddressTab = ({
 
   return (
     <div className="border-gray-200 dark:border-gray-700 dark:bg-charade-900 rounded-lg bg-white">
-      {!validator ? (
-        <div className="p-4">
-          <Skeleton className="h-6 w-3/4" />
-        </div>
-      ) : !showAddressForm ? (
+      {address && !showAddressForm ? (
         <div className="space-y-4">
-          {address ? (
-            <div className="p-4 bg-gray-100 dark:bg-[#4A4B59] rounded-lg ">
-              <p className="text-gray-700 dark:text-gray-300 mb-4">{address}</p>
-              <Button
-                onClick={() => setShowAddressForm(true)}
-                className={`bg-gray-500 hover:bg-charade-800 text-white px-4 py-2 rounded-lg transition-colors duration-200 ${
-                  isLoading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-                disabled={isLoading}
-              >
-                {t("address.edit_address")}
-              </Button>
-            </div>
-          ) : (
-            <div className="text-center space-y-4">
-              <p className="text-gray-600 dark:text-gray-400">
-                {t("address.no_address")}
-              </p>
-              <Button
-                onClick={() => setShowAddressForm(true)}
-                className="bg-gray-500 hover:bg-charade-800 text-white px-4 py-2 rounded-lg"
-              >
-                {t("address.add_address")}
-              </Button>
-            </div>
-          )}
+          <div className="p-4 bg-gray-100 dark:bg-[#4A4B59] rounded-lg ">
+            <p className="text-gray-700 dark:text-gray-300 mb-4">{address}</p>
+            <Button
+              onClick={() => setShowAddressForm(true)}
+              className={`bg-gray-500 hover:bg-charade-800 text-white px-4 py-2 rounded-lg transition-colors duration-200 ${
+                isLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={isLoading}
+            >
+              {t("address.edit_address")}
+            </Button>
+          </div>
         </div>
       ) : (
         <form
@@ -715,7 +753,6 @@ export const AddressTab = ({
                     entrance: "",
                     floor: "",
                     apartment: "",
-                    office: "",
                     city: "",
                     sector: "",
                     district: "",

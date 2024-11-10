@@ -26,7 +26,6 @@ interface UserProfile {
   Prenume: string;
   Numar_Telefon: string;
   Provider?: string;
-  nc_pka4___Adrese_id?: number;
 }
 
 export default function FastOrder() {
@@ -133,6 +132,7 @@ export default function FastOrder() {
       : 0;
     const currentDeliveryRules = DELIVERY_RULES[deliveryZone];
     const isFreeDelivery = total >= currentDeliveryRules.freeDeliveryThreshold;
+    const deliveryCost = isFreeDelivery ? 0 : currentDeliveryRules.cost;
 
     try {
       const response = await fetch("/api/orders/fastOrder", {
@@ -148,7 +148,7 @@ export default function FastOrder() {
           quantity: quantity,
           deliveryZone: deliveryZone,
           isFreeDelivery,
-          existingAddressId: userProfile?.nc_pka4___Adrese_id,
+          locale: params.locale,
         }),
       });
 
@@ -156,22 +156,53 @@ export default function FastOrder() {
         const data = await response.json();
         setOpen(false);
 
-        setOrderData({
-          id: data.orderId,
-          Status: "De Confirmat",
-          Nume_Prenume: name,
-          Numar_telefon: stripPhonePrefix(phone),
-          Pret_Livrare: isFreeDelivery
-            ? "Gratis"
-            : DELIVERY_RULES[deliveryZone].cost.toString(),
-          Cantitate: quantity,
-          Produs_Id: product.id,
-          Nume_Produs: product.name,
-          Pret_Standard: product.price,
-          Pret_Redus: product.discount || null,
-          Imagine_Principala: product.image,
-        });
+        const getLocalizedPaymentMethod = (locale: string) => {
+          switch (locale) {
+            case "ru":
+              return "Оплата при доставке";
+            case "ro":
+              return "Plata la livrare";
+            default:
+              return "Cash on delivery";
+          }
+        };
 
+        const getLocalizedAddressMessage = (locale: string) => {
+          switch (locale) {
+            case "ru":
+              return "Адрес будет подтвержден";
+            case "ro":
+              return "Adresa va fi confirmată";
+            default:
+              return "Address to be confirmed";
+          }
+        };
+
+        const orderConfirmation = {
+          products: [
+            {
+              id: product.id,
+              name: product.name,
+              image: product.image,
+              quantity: quantity,
+              price: parseFloat(product.price),
+              discountPrice: product.discount
+                ? parseFloat(product.discount)
+                : undefined,
+            },
+          ],
+          deliveryCost: deliveryCost,
+          total: total + deliveryCost,
+          couponDiscount: 0,
+          ...(data.address && { address: data.address }),
+          orderIds: [data.orderId],
+          paymentMethod: getLocalizedPaymentMethod(params.locale as string),
+        };
+
+        localStorage.setItem(
+          "orderConfirmation",
+          JSON.stringify(orderConfirmation)
+        );
         router.push(`/${params.locale}/checkout/order`);
       } else {
         throw new Error("Failed to create order");

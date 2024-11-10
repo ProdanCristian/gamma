@@ -56,9 +56,7 @@ export default function AuthModal() {
     : "";
 
   const displayName =
-    session?.user?.name ||
-    (userData && `${userData.Nume} ${userData.Prenume}`.trim()) ||
-    "";
+    (userData && `${userData.Nume} ${userData.Prenume}`.trim()) || "";
 
   const switchTab = (tab) => {
     setActiveTab(tab);

@@ -34,6 +34,9 @@ export async function GET() {
         c."Pret_Livrare",
         c."Cantitate",
         c."Total",
+        c."Pret_Produs",
+        c."Cupon_Aplicat",
+        c."Adresa_Livrare",
         c.created_at,
         p."Nume_Produs_RO",
         p."Nume_Produs_RU",
@@ -41,7 +44,7 @@ export async function GET() {
         p."Pret_Standard"
       FROM "nc_pka4___Comenzi" c
       LEFT JOIN "nc_pka4__Produse" p 
-      ON c."nc_pka4___produse_copy_id" = p.id
+      ON c."nc_pka4__Produse_id" = p.id
       WHERE c."nc_pka4___Utilizatori_id" = $1
       ORDER BY c.created_at DESC
     `;

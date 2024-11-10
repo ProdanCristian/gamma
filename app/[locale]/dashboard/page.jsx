@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ProfileTab } from "@/components/Dashboard/ProfileTab";
 import { AddressTab } from "@/components/Dashboard/AdressTab";
 import OrdersTab from "@/components/Dashboard/OrdersTab";
 
 export default function DashboardPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const locale = useLocale();
   const [isTranslationsLoaded, setIsTranslationsLoaded] = useState(false);
 
@@ -22,7 +23,9 @@ export default function DashboardPage() {
     t = (key) => key;
   }
 
-  const [selectedTab, setSelectedTab] = useState("profile");
+  const [selectedTab, setSelectedTab] = useState(
+    searchParams.get("tab") || "profile"
+  );
   const [userData, setUserData] = useState(null);
 
   const fetchUserData = async () => {
@@ -54,6 +57,11 @@ export default function DashboardPage() {
     orders: "auth.orders_title",
   };
 
+  const handleTabChange = (tab) => {
+    setSelectedTab(tab);
+    router.push(`/${locale}/dashboard?tab=${tab}`, { scroll: false });
+  };
+
   if (!isTranslationsLoaded) {
     return (
       <div className="dashboard py-10 max-w-[1250px] w-[90vw] mx-auto">
@@ -69,18 +77,18 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="dashboard py-10 max-w-[1250px] w-[90vw] mx-auto">
+    <div className="dashboard py-10 max-w-[1250px] w-[90vw] mx-auto min-h-screen">
       <h1 className="text-3xl font-bold mb-6 dark:text-white">
         {t("auth.Dashboard")}
       </h1>
 
       <div className="space-y-6">
         <nav>
-          <ul className="flex gap-4 mb-6 border border-gray-200 dark:border-charade-800 p-4 rounded-lg">
+          <ul className="flex md:flex-row flex-col gap-4 mb-6 border border-gray-200 dark:border-charade-800 p-4 rounded-lg">
             {tabs.map((tab) => (
               <li
                 key={tab}
-                onClick={() => setSelectedTab(tab)}
+                onClick={() => handleTabChange(tab)}
                 className={`cursor-pointer px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-500 dark:text-white
                   ${
                     selectedTab === tab

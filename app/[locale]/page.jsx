@@ -3,7 +3,7 @@ import ImageCarousel from "@/components/ImageCarousel";
 import TopCategories from "@/components/TopCategories";
 import DiscountedProducts from "@/components/Shop/DiscoutedProducts";
 import BestSellingProducts from "@/components/Shop/BestSellingProducts";
-
+import Image from "next/image";
 async function getSliders() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -46,11 +46,14 @@ export default async function Page({ params }) {
       ? marketingData?.Bannere_Slider_RU_
       : marketingData?.Bannere_Slider_RO_;
 
+  const banner3 =
+    locale === "ru"
+      ? marketingData?.Banner3_RU_[0]
+      : marketingData?.Banner3_RO_[0];
+
   if (!marketingData) {
-    console.log("No marketing data found");
     return null;
   }
-
   return (
     <main>
       <div className="max-w-[1250px] w-[90vw] mx-auto">
@@ -64,6 +67,20 @@ export default async function Page({ params }) {
       <TopCategories categories={topCategories} />
       <DiscountedProducts marketingData={marketingData} />
       <BestSellingProducts marketingData={marketingData} />
+      <div className="max-w-[1250px] w-[90vw] mx-auto mt-10">
+        <div className="w-full h-[200px] lg:h-[250px] relative">
+          {banner3 && (
+            <Image
+              src={banner3}
+              alt="Gamma Livrare Gratuita"
+              className="rounded-xl"
+              fill
+              style={{ objectFit: "cover" }}
+              priority
+            />
+          )}
+        </div>
+      </div>
     </main>
   );
 }

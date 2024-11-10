@@ -284,8 +284,12 @@
     "go_back": "Înapoi"
   },
   "Order": {
-    "order_confirmation": "Confirmare Comandă",
-    "order_details": "Detalii Comandă",
+    "view_orders_in_dashboard": "Vezi comenzile în panoul de control",
+    "coupon_discount": "Reducere cupon",
+    "free": "Gratis",
+    "delivery_address": "Adresă",
+    "order_confirmation": "Confirmare comandă",
+    "order_details": "Detalii comandă",
     "quantity": "Cantitate",
     "subtotal": "Subtotal",
     "delivery": "Livrare",
@@ -303,7 +307,12 @@
       "pending": "De Confirmat",
       "confirmed": "Confirmat",
       "cancelled": "Anulată"
-    }
+    },
+    "no_order_data": "Nu s-au găsit detalii despre comandă",
+    "product_price": "Preț produs",
+    "coupon_applied": "Cupon aplicat",
+    "no_orders": "Nu aveți comenzi",
+    "payment_method": "Metoda de plată"
   },
   "checkout": {
     "title": "Finalizare comandă",
@@ -354,6 +363,14 @@
     "email_placeholder": "Introduceți adresa de email",
     "phone": "Telefon",
     "phone_format": "Format: +373 XXXXXXXX",
-    "user_info": "Informații utilizator"
+    "user_info": "Informații utilizator",
+    "applying": "Se aplică...",
+    "coupon_applied": "Cupon aplicat cu succes",
+    "enter_valid_coupon": "Introduceți un cod de cupon valid",
+    "coupon_invalid": "Cod cupon invalid",
+    "coupon_expired": "Cuponul a expirat",
+    "coupon_already_used": "Acest cupon a fost deja utilizat",
+    "coupon_discount": "Reducere cupon",
+    "coupon_discount_value": "Reducere cupon"
   }
 }

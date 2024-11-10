@@ -7,14 +7,19 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthModal } from "@/hooks/useAuthModal";
 
-export const CouponSection = () => {
+interface CouponSectionProps {
+  onDiscountApplied?: (discount: number, couponName: string) => void;
+}
+
+export const CouponSection = ({ onDiscountApplied }: CouponSectionProps) => {
   const t = useTranslations();
   const { data: session } = useSession();
   const { toast } = useToast();
   const { openAuthModal } = useAuthModal();
   const [couponCode, setCouponCode] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleApplyCoupon = () => {
+  const handleApplyCoupon = async () => {
     if (!session) {
       openAuthModal();
       toast({
@@ -24,7 +29,52 @@ export const CouponSection = () => {
       });
       return;
     }
-    // Add coupon application logic here
+
+    if (!couponCode.trim()) {
+      toast({
+        title: t("checkout.error"),
+        description: t("checkout.enter_valid_coupon"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/orders/cuponUsage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ couponCode }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(t(data.error));
+      }
+
+      toast({
+        title: t("checkout.success"),
+        description: t(data.message),
+      });
+
+      if (onDiscountApplied) {
+        onDiscountApplied(data.discount, couponCode);
+      }
+
+      setCouponCode("");
+    } catch (error) {
+      toast({
+        title: t("checkout.error"),
+        description:
+          error instanceof Error ? error.message : t("checkout.generic_error"),
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -44,9 +94,10 @@ export const CouponSection = () => {
         />
         <Button
           onClick={handleApplyCoupon}
+          disabled={isLoading}
           className="bg-accent hover:bg-charade-900 text-white h-[42px] dark:bg-accent dark:hover:bg-charade-900"
         >
-          {t("checkout.apply")}
+          {isLoading ? t("checkout.applying") : t("checkout.apply")}
         </Button>
       </div>
     </div>
