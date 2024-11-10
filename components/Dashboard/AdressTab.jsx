@@ -51,9 +51,7 @@ export const AddressTab = ({
   const [validator, setValidator] = useState(null);
 
   useEffect(() => {
-    console.log("Current locale:", locale);
     const validator = new MoldovaAddressValidator(locale);
-    console.log("Validator created with language:", validator.language);
     setValidator(validator);
   }, [locale]);
 
@@ -733,7 +731,7 @@ export const AddressTab = ({
               <button
                 type="submit"
                 disabled={isLoading || !isFormValid()}
-                className={`bg-gray-500 hover:bg-charade-800 text-white px-4 py-2 rounded-lg w-full transition-colors duration-200 ${
+                className={`bg-gray-500 hover:bg-charade-800 text-white px-4 py-2 rounded-lg  transition-colors duration-200 ${
                   isLoading || !isFormValid()
                     ? "opacity-50 cursor-not-allowed"
                     : ""
@@ -742,29 +740,31 @@ export const AddressTab = ({
                 {isLoading ? t("address.saving") : t("address.save_address")}
               </button>
 
-              <button
-                onClick={() => {
-                  setShowAddressForm(false);
-                  setFormData({
-                    streetType: "street",
-                    street: "",
-                    houseNumber: "",
-                    building: "",
-                    entrance: "",
-                    floor: "",
-                    apartment: "",
-                    city: "",
-                    sector: "",
-                    district: "",
-                    postalCode: "",
-                  });
-                  setCitySearch("");
-                  setCitySuggestions([]);
-                }}
-                className="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
-              >
-                {t("address.cancel")}
-              </button>
+              {address && (
+                <button
+                  onClick={() => {
+                    setShowAddressForm(false);
+                    setFormData({
+                      streetType: "street",
+                      street: "",
+                      houseNumber: "",
+                      building: "",
+                      entrance: "",
+                      floor: "",
+                      apartment: "",
+                      city: "",
+                      sector: "",
+                      district: "",
+                      postalCode: "",
+                    });
+                    setCitySearch("");
+                    setCitySuggestions([]);
+                  }}
+                  className=" bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+                >
+                  {t("address.cancel")}
+                </button>
+              )}
             </div>
           )}
         </form>

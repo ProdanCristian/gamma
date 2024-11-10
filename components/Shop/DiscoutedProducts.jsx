@@ -47,7 +47,6 @@ const DiscountCarousel = ({ marketingData }) => {
 
   const displayProducts = loading ? Array(20).fill({}) : products;
 
-  // Split products into two rows
   const firstRow = displayProducts.slice(0, displayProducts.length / 2);
   const secondRow = displayProducts.slice(displayProducts.length / 2);
 

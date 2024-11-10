@@ -104,6 +104,10 @@ export default function FastOrder() {
 
     if (!product) return;
 
+    if (!name.trim() || phone.length < 13) {
+      return;
+    }
+
     if (session?.user && (!userProfile?.Numar_Telefon || !userProfile?.Nume)) {
       try {
         const [firstName, ...restName] = name.trim().split(" ");
@@ -126,10 +130,11 @@ export default function FastOrder() {
         console.error("Error updating profile:", error);
       }
     }
+    const productPrice = hasDiscount
+      ? parseFloat(product.discount!)
+      : parseFloat(product.price);
 
-    const total = product
-      ? parseFloat(product.discount || product.price) * quantity
-      : 0;
+    const total = productPrice * quantity;
     const currentDeliveryRules = DELIVERY_RULES[deliveryZone];
     const isFreeDelivery = total >= currentDeliveryRules.freeDeliveryThreshold;
     const deliveryCost = isFreeDelivery ? 0 : currentDeliveryRules.cost;
@@ -149,6 +154,7 @@ export default function FastOrder() {
           deliveryZone: deliveryZone,
           isFreeDelivery,
           locale: params.locale,
+          productPrice: productPrice,
         }),
       });
 
@@ -364,14 +370,6 @@ export default function FastOrder() {
                     )}
                   </div>
 
-                  {remainingForFreeDelivery > 0 && (
-                    <div className="text-xs text-gray-500">
-                      {t("add_more_for_free_delivery", {
-                        amount: remainingForFreeDelivery.toFixed(2),
-                      })}
-                    </div>
-                  )}
-
                   <div className="flex justify-between font-medium pt-2 border-t dark:border-gray-700">
                     <span>{t("total_with_delivery")}:</span>
                     <span>
@@ -413,7 +411,7 @@ export default function FastOrder() {
           <button
             type="submit"
             className="w-full bg-accent hover:bg-charade-900 text-white font-bold py-2 px-4 rounded-lg 
-              dark:bg-accent dark:hover:bg-charade-900"
+              dark:bg-accent dark:hover:bg-white dark:hover:text-charade-900"
           >
             {t("get_call_now")}
           </button>

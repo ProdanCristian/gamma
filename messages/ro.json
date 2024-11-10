@@ -80,7 +80,6 @@
     "delivery": "Livrare",
     "free_delivery": "Livrare gratuită",
     "total_with_delivery": "Total cu livrare",
-    "add_more_for_free_delivery": "Adaugă încă {{amount}} lei pentru livrare gratuită",
     "currency": "lei",
     "order_success": "Comandă plasată cu succes",
     "order_success_description": "Veți fi contactat în curând pentru confirmare",
@@ -94,7 +93,7 @@
     "unit": "unitate",
     "units": "unități",
     "in_stock": "în stoc",
-    "add_more_for_free_delivery": "Adaugă încă {{amount}} lei pentru livrare gratuită",
+    "add_more_for_free_delivery": "Livrare gratuită dacă adăugați încă ",
     "free_delivery_eligible": "Felicitări! Beneficiezi de livrare gratuită",
     "total_discount": "Economisești",
     "currency": "lei",
@@ -230,6 +229,7 @@
     "subscription_error": "Eroare la abonare. Vă rugăm să încercați din nou mai târziu."
   },
   "home": {
+    "free_delivery_info": "Livrare gratuită la comenzi de peste 500 lei",
     "discounted_products_title": "Reduceri irezistibile",
     "view_all": "Vezi toate",
     "discover_top_products": "Descoperă produsele populare"
@@ -284,6 +284,7 @@
     "go_back": "Înapoi"
   },
   "Order": {
+    "view_product": "Vezi produs",
     "view_orders_in_dashboard": "Vezi comenzile în panoul de control",
     "coupon_discount": "Reducere cupon",
     "free": "Gratis",
@@ -371,6 +372,12 @@
     "coupon_expired": "Cuponul a expirat",
     "coupon_already_used": "Acest cupon a fost deja utilizat",
     "coupon_discount": "Reducere cupon",
-    "coupon_discount_value": "Reducere cupon"
+    "coupon_discount_value": "Reducere cupon",
+    "name_required": "Numele este obligatoriu",
+    "email_required": "Email-ul este obligatoriu",
+    "phone_required": "Numărul de telefon este obligatoriu",
+    "invalid_email": "Adresa de email nu este validă",
+    "invalid_phone": "Numărul de telefon nu este valid",
+    "address_required": "Adresa de livrare este obligatorie"
   }
 }

@@ -12,6 +12,7 @@ import { AddressTab } from "@/components/Dashboard/AdressTab";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { CouponSection } from "@/components/Checkout/CouponSection";
 import { UserInfoForm } from "@/components/Checkout/UserInfoForm";
+import { useOrderStore } from "@/lib/store/useOrderStore";
 
 interface ExtendedUser {
   id: string;
@@ -53,6 +54,8 @@ const CheckoutPage = () => {
       ? "Оплата при доставке"
       : "cash_on_delivery"
   );
+
+  const setOrderData = useOrderStore((state) => state.setOrderData);
 
   useEffect(() => {
     let mounted = true;
@@ -140,45 +143,74 @@ const CheckoutPage = () => {
     setAppliedCouponName(couponName);
   };
 
+  const validateFields = () => {
+    // Check for empty fields
+    if (!guestName.trim()) {
+      toast({
+        title: t("checkout.error"),
+        description: t("checkout.name_required"),
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (!guestEmail.trim()) {
+      toast({
+        title: t("checkout.error"),
+        description: t("checkout.email_required"),
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (!guestPhone.trim()) {
+      toast({
+        title: t("checkout.error"),
+        description: t("checkout.phone_required"),
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(guestEmail)) {
+      toast({
+        title: t("checkout.error"),
+        description: t("checkout.invalid_email"),
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    // Validate phone format
+    const phoneRegex = /^\+?[0-9]{8,}$/;
+    if (!phoneRegex.test(guestPhone.replace(/\s/g, ""))) {
+      toast({
+        title: t("checkout.error"),
+        description: t("checkout.invalid_phone"),
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    // Check delivery address
+    if (!userAddress && !guestAddress) {
+      toast({
+        title: t("checkout.error"),
+        description: t("checkout.address_required"),
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   const handlePlaceOrder = async () => {
-    if (!session) {
-      if (!guestName || !guestEmail || !guestPhone || !guestAddress) {
-        toast({
-          title: t("checkout.error"),
-          description: t("checkout.fill_all_fields"),
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(guestEmail)) {
-        toast({
-          title: t("checkout.error"),
-          description: t("checkout.invalid_email"),
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const phoneRegex = /^\+?[0-9]{8,}$/;
-      if (!phoneRegex.test(guestPhone.replace(/\s/g, ""))) {
-        toast({
-          title: t("checkout.error"),
-          description: t("checkout.invalid_phone"),
-          variant: "destructive",
-        });
-        return;
-      }
-    } else {
-      if (!userAddress) {
-        toast({
-          title: t("checkout.error"),
-          description: t("checkout.address_required"),
-          variant: "destructive",
-        });
-        return;
-      }
+    // Add validation check before proceeding
+    if (!validateFields()) {
+      return;
     }
 
     setIsLoading(true);
@@ -244,7 +276,6 @@ const CheckoutPage = () => {
       }
 
       const data = await response.json();
-      clearCart();
 
       const orderConfirmationData = {
         products: items.map((item) => ({
@@ -256,24 +287,47 @@ const CheckoutPage = () => {
           discountPrice: item.discountPrice,
         })),
         deliveryCost,
-        total,
-        couponDiscount,
+        total: total,
+        couponDiscount: couponDiscount,
         address: session ? userAddress : guestAddress,
         orderIds: data.orderIds,
         paymentMethod,
       };
 
+      // Set localStorage first
       localStorage.setItem(
         "orderConfirmation",
         JSON.stringify(orderConfirmationData)
       );
 
-      router.push(`/${params.locale}/checkout/order`);
+      // Set order data
+      setOrderData({
+        Status: "Pending",
+        Nume_Prenume: guestName,
+        Numar_telefon: parseInt(formattedPhone),
+        Pret_Livrare: deliveryCost.toString(),
+        Cantitate: items.reduce((sum, item) => sum + item.quantity, 0),
+        Produs_Id: items[0].id,
+        Nume_Produs: items[0].name,
+        Pret_Standard: items[0].price.toString(),
+        Pret_Redus: items[0].discountPrice?.toString() || null,
+        Imagine_Principala: items[0].image,
+      });
 
+      // Clear cart before navigation
+      clearCart();
+
+      // Show success toast
       toast({
         title: t("checkout.success"),
         description: t("checkout.order_placed"),
       });
+
+      // Add a small delay before navigation to ensure localStorage is set
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Navigate to order page
+      router.push(`/${params.locale}/checkout/order`);
     } catch (error) {
       toast({
         title: t("checkout.error"),
@@ -316,7 +370,7 @@ const CheckoutPage = () => {
             {items.map((item) => (
               <div
                 key={item.id}
-                className="flex gap-4 border-b dark:border-charade-900 py-4"
+                className="flex gap-4 border-b dark:border-charade-700 py-4"
               >
                 <div className="relative w-20 h-20">
                   <img
@@ -498,7 +552,13 @@ const CheckoutPage = () => {
 
           <Button
             onClick={handlePlaceOrder}
-            disabled={isLoading || (session ? !userAddress : false)}
+            disabled={
+              isLoading ||
+              (session ? !userAddress : !guestAddress) ||
+              !guestName ||
+              !guestEmail ||
+              !guestPhone
+            }
             className="w-full bg-accent hover:bg-charade-900 hover:text-white text-charade-900 dark:hover:bg-gray-100 dark:hover:text-charade-900 h-10 text-sm font-semibold"
           >
             {isLoading ? t("checkout.processing") : t("checkout.place_order")}

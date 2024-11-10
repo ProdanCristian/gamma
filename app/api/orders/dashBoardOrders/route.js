@@ -38,6 +38,7 @@ export async function GET() {
         c."Cupon_Aplicat",
         c."Adresa_Livrare",
         c.created_at,
+        c."nc_pka4__Produse_id" as product_id,
         p."Nume_Produs_RO",
         p."Nume_Produs_RU",
         p."Imagine_Principala",

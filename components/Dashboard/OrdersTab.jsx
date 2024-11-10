@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
@@ -5,6 +7,16 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import useSWR from "swr";
+import { PiEye } from "react-icons/pi";
+import slugify from "slugify";
+
+const createSlug = (text) => {
+  return slugify(text, {
+    replacement: "-",
+    lower: true,
+    strict: true,
+  }).toLowerCase();
+};
 
 const OrdersTab = () => {
   const { toast } = useToast();
@@ -61,6 +73,11 @@ const OrdersTab = () => {
     }, {});
   }, [orders]);
 
+  const handleProductClick = (order) => {
+    const slug = createSlug(order.Nume_Produs_RO);
+    router.push(`/${locale}/product/${slug}_${order.product_id}`);
+  };
+
   if (error) {
     toast({
       title: t("Order.error"),
@@ -81,7 +98,10 @@ const OrdersTab = () => {
             >
               <div className="flex items-start gap-4">
                 {order.Imagine_Principala && (
-                  <div className="relative w-24 h-24">
+                  <div
+                    className="relative w-24 h-24 group cursor-pointer border border-gray-200 dark:border-charade-600 rounded-md p-2"
+                    onClick={() => handleProductClick(order)}
+                  >
                     <Image
                       src={order.Imagine_Principala}
                       alt={order.Nume_Produs_RO}
@@ -90,16 +110,21 @@ const OrdersTab = () => {
                       className="object-cover rounded-md"
                       unoptimized
                     />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-md flex items-center justify-center">
+                      <PiEye className="w-8 h-8 text-white" />
+                    </div>
                   </div>
                 )}
                 <div className="flex-1">
                   <div className="flex justify-between">
                     <h3 className="font-semibold">
-                      {order.Nume_Produs_RO ||
+                      {(locale === "ro"
+                        ? order.Nume_Produs_RO
+                        : order.Nume_Produs_RU) ||
                         t("Order.product_name_not_available")}
                     </h3>
                   </div>
-                  <div className="mt-2 space-y-1 text-sm">
+                  <div className="mt-2 space-y-1 text-sm relative">
                     <p
                       className={`${getStatusColor(
                         order.Status

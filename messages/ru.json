@@ -82,7 +82,6 @@
     "delivery": "Доставка",
     "free_delivery": "Бесплатная доставка",
     "total_with_delivery": "Итого с доставкой",
-    "add_more_for_free_delivery": "Добавьте еще {{amount}} лей для бесплатной доставки",
     "currency": "лей",
     "order_success": "Заказ успешно размещен",
     "order_success_description": "Мы свяжемся с вами в ближайшее время для подтверждения",
@@ -96,7 +95,7 @@
     "unit": "единица",
     "units": "единиц",
     "in_stock": "в наличии",
-    "add_more_for_free_delivery": "Добавьте еще {{amount}} лей для бесплатной доставки",
+    "add_more_for_free_delivery": "Бесплатная доставка, если добавить еще ",
     "free_delivery_eligible": "Поздравляем! Вы получаете бесплатную доставку",
     "total_discount": "Вы экономите",
     "currency": "лей",
@@ -156,7 +155,7 @@
     "login_successful": "Вход выполнен успешно",
     "email_already_exists": "т email уже заргстирован",
     "invalid_email_format": "Неверный формат email",
-    "password_too_short": "Пароль должен содерать не менее 6 символов",
+    "password_too_short": "Пароль должен ��одерать не менее 6 символов",
     "name_required": "Имя и фамилия обязательны",
     "email_required": "Email обязателен",
     "password_required": "Пароль обязателен",
@@ -234,7 +233,8 @@
   "home": {
     "discounted_products_title": "Неоспоримые скидки",
     "view_all": "Посмотреть все",
-    "discover_top_products": "Ппулярные товары"
+    "discover_top_products": "Ппулярные товары",
+    "free_delivery_info": "Бесплатная доставка при заказе на сумму свыше 500 лей"
   },
   "productcard": {
     "out_of_stock": "Нет в наличии",
@@ -286,6 +286,7 @@
     "go_back": "Назад"
   },
   "Order": {
+    "view_product": "Посмотреть товар",
     "view_orders_in_dashboard": "Посмотреть заказы в панели управления",
     "coupon_discount": "Скидка по купону",
     "free": "Бесплатно",
@@ -373,6 +374,12 @@
     "coupon_expired": "Срок действия купона истек",
     "coupon_already_used": "Этот купон уже использован",
     "coupon_discount": "Скидка по купону",
-    "coupon_discount_value": "Скидка по купону"
+    "coupon_discount_value": "Скидка по купону",
+    "name_required": "Имя обязательно",
+    "email_required": "Email обязателен",
+    "phone_required": "Номер телефона обязателен",
+    "invalid_email": "Неверный формат email",
+    "invalid_phone": "Неверный формат номера телефона",
+    "address_required": "Адрес доставки обязателен"
   }
 }

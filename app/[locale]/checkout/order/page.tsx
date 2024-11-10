@@ -4,7 +4,6 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
-import { PiSealPercentFill } from "react-icons/pi";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 
@@ -33,31 +32,24 @@ export default function OrderPage() {
   const locale = useLocale();
   const { data: session } = useSession();
 
-  const [mounted, setMounted] = useState(false);
-  const [orderData, setOrderData] = useState<OrderConfirmationData | null>(
-    null
-  );
-
-  useEffect(() => {
-    const loadOrderData = () => {
+  const [orderData] = useState<OrderConfirmationData | null>(() => {
+    if (typeof window !== "undefined") {
       const savedOrderData = localStorage.getItem("orderConfirmation");
       if (savedOrderData) {
-        setOrderData(JSON.parse(savedOrderData));
         localStorage.removeItem("orderConfirmation");
+        return JSON.parse(savedOrderData);
       }
-    };
+    }
+    return null;
+  });
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
     setMounted(true);
-    loadOrderData();
-    window.scrollTo(0, 0);
   }, []);
 
-  // Don't render anything until mounted
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null;
 
-  // Show message if no order data
   if (!orderData) {
     return (
       <div className="max-w-[1250px] w-[90vw] mx-auto my-10">

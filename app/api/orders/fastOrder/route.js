@@ -16,6 +16,7 @@ export async function POST(request) {
       deliveryZone,
       isFreeDelivery,
       locale,
+      productPrice,
     } = await request.json();
 
     await db.query("BEGIN");
@@ -30,14 +31,7 @@ export async function POST(request) {
         throw new Error("Product not found");
       }
 
-      const product = productResult.rows[0];
-      const productPrice =
-        product.Pret_Redus &&
-        parseFloat(product.Pret_Redus) < parseFloat(product.Pret_Standard)
-          ? product.Pret_Redus
-          : product.Pret_Standard;
-
-      const subtotal = parseFloat(productPrice) * quantity;
+      const subtotal = productPrice * quantity;
       const deliveryPrice = isFreeDelivery
         ? 0
         : DELIVERY_RULES[deliveryZone].cost;
@@ -67,8 +61,8 @@ export async function POST(request) {
       const orderResult = await db.query(
         `INSERT INTO "nc_pka4___Comenzi" 
         ("nc_pka4___Utilizatori_id", "Nume_Prenume", "Numar_telefon", "nc_pka4__Produse_id", 
-         "Status", "Cantitate", "Pret_Livrare", "Total", "created_at", "Adresa_Livrare", "Metoda_De_Plata") 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
+         "Status", "Cantitate", "Pret_Livrare", "Total", "created_at", "Adresa_Livrare", "Metoda_De_Plata", "Pret_Produs") 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) 
         RETURNING id`,
         [
           userId || null,
@@ -84,6 +78,7 @@ export async function POST(request) {
           chisinauDate,
           address,
           paymentMethod,
+          productPrice.toFixed(2),
         ]
       );
 

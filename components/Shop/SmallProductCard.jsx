@@ -14,6 +14,15 @@ import { useRouter } from "next/navigation";
 import { useFastOrderStore } from "@/lib/store/useFastOrderStore";
 import { useWishlist } from "@/lib/store/useWishlist";
 import { useCartStore } from "@/lib/store/useCart";
+import slugify from "slugify";
+
+const createSlug = (text) => {
+  return slugify(text, {
+    replacement: "-",
+    lower: true,
+    strict: true,
+  }).toLowerCase();
+};
 
 const SmallProductCard = ({ product, loading = false }) => {
   const t = useTranslations("productcard");
@@ -46,7 +55,9 @@ const SmallProductCard = ({ product, loading = false }) => {
     if (!product || loading) return null;
 
     return {
-      slug: product?.Nume_Produs_RO?.split(" ").join("-"),
+      slug: createSlug(
+        locale === "ro" ? product.Nume_Produs_RO : product.Nume_Produs_RU
+      ),
       id: product.id,
       name: locale === "ro" ? product.Nume_Produs_RO : product.Nume_Produs_RU,
       image: getImage(product.Imagine_Principala),

@@ -4,13 +4,14 @@ import TopCategories from "@/components/TopCategories";
 import DiscountedProducts from "@/components/Shop/DiscoutedProducts";
 import BestSellingProducts from "@/components/Shop/BestSellingProducts";
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
+
 async function getSliders() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     const res = await fetch(`${baseUrl}/api/marketingDesign`);
 
     if (!res.ok) {
-      console.log("Response not OK:", res.status);
       return null;
     }
 
@@ -35,6 +36,7 @@ async function getTopCategories() {
 }
 
 export default async function Page({ params }) {
+  const t = await getTranslations("home");
   const [{ locale }, marketingData, topCategories] = await Promise.all([
     params,
     getSliders(),
@@ -54,6 +56,7 @@ export default async function Page({ params }) {
   if (!marketingData) {
     return null;
   }
+
   return (
     <main>
       <div className="max-w-[1250px] w-[90vw] mx-auto">
@@ -80,6 +83,9 @@ export default async function Page({ params }) {
             />
           )}
         </div>
+        <p className="text-center  text-gray-500 mt-5 text-base">
+          {t("free_delivery_info")}
+        </p>
       </div>
     </main>
   );

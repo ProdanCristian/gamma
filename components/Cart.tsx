@@ -145,9 +145,8 @@ export default function Cart() {
                 <PiTruck className="text-accent" size={20} />
                 {remainingForFreeDelivery > 0 ? (
                   <span>
-                    {t("add_more_for_free_delivery", {
-                      amount: remainingForFreeDelivery.toFixed(2),
-                    })}
+                    {t("add_more_for_free_delivery")}
+                    {remainingForFreeDelivery.toFixed(2)} {t("currency")}
                   </span>
                 ) : (
                   <span className="text-green-500">
