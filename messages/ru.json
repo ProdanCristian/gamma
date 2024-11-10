@@ -1,4 +1,7 @@
 {
+  "shop": {
+    "All Products": "Все товары"
+  },
   "address": {
     "suburban": "Пригород",
     "locality": "Населенный пункт",

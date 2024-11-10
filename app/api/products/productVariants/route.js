@@ -25,10 +25,12 @@ export async function GET(request) {
         a."Atribut_RU_" as "Atribut_RU",
         c."Culoare_RO_" as "Culoare_RO",
         c."Culoare_RU_" as "Culoare_RU",
-        c."Cod_Culoare"
+        c."Cod_Culoare",
+        v."Imagini" as "ShowVariantImages"
       FROM public."nc_pka4__Produse" p
       LEFT JOIN public."nc_pka4__Atribute" a ON p."nc_pka4__Atribute_id" = a.id
       LEFT JOIN public."nc_pka4___Culori" c ON p."nc_pka4___Culori_id" = c.id
+      LEFT JOIN public."nc_pka4___Variante" v ON p."nc_pka4___Variante_id" = v.id
       WHERE p."nc_pka4___Variante_id" = $1
     `;
 

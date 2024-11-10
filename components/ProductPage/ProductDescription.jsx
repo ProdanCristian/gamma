@@ -34,14 +34,18 @@ const ProductDescription = ({
   const attributeLabel =
     variantsData[0]?.[locale === "ru" ? "Atribut_RU" : "Atribut_RO"] || "";
 
-  const modelVariantsWithImages = variantsData.reduce((acc, variant) => {
-    const key = variant.Valoare_Atribut;
-    if (!acc[key]) {
-      acc[key] = [];
-    }
-    acc[key].push(variant);
-    return acc;
-  }, {});
+  const hasAttributes = variantsData.some((variant) => variant.Valoare_Atribut);
+
+  const modelVariantsWithImages = hasAttributes
+    ? variantsData.reduce((acc, variant) => {
+        const key = variant.Valoare_Atribut;
+        if (!acc[key]) {
+          acc[key] = [];
+        }
+        acc[key].push(variant);
+        return acc;
+      }, {})
+    : {};
 
   const getVariantImage = (variants) => {
     if (selectedColor) {
@@ -58,18 +62,20 @@ const ProductDescription = ({
   };
 
   const availableColors = variantsData
-    .filter((v) => v.Valoare_Atribut === selectedModel)
     .filter((v) => v.nc_pka4___Culori_id)
     .map((v) => ({
       id: v.nc_pka4___Culori_id,
       name: locale === "ru" ? v.Culoare_RU : v.Culoare_RO,
       code: v.Cod_Culoare,
-    }));
+    }))
+    .filter(
+      (color, index, self) => index === self.findIndex((c) => c.id === color.id)
+    );
 
   useEffect(() => {
     const matchingProduct = variantsData.find(
       (v) =>
-        v.Valoare_Atribut === selectedModel &&
+        (selectedModel ? v.Valoare_Atribut === selectedModel : true) &&
         (selectedColor ? v.nc_pka4___Culori_id === selectedColor : true)
     );
 
@@ -164,6 +170,9 @@ const ProductDescription = ({
     addItem(item);
   };
 
+  // Get the ShowVariantImages value from the first variant
+  const showVariantImages = variantsData[0]?.ShowVariantImages ?? false;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center">
@@ -188,7 +197,7 @@ const ProductDescription = ({
         )}
       </div>
 
-      {Object.entries(modelVariantsWithImages).length > 0 && (
+      {hasAttributes && Object.entries(modelVariantsWithImages).length > 0 && (
         <div>
           <label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
             {attributeLabel}
@@ -196,7 +205,9 @@ const ProductDescription = ({
           <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
             {Object.entries(modelVariantsWithImages).map(
               ([model, variants]) => {
-                const mainImage = getVariantImage(variants);
+                const mainImage = showVariantImages
+                  ? getVariantImage(variants)
+                  : null;
                 const imagePath = mainImage
                   ? `${BASE_URL}/${mainImage.path}`
                   : null;
@@ -215,17 +226,25 @@ const ProductDescription = ({
                         : "border-gray-200 dark:border-charade-700 hover:border-accent"
                     }`}
                   >
-                    <div className="relative w-full pt-[100%] rounded-lg overflow-hidden mb-2">
-                      {imagePath && (
-                        <Image
-                          src={imagePath}
-                          alt={variants[0].Nume_Produs_RO}
-                          fill
-                          className="object-cover rounded-lg"
-                        />
-                      )}
-                    </div>
-                    <span className="text-sm font-medium">{model}</span>
+                    {showVariantImages && (
+                      <div className="relative w-full pt-[100%] rounded-lg overflow-hidden mb-2">
+                        {imagePath && (
+                          <Image
+                            src={imagePath}
+                            alt={variants[0].Nume_Produs_RO}
+                            fill
+                            className="object-cover rounded-lg"
+                          />
+                        )}
+                      </div>
+                    )}
+                    <span
+                      className={`text-sm font-medium ${
+                        !showVariantImages ? "py-2" : ""
+                      }`}
+                    >
+                      {model}
+                    </span>
                   </button>
                 );
               }

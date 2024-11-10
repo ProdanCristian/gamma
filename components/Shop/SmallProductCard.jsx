@@ -17,11 +17,12 @@ import { useCartStore } from "@/lib/store/useCart";
 import slugify from "slugify";
 
 const createSlug = (text) => {
+  if (!text) return "";
   return slugify(text, {
     replacement: "-",
     lower: true,
     strict: true,
-  }).toLowerCase();
+  });
 };
 
 const SmallProductCard = ({ product, loading = false }) => {

@@ -1,4 +1,7 @@
 {
+  "shop": {
+    "All Products": "Toate produsele"
+  },
   "address": {
     "delivery_address": "Adresă de livrare",
     "edit_address": "Editează adresa",
