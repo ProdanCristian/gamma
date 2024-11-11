@@ -233,7 +233,7 @@ export default function FastOrder() {
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
       <DialogContent
-        className="sm:max-w-[425px] max-w-[90vw] dark:bg-charade-900 bg-white border-none rounded-xl"
+        className="sm:max-w-[425px] max-w-[90vw] dark:bg-charade-900 bg-white border-none rounded-xl h-[95vh] overflow-y-auto"
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
