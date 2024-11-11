@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import SubCategoryProducts from "./subcategoryproducts";
 import {
   Carousel,
@@ -9,15 +9,15 @@ import {
 } from "@/components/ui/carousel";
 import SubSubCategoryCard from "@/components/CategoriesCards/SubSubCategoryCard";
 
-const formatCategoryName = (slug) => {
+const formatCategoryName = (slug: string): string => {
   if (!slug) return "";
   return slug
     .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 };
 
-async function getSubcategoryData(subcategoryId) {
+async function getSubcategoryData(subcategoryId: string) {
   const [subcategoryNames, subSubCategories] = await Promise.all([
     fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/catNames/subCat?id=${subcategoryId}`
@@ -30,11 +30,29 @@ async function getSubcategoryData(subcategoryId) {
   return { subcategoryNames, subSubCategories };
 }
 
-export default async function SubcategoryPage({ params }) {
+interface SubcategoryPageProps {
+  params: {
+    subcategory?: string;
+    category?: string;
+    locale?: string;
+  };
+}
+
+interface SubSubCategory {
+  id: string;
+  [key: string]: any;
+}
+
+export default async function SubcategoryPage({
+  params,
+}: SubcategoryPageProps) {
   const t = await getTranslations("shop");
-  const subcategorySlug = decodeURIComponent(params.subcategory);
-  const categorySlug = decodeURIComponent(params.category);
-  const locale = params.locale;
+
+  // Await params before accessing properties
+  const parameters = await params;
+  const subcategorySlug = decodeURIComponent(parameters.subcategory || "");
+  const categorySlug = decodeURIComponent(parameters.category || "");
+  const locale = await getLocale();
 
   const [subcategoryName, subcategoryId] = subcategorySlug.split("_");
   const [categoryName, categoryId] = categorySlug.split("_");
@@ -84,7 +102,7 @@ export default async function SubcategoryPage({ params }) {
           }}
         >
           <CarouselContent className="-ml-2 md:-ml-4 w-[60%] md:w-full">
-            {subSubCategories.data.map((subSubCategory) => (
+            {subSubCategories.data.map((subSubCategory: SubSubCategory) => (
               <CarouselItem
                 key={subSubCategory.id}
                 className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 xl:basis-1/6"

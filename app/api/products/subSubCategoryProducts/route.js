@@ -14,12 +14,7 @@ export async function GET(request) {
     const colorId = searchParams.get("color");
     const brandId = searchParams.get("brand");
 
-    console.log("API Request URL:", request.url);
-    console.log("SubSubCategory ID:", subSubCategoryId);
-    console.log("Search Params:", Object.fromEntries(searchParams.entries()));
-
     if (!subSubCategoryId) {
-      console.log("No subsubcategory ID provided");
       return NextResponse.json(
         { error: "SubSubCategory ID is required" },
         { status: 400 }
@@ -29,9 +24,6 @@ export async function GET(request) {
     // Start with basic conditions
     let conditions = [`p."nc_pka4___SubSubCategorii_id" = $1`];
     const params = [subSubCategoryId];
-
-    console.log("Initial conditions:", conditions);
-    console.log("Initial params:", params);
 
     // Add price filters
     if (minPrice !== null && minPrice !== undefined) {
@@ -115,9 +107,6 @@ export async function GET(request) {
       OFFSET $${params.length + 2}
     `;
 
-    console.log("Final SQL Query:", query);
-    console.log("Final Query Params:", params);
-
     // Count query
     const countQuery = `
       SELECT COUNT(DISTINCT p.id)
@@ -133,11 +122,6 @@ export async function GET(request) {
       db.query(query, params),
       db.query(countQuery, params.slice(0, -2)),
     ]);
-
-    console.log("Query Results:", {
-      productsCount: productsResult.rows.length,
-      totalCount: countResult.rows[0].count,
-    });
 
     const totalProducts = parseInt(countResult.rows[0].count);
     const totalPages = Math.ceil(totalProducts / limit);
@@ -164,11 +148,8 @@ export async function GET(request) {
       },
     };
 
-    console.log("Final Response:", response);
     return NextResponse.json(response);
   } catch (error) {
-    console.error("Error fetching subsubcategory products:", error);
-    console.error("Full error stack:", error.stack);
     return NextResponse.json(
       {
         error: "Error fetching products",

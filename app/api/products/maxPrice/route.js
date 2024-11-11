@@ -106,20 +106,14 @@ export async function GET(request) {
       ${whereClause}
     `;
 
-    console.log("MaxPrice Query:", query);
-    console.log("MaxPrice Params:", params);
-
     const result = await db.query(query, params);
     const maxPrice = parseInt(result.rows[0].max_price) || 50000;
-
-    console.log("MaxPrice Result:", maxPrice);
 
     return NextResponse.json({
       success: true,
       maxPrice,
     });
   } catch (error) {
-    console.error("API Error:", error);
     return NextResponse.json(
       {
         success: false,

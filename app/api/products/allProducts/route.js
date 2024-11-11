@@ -132,15 +132,6 @@ export async function GET(request) {
       db.query(countQuery, params.slice(0, -2)),
     ]);
 
-    console.log("Number of products found:", productsResult.rows.length);
-    if (productsResult.rows.length > 0) {
-      console.log("First product:", {
-        id: productsResult.rows[0].id,
-        name: productsResult.rows[0].Nume_Produs_RO,
-        price: productsResult.rows[0].Pret_Standard,
-      });
-    }
-
     const totalProducts = parseInt(countResult.rows[0].count);
     const totalPages = Math.ceil(totalProducts / limit);
 

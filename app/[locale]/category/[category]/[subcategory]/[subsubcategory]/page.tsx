@@ -1,15 +1,15 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import SubSubCategoryProducts from "./subsubcategoryproducts";
 
-const formatCategoryName = (slug) => {
+const formatCategoryName = (slug: string): string => {
   if (!slug) return "";
   return slug
     .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 };
 
-async function getSubSubCategoryData(subsubcategoryId) {
+async function getSubSubCategoryData(subsubcategoryId: string) {
   const subsubcategoryNames = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/catNames/subSubCat?id=${subsubcategoryId}`
   ).then((res) => res.json());
@@ -17,12 +17,28 @@ async function getSubSubCategoryData(subsubcategoryId) {
   return { subsubcategoryNames };
 }
 
-export default async function SubSubCategoryPage({ params }) {
+interface SubSubCategoryPageProps {
+  params: {
+    subsubcategory?: string;
+    subcategory?: string;
+    category?: string;
+    locale?: string;
+  };
+}
+
+export default async function SubSubCategoryPage({
+  params,
+}: SubSubCategoryPageProps) {
   const t = await getTranslations("shop");
-  const subsubcategorySlug = decodeURIComponent(params.subsubcategory);
-  const subcategorySlug = decodeURIComponent(params.subcategory);
-  const categorySlug = decodeURIComponent(params.category);
-  const locale = params.locale;
+
+  // Await params before accessing properties
+  const parameters = await params;
+  const subsubcategorySlug = decodeURIComponent(
+    parameters.subsubcategory || ""
+  );
+  const subcategorySlug = decodeURIComponent(parameters.subcategory || "");
+  const categorySlug = decodeURIComponent(parameters.category || "");
+  const locale = await getLocale();
 
   const [subsubcategoryName, subsubcategoryId] = subsubcategorySlug.split("_");
   const [subcategoryName, subcategoryId] = subcategorySlug.split("_");

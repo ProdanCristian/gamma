@@ -233,13 +233,12 @@ export default function FastOrder() {
   return (
     <Dialog open={isOpen} onOpenChange={setOpen}>
       <DialogContent
-        className="sm:max-w-[425px] max-w-[90vw] dark:bg-charade-900 bg-white border-none rounded-xl h-[95vh] overflow-y-auto"
+        className="sm:max-w-[425px] max-w-[90vw] dark:bg-charade-900 bg-white border-none rounded-xl h-[80vh] overflow-y-auto"
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <DialogHeader className="flex w-full gap-4">
-          <h1 className="text-2xl font-bold text-center">{t("title")}</h1>
-          <div className="flex items-center justify-between gap-2 w-full">
+        <DialogHeader className="flex w-full gap-2">
+          <div className="flex items-center justify-between gap-1 w-full">
             <DialogTitle className="text-left">{product?.name}</DialogTitle>
             <img
               src={product?.image}
@@ -249,21 +248,21 @@ export default function FastOrder() {
             />
           </div>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4 py-2">
+        <form onSubmit={handleSubmit} className="grid gap-2 ">
           {product && (
             <>
-              <div className="space-y-2">
+              <div>
                 <div className="flex items-center mb-6">
-                  <span className="font-bold text-xl">
+                  <span className="font-bold text-lg">
                     {hasDiscount ? product.discount : product.price} {t("lei")}
                   </span>
                   {hasDiscount && (
                     <>
-                      <s className="ml-5 text-gray-500 text-xl">
+                      <s className="ml-5 text-gray-500 text-lg">
                         {product.price} {t("lei")}
                       </s>
                       <div className="flex items-center ml-10">
-                        <span className="text-red-500 mr-2 text-xl">
+                        <span className="text-red-500 mr-2 text-lg">
                           {getDiscountPercentage()}%
                         </span>
                         <PiSealPercentFill size={30} className="text-red-500" />
@@ -404,9 +403,6 @@ export default function FastOrder() {
               required
               autoFocus={false}
             />
-            <p className="text-sm text-gray-500">
-              {t("phone_format", { fallback: "Format: +373 XXXXXXXX" })}
-            </p>
           </div>
           <button
             type="submit"

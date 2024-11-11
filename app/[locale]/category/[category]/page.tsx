@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import CategoryProducts from "./categoryproducts";
 import {
   Carousel,
@@ -9,15 +9,15 @@ import {
 } from "@/components/ui/carousel";
 import SubCategoryCard from "@/components/CategoriesCards/SubCategoryCard";
 
-const formatCategoryName = (slug) => {
+const formatCategoryName = (slug: string): string => {
   if (!slug) return "";
   return slug
     .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 };
 
-async function getCategoryData(categoryId) {
+async function getCategoryData(categoryId: string) {
   const [categoryNames, subcategories] = await Promise.all([
     fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/catNames/cat?id=${categoryId}`
@@ -30,10 +30,20 @@ async function getCategoryData(categoryId) {
   return { categoryNames, subcategories };
 }
 
-export default async function CategoryPage({ params }) {
+interface CategoryPageProps {
+  params: {
+    category?: string;
+    locale?: string;
+  };
+}
+
+export default async function CategoryPage({ params }: CategoryPageProps) {
   const t = await getTranslations("shop");
-  const categorySlug = decodeURIComponent(params.category);
-  const locale = params.locale;
+  const locale = await getLocale();
+
+  // Await params before accessing category
+  const category = (await params)?.category;
+  const categorySlug = decodeURIComponent(category || "");
 
   // Split the category slug into name and ID parts
   const [categoryName, categoryId] = categorySlug.split("_");
@@ -81,7 +91,7 @@ export default async function CategoryPage({ params }) {
           }}
         >
           <CarouselContent className="-ml-2 md:-ml-4 w-[60%] md:w-full">
-            {subcategories.data.map((subcategory) => (
+            {subcategories.data.map((subcategory: any) => (
               <CarouselItem
                 key={subcategory.id}
                 className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/6"
