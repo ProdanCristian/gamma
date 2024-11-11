@@ -128,7 +128,7 @@ const OrdersTab = () => {
                     <p
                       className={`${getStatusColor(
                         order.Status
-                      )} text-white rounded-full w-fit p-1`}
+                      )} text-white rounded-full w-fit p-2`}
                     >
                       {t("Order.Status")}:{" "}
                       <span className="font-medium">

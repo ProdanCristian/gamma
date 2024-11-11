@@ -46,6 +46,7 @@ export default function OrderPage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
+    window.scrollTo(0, 0);
   }, []);
 
   if (!mounted) return null;
