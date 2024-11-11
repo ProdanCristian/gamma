@@ -98,7 +98,7 @@ const FilterSidebar = ({
         </Button>
       </div>
 
-      <div className="space-y-6 overflow-y-auto pr-2">
+      <div className="space-y-6 overflow-y-auto p-2">
         {/* Discounted Products Filter */}
         {!hideDiscountFilter && (
           <div className="flex items-center space-x-2">
@@ -154,49 +154,6 @@ const FilterSidebar = ({
             </>
           )}
         </div>
-
-        {/* Updated Attribute Filters */}
-        {isLoading
-          ? Array(3)
-              .fill(0)
-              .map((_, index) => (
-                <div key={index} className="space-y-2 w-full">
-                  <Skeleton className="w-24 h-4" />
-                  <Skeleton className="w-full h-10 rounded-md" />
-                </div>
-              ))
-          : attributesData?.attributes?.map(
-              (attribute) =>
-                attribute.values &&
-                attribute.values.length > 0 && (
-                  <div key={attribute.id} className="space-y-2">
-                    <Label>
-                      {locale === "ru"
-                        ? attribute.Atribut_RU_
-                        : attribute.Atribut_RO_}
-                    </Label>
-                    <Select
-                      value={selectedAttributes[attribute.id] || "all"}
-                      onValueChange={(value) =>
-                        handleAttributeChange(attribute.id, value)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("Select")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">{t("All")}</SelectItem>
-                        {attribute.values.map((value) => (
-                          <SelectItem key={value} value={value}>
-                            {value}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )
-            )}
-
         {/* Updated Color Filters */}
         {isLoading ? (
           <div className="space-y-2">
@@ -281,6 +238,48 @@ const FilterSidebar = ({
             </div>
           )
         )}
+
+        {/* Updated Attribute Filters */}
+        {isLoading
+          ? Array(3)
+              .fill(0)
+              .map((_, index) => (
+                <div key={index} className="space-y-2 w-full">
+                  <Skeleton className="w-24 h-4" />
+                  <Skeleton className="w-full h-10 rounded-md" />
+                </div>
+              ))
+          : attributesData?.attributes?.map(
+              (attribute) =>
+                attribute.values &&
+                attribute.values.length > 0 && (
+                  <div key={attribute.id} className="space-y-2">
+                    <Label>
+                      {locale === "ru"
+                        ? attribute.Atribut_RU_
+                        : attribute.Atribut_RO_}
+                    </Label>
+                    <Select
+                      value={selectedAttributes[attribute.id] || "all"}
+                      onValueChange={(value) =>
+                        handleAttributeChange(attribute.id, value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("Select")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">{t("All")}</SelectItem>
+                        {attribute.values.map((value) => (
+                          <SelectItem key={value} value={value}>
+                            {value}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )
+            )}
       </div>
     </div>
   );

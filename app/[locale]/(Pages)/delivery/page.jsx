@@ -8,25 +8,19 @@ export default function Delivery() {
       <h1 className="text-3xl font-semibold mt-10">
         {locale === "ro" ? "Livrare" : "Доставка"}
       </h1>
-      <div className="h-[500px] overflow-hidden rounded-xl mt-4">
+      <div className="h-[200px]  md:h-[500px] overflow-hidden rounded-xl mt-4">
         {locale === "ro" && (
-          <Image
+          <img
             src="/Livrare.webp"
             alt="Livrare"
-            className="w-full"
-            width={1000}
-            height={500}
-            layout="responsive"
+            className="w-full h-full object-cover"
           />
         )}
         {locale === "ru" && (
-          <Image
+          <img
             src="/Доставка.webp"
             alt="Доставка"
-            className="w-full"
-            width={1000}
-            height={500}
-            layout="responsive"
+            className="w-full h-full object-cover"
           />
         )}
       </div>

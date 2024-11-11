@@ -138,9 +138,18 @@ const BestsellersPage = () => {
   // Add the missing SWR hooks for fetching data
   const { data: maxPriceData } = useSWR<MaxPriceResponse>(maxPriceUrl, fetcher);
   const { data, error, isLoading } = useSWR<ApiResponse>(apiUrl, fetcher);
-  const { data: attributesData } = useSWR("/api/products/attributes", fetcher);
-  const { data: colorsData } = useSWR("/api/products/colors", fetcher);
-  const { data: brandsData } = useSWR("/api/products/brands", fetcher);
+  const { data: attributesData } = useSWR(
+    "/api/products/bestSellingFilters/attributes",
+    fetcher
+  );
+  const { data: colorsData } = useSWR(
+    "/api/products/bestSellingFilters/colors",
+    fetcher
+  );
+  const { data: brandsData } = useSWR(
+    "/api/products/bestSellingFilters/brands",
+    fetcher
+  );
 
   const products = data?.products || [];
   const totalPages = data?.pagination?.totalPages || 1;
@@ -164,7 +173,7 @@ const BestsellersPage = () => {
   const updateUrlWithFilters = () => {
     const params = new URLSearchParams();
 
-    // Add all filter parameters
+    // Only add parameters if they differ from default values
     if (priceRange[0] > 0) params.set("minPrice", priceRange[0].toString());
     if (priceRange[1] < maxPrice)
       params.set("maxPrice", priceRange[1].toString());
@@ -172,24 +181,39 @@ const BestsellersPage = () => {
     if (selectedColor) params.set("color", selectedColor);
     if (selectedBrand) params.set("brand", selectedBrand);
 
-    // Add attribute filters
     Object.entries(selectedAttributes).forEach(([key, value]) => {
       if (value && value !== "all") {
         params.set(`attr_${key}`, value);
       }
     });
 
-    // Add page parameter last
     if (currentPage > 1) params.set("page", currentPage.toString());
 
     const queryString = params.toString();
-    router.push(queryString ? `?${queryString}` : "", { scroll: false });
+    router.replace(
+      `/${locale}/shop/bestsellers${queryString ? `?${queryString}` : ""}`,
+      { scroll: false }
+    );
   };
 
-  // Reset page to 1 when any filter changes
+  // Add effect to reset URL when filters are cleared
   useEffect(() => {
-    setCurrentPage(1);
+    const hasActiveFilters =
+      priceRange[0] > 0 ||
+      priceRange[1] < maxPrice ||
+      showDiscounted ||
+      selectedColor ||
+      selectedBrand ||
+      Object.values(selectedAttributes).some((value) => value !== "all") ||
+      currentPage > 1;
+
+    if (!hasActiveFilters) {
+      router.replace(`/${locale}/shop/bestsellers`, { scroll: false });
+    } else {
+      updateUrlWithFilters();
+    }
   }, [
+    currentPage,
     priceRange,
     showDiscounted,
     selectedAttributes,
@@ -197,11 +221,10 @@ const BestsellersPage = () => {
     selectedBrand,
   ]);
 
-  // Update URL when any parameter changes
+  // Add new effect to reset page when filters change
   useEffect(() => {
-    updateUrlWithFilters();
+    setCurrentPage(1);
   }, [
-    currentPage,
     priceRange,
     showDiscounted,
     selectedAttributes,

@@ -86,9 +86,18 @@ const ShopPage = () => {
   const totalPages = data?.pagination?.totalPages || 1;
   const totalProducts = data?.pagination?.totalProducts || 0;
 
-  const { data: attributesData } = useSWR("/api/products/attributes", fetcher);
-  const { data: colorsData } = useSWR("/api/products/colors", fetcher);
-  const { data: brandsData } = useSWR("/api/products/brands", fetcher);
+  const { data: attributesData } = useSWR(
+    "/api/products/allFilters/attributes",
+    fetcher
+  );
+  const { data: colorsData } = useSWR(
+    "/api/products/allFilters/colors",
+    fetcher
+  );
+  const { data: brandsData } = useSWR(
+    "/api/products/allFilters/brands",
+    fetcher
+  );
 
   useEffect(() => {
     if (maxPriceData?.maxPrice) {
@@ -130,12 +139,31 @@ const ShopPage = () => {
     if (currentPage > 1) params.set("page", currentPage);
 
     const queryString = params.toString();
-    router.push(queryString ? `?${queryString}` : "", { scroll: false });
+
+    router.replace(
+      queryString ? `/${locale}/shop?${queryString}` : `/${locale}/shop`,
+      { scroll: false }
+    );
   };
 
   useEffect(() => {
-    setCurrentPage(1);
+    const hasActiveFilters =
+      priceRange[0] > 0 ||
+      priceRange[1] < maxPrice ||
+      showBestsellers ||
+      showDiscounted ||
+      selectedColor ||
+      selectedBrand ||
+      Object.values(selectedAttributes).some((value) => value !== "all") ||
+      currentPage > 1;
+
+    if (!hasActiveFilters) {
+      router.replace(`/${locale}/shop`, { scroll: false });
+    } else {
+      updateUrlWithFilters();
+    }
   }, [
+    currentPage,
     priceRange,
     showBestsellers,
     showDiscounted,
@@ -144,10 +172,10 @@ const ShopPage = () => {
     selectedBrand,
   ]);
 
+  // Add new effect to reset page when filters change
   useEffect(() => {
-    updateUrlWithFilters();
+    setCurrentPage(1);
   }, [
-    currentPage,
     priceRange,
     showBestsellers,
     showDiscounted,

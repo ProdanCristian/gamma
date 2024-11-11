@@ -1,17 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import { useState, useEffect } from "react";
 import useSWR from "swr";
-import SmallProductCard from "@/components/Shop/SmallProductCard";
-import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
-import {
-  PiArrowLeft,
-  PiArrowRight,
-  PiShoppingCartSimple,
-  PiFunnelSimple,
-} from "react-icons/pi";
-import FilterSidebar from "@/components/Shop/FilterSidebar";
 import {
   Sheet,
   SheetContent,
@@ -19,37 +11,60 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  PiArrowLeft,
+  PiArrowRight,
+  PiFunnelSimple,
+  PiShoppingCartSimple,
+} from "react-icons/pi";
 import { useRouter, useSearchParams } from "next/navigation";
+import SmallProductCard from "@/components/Shop/SmallProductCard";
+import FilterSidebar from "@/components/Shop/FilterSidebar";
 
-interface AttributeMap {
+interface SubSubCategoryProductsProps {
+  subsubcategoryId: string;
+  subcategoryId: string;
+  categoryId: string;
+  categoryName: string;
+  subcategoryName: string;
+  subsubcategoryName: string;
+  locale: string;
+}
+
+interface AttributesState {
   [key: string]: string;
 }
 
-// Add TypeScript interfaces
 interface Product {
-  id: string;
-  // Add other product properties as needed
+  id: number;
+  // add other product properties as needed
 }
 
-interface PaginationData {
-  totalPages: number;
-  totalProducts: number;
-}
-
-interface ApiResponse {
+interface ProductsData {
+  success: boolean;
   products: Product[];
-  pagination: PaginationData;
+  pagination: {
+    totalProducts: number;
+    totalPages: number;
+  };
 }
 
-interface MaxPriceResponse {
-  maxPrice: number;
-}
+const fetcher = async (url: string) => {
+  const response = await fetch(url);
+  const data = await response.json();
+  return data;
+};
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
-export default function DiscountsPage() {
+export default function SubSubCategoryProducts({
+  subsubcategoryId,
+  subcategoryId,
+  categoryId,
+  categoryName,
+  subcategoryName,
+  subsubcategoryName,
+  locale,
+}: SubSubCategoryProductsProps) {
   const t = useTranslations("shop");
-  const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -64,14 +79,12 @@ export default function DiscountsPage() {
   const [showBestsellers, setShowBestsellers] = useState(
     searchParams.get("bestsellers") === "true"
   );
-  // Always true for discounts page
-  const showDiscounted = true;
-  const setShowDiscounted = () => {}; // Empty function since we don't need to change it
-  const productsPerPage = 12;
-
-  const [selectedAttributes, setSelectedAttributes] = useState<AttributeMap>(
+  const [showDiscounted, setShowDiscounted] = useState(
+    searchParams.get("discounted") === "true"
+  );
+  const [selectedAttributes, setSelectedAttributes] = useState<AttributesState>(
     () => {
-      const attrs: AttributeMap = {};
+      const attrs: AttributesState = {};
       for (const [key, value] of searchParams.entries()) {
         if (key.startsWith("attr_")) {
           attrs[key.replace("attr_", "")] = value;
@@ -80,7 +93,6 @@ export default function DiscountsPage() {
       return attrs;
     }
   );
-
   const [selectedColor, setSelectedColor] = useState<string | null>(
     searchParams.get("color")
   );
@@ -88,7 +100,58 @@ export default function DiscountsPage() {
     searchParams.get("brand")
   );
 
-  // Format price function
+  // Construct products URL
+  const productsUrl = `${
+    process.env.NEXT_PUBLIC_BASE_URL
+  }/api/products/subSubCategoryProducts?subSubCategoryId=${subsubcategoryId}&page=${currentPage}&limit=12&minPrice=${
+    priceRange[0]
+  }&maxPrice=${
+    priceRange[1]
+  }&bestsellers=${showBestsellers}&discounted=${showDiscounted}${
+    selectedColor ? `&color=${selectedColor}` : ""
+  }${selectedBrand ? `&brand=${selectedBrand}` : ""}${Object.entries(
+    selectedAttributes
+  )
+    .filter(([_, value]) => value !== "all")
+    .map(([id, value]) => `&attr_${id}=${encodeURIComponent(value)}`)
+    .join("")}`;
+
+  // Fetch products data
+  const {
+    data: productsData,
+    error: productsError,
+    isLoading,
+  } = useSWR<ProductsData>(productsUrl, fetcher);
+
+  const products = productsData?.products || [];
+  const totalPages = productsData?.pagination?.totalPages || 1;
+  const totalProducts = productsData?.pagination?.totalProducts || 0;
+
+  // Fetch filter data
+  const { data: attributesData } = useSWR(
+    `/api/products/subSubCategoryFilters/attributes?subSubCategoryId=${subsubcategoryId}`,
+    fetcher
+  );
+  const { data: colorsData } = useSWR(
+    `/api/products/subSubCategoryFilters/colors?subSubCategoryId=${subsubcategoryId}`,
+    fetcher
+  );
+  const { data: brandsData } = useSWR(
+    `/api/products/subSubCategoryFilters/brands?subSubCategoryId=${subsubcategoryId}`,
+    fetcher
+  );
+
+  // Construct maxPrice URL
+  const maxPriceUrl = `/api/products/maxPrice?subSubCategoryId=${subsubcategoryId}&bestsellers=${showBestsellers}&discounted=${showDiscounted}${Object.entries(
+    selectedAttributes
+  )
+    .filter(([_, value]) => value !== "all")
+    .map(([id, value]) => `&attr_${id}=${encodeURIComponent(value)}`)
+    .join("")}`;
+
+  // Fetch maxPrice
+  const { data: maxPriceData } = useSWR(maxPriceUrl, fetcher);
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ro-MD", {
       style: "currency",
@@ -97,38 +160,24 @@ export default function DiscountsPage() {
     }).format(price);
   };
 
-  // Modified URLs to always include discounted=true
-  const maxPriceUrl = `/api/products/maxPrice?bestsellers=${showBestsellers}&discounted=true${Object.entries(
-    selectedAttributes
-  )
-    .filter(([_, value]) => value !== "all")
-    .map(([id, value]) => `&attr_${id}=${encodeURIComponent(String(value))}`)
-    .join("")}`;
-
-  const apiUrl = `/api/products/allProducts?page=${currentPage}&limit=${productsPerPage}&minPrice=${
-    priceRange[0]
-  }&maxPrice=${priceRange[1]}&bestsellers=${showBestsellers}&discounted=true${
-    selectedColor ? `&color=${selectedColor}` : ""
-  }${selectedBrand ? `&brand=${selectedBrand}` : ""}${Object.entries(
-    selectedAttributes
-  )
-    .filter(([_, value]) => value !== "all")
-    .map(([id, value]) => `&attr_${id}=${encodeURIComponent(String(value))}`)
-    .join("")}`;
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const updateUrlWithFilters = () => {
     const params = new URLSearchParams();
 
-    // Only add parameters if they differ from default values
     if (priceRange[0] > 0) params.set("minPrice", priceRange[0].toString());
     if (priceRange[1] < maxPrice)
       params.set("maxPrice", priceRange[1].toString());
     if (showBestsellers) params.set("bestsellers", "true");
+    if (showDiscounted) params.set("discounted", "true");
     if (selectedColor) params.set("color", selectedColor);
     if (selectedBrand) params.set("brand", selectedBrand);
 
     Object.entries(selectedAttributes).forEach(([key, value]) => {
-      if (value && value !== "all") {
+      if (value !== "all") {
         params.set(`attr_${key}`, value);
       }
     });
@@ -136,76 +185,28 @@ export default function DiscountsPage() {
     if (currentPage > 1) params.set("page", currentPage.toString());
 
     const queryString = params.toString();
-    router.replace(
-      `/${locale}/shop/discounts${queryString ? `?${queryString}` : ""}`,
+    router.push(
+      `/${locale}/category/${categoryName}_${categoryId}/${subcategoryName}_${subcategoryId}/${subsubcategoryName}_${subsubcategoryId}${
+        queryString ? `?${queryString}` : ""
+      }`,
       { scroll: false }
     );
   };
 
-  // Add effect to reset URL when filters are cleared
-  useEffect(() => {
-    const hasActiveFilters =
-      priceRange[0] > 0 ||
-      priceRange[1] < maxPrice ||
-      showBestsellers ||
-      selectedColor ||
-      selectedBrand ||
-      Object.values(selectedAttributes).some((value) => value !== "all") ||
-      currentPage > 1;
-
-    if (!hasActiveFilters) {
-      router.replace(`/${locale}/shop/discounts`, { scroll: false });
-    } else {
-      updateUrlWithFilters();
-    }
-  }, [
-    currentPage,
-    priceRange,
-    showBestsellers,
-    selectedAttributes,
-    selectedColor,
-    selectedBrand,
-  ]);
-
-  // Update URL when any parameter changes
+  // Update URL when filters change
   useEffect(() => {
     updateUrlWithFilters();
   }, [
     currentPage,
     priceRange,
     showBestsellers,
+    showDiscounted,
     selectedAttributes,
     selectedColor,
     selectedBrand,
   ]);
 
-  // Update type for the SWR responses
-  const { data: maxPriceData } = useSWR<MaxPriceResponse>(maxPriceUrl, fetcher);
-  const { data, error, isLoading } = useSWR<ApiResponse>(apiUrl, fetcher);
-
-  const products = data?.products || [];
-  const totalPages = data?.pagination?.totalPages || 1;
-  const totalProducts = data?.pagination?.totalProducts || 0;
-
-  const { data: attributesData } = useSWR(
-    "/api/products/discountedFilters/attributes",
-    fetcher
-  );
-  const { data: colorsData } = useSWR(
-    "/api/products/discountedFilters/colors",
-    fetcher
-  );
-  const { data: brandsData } = useSWR(
-    "/api/products/discountedFilters/brands",
-    fetcher
-  );
-
-  // Add these handlers from the shop page
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
+  // Update maxPrice when maxPriceData changes
   useEffect(() => {
     if (maxPriceData?.maxPrice) {
       const newMaxPrice = maxPriceData.maxPrice;
@@ -214,27 +215,23 @@ export default function DiscountsPage() {
     }
   }, [maxPriceData?.maxPrice]);
 
-  // Add new effect to reset page when filters change
+  // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [
     priceRange,
     showBestsellers,
+    showDiscounted,
     selectedAttributes,
     selectedColor,
     selectedBrand,
   ]);
 
   return (
-    <div className="max-w-[1250px] w-[90vw] mx-auto mt-5 min-h-screen">
-      <div className="flex items-center justify-between mb-8 md:mb-0 mt-10">
-        <h1 className="text-3xl font-bold">{t("Discounted Products")}</h1>
-      </div>
-
-      {/* Total products count */}
+    <>
       <div className="mb-4 w-full flex justify-between md:flex-row-reverse">
-        {t.rich("Found Products", { count: totalProducts })}
-        {/* Mobile Filter Button */}
+        {totalProducts !== undefined &&
+          t.rich("Found Products", { count: totalProducts })}
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline" className="lg:hidden">
@@ -267,14 +264,12 @@ export default function DiscountsPage() {
               colorsData={colorsData}
               brandsData={brandsData}
               formatPrice={formatPrice}
-              hideDiscountFilter={true}
             />
           </SheetContent>
         </Sheet>
       </div>
 
       <div className="flex flex-col md:flex-row gap-6 min-h-screen">
-        {/* Desktop Filter Sidebar */}
         <div className="hidden lg:block">
           <FilterSidebar
             showDiscounted={showDiscounted}
@@ -294,56 +289,47 @@ export default function DiscountsPage() {
             colorsData={colorsData}
             brandsData={brandsData}
             formatPrice={formatPrice}
-            hideDiscountFilter={true}
           />
         </div>
 
-        {/* Products Section */}
         <div className="flex-1">
-          {/* Products Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6">
-            {isLoading
-              ? Array(12)
-                  .fill(0)
-                  .map((_, index) => (
-                    <SmallProductCard key={index} product={{}} loading />
-                  ))
-              : products.map((product: Product) => (
-                  <SmallProductCard key={product.id} product={product} />
-                ))}
+            {isLoading ? (
+              Array(12)
+                .fill(0)
+                .map((_, index) => (
+                  <SmallProductCard key={index} product={{}} loading />
+                ))
+            ) : products.length > 0 ? (
+              products.map((product) => (
+                <SmallProductCard key={product.id} product={product} />
+              ))
+            ) : (
+              <div className="col-span-full flex flex-col items-center justify-center py-16 text-muted-foreground space-y-4">
+                <PiShoppingCartSimple className="w-16 h-16" />
+                <div className="text-xl font-medium">{t("We're Sorry")}</div>
+                <div className="text-center max-w-md">{t("sorry_message")}</div>
+                <button
+                  onClick={() => {
+                    setShowDiscounted(false);
+                    setShowBestsellers(false);
+                    setPriceRange([0, maxPrice]);
+                    setSelectedAttributes({});
+                    setSelectedColor("");
+                    setSelectedBrand("");
+                    setCurrentPage(1);
+                    router.push(
+                      `/${locale}/category/${categoryName}_${categoryId}/${subcategoryName}_${subcategoryId}/${subsubcategoryName}_${subsubcategoryId}`
+                    );
+                  }}
+                  className="mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                >
+                  {t("Reset Filters")}
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* No products found message */}
-          {!isLoading && products.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground space-y-4">
-              <PiShoppingCartSimple className="w-16 h-16" />
-              <div className="text-xl font-medium">{t("We're Sorry")}</div>
-              <div className="text-center max-w-md">{t("sorry_message")}</div>
-              <Button
-                onClick={() => {
-                  // First reset all states
-                  setShowBestsellers(false);
-                  setPriceRange([0, maxPrice]);
-                  setSelectedAttributes({});
-                  setSelectedColor(null);
-                  setSelectedBrand(null);
-                  setCurrentPage(1);
-
-                  // Only clear query parameters while keeping the current path
-                  const currentPath = window.location.pathname;
-                  window.history.replaceState({}, "", currentPath);
-
-                  // Force a re-fetch of the data
-                  router.refresh();
-                }}
-                className="mt-4"
-              >
-                {t("Reset Filters")}
-              </Button>
-            </div>
-          )}
-
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex justify-center gap-2 mt-8">
               <Button
@@ -377,6 +363,6 @@ export default function DiscountsPage() {
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -8,12 +8,50 @@ export async function GET(request) {
     const showDiscounted = url.searchParams.get("discounted") === "true";
     const colorId = url.searchParams.get("color");
     const brandId = url.searchParams.get("brand");
+    const categoryId = url.searchParams.get("categoryId");
+    const subCategoryId = url.searchParams.get("subCategoryId");
+    const subSubCategoryId = url.searchParams.get("subSubCategoryId");
 
     // Start with basic conditions
     let conditions = [];
     const params = [];
 
     conditions.push(`"Nume_Produs_RO" IS NOT NULL`);
+
+    // Add category filter
+    if (categoryId) {
+      conditions.push(`
+        EXISTS (
+          SELECT 1 
+          FROM "nc_pka4___SubSubCategorii" ssc
+          JOIN "nc_pka4___SubCategorii" sc ON ssc."nc_pka4___SubCategorii_id" = sc.id
+          JOIN "nc_pka4___Categorii" c ON sc."nc_pka4___Categorii_id" = c.id
+          WHERE ssc.id = "nc_pka4___SubSubCategorii_id"
+          AND c.id = $${params.length + 1}
+        )
+      `);
+      params.push(categoryId);
+    }
+
+    // Add subcategory filter
+    if (subCategoryId) {
+      conditions.push(`
+        EXISTS (
+          SELECT 1 
+          FROM "nc_pka4___SubSubCategorii" ssc
+          JOIN "nc_pka4___SubCategorii" sc ON ssc."nc_pka4___SubCategorii_id" = sc.id
+          WHERE ssc.id = "nc_pka4___SubSubCategorii_id"
+          AND sc.id = $${params.length + 1}
+        )
+      `);
+      params.push(subCategoryId);
+    }
+
+    // Add subsubcategory filter
+    if (subSubCategoryId) {
+      conditions.push(`"nc_pka4___SubSubCategorii_id" = $${params.length + 1}`);
+      params.push(subSubCategoryId);
+    }
 
     if (showBestsellers) {
       conditions.push(`"Bestselling" = true`);
@@ -68,8 +106,13 @@ export async function GET(request) {
       ${whereClause}
     `;
 
+    console.log("MaxPrice Query:", query);
+    console.log("MaxPrice Params:", params);
+
     const result = await db.query(query, params);
     const maxPrice = parseInt(result.rows[0].max_price) || 50000;
+
+    console.log("MaxPrice Result:", maxPrice);
 
     return NextResponse.json({
       success: true,
