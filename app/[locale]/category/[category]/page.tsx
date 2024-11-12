@@ -30,14 +30,11 @@ async function getCategoryData(categoryId: string) {
   return { categoryNames, subcategories };
 }
 
-interface CategoryPageProps {
-  params: {
-    category?: string;
-    locale?: string;
-  };
-}
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
+
+export default async function CategoryPage({
+  params,
+}: any) {
   const t = await getTranslations("shop");
   const locale = await getLocale();
 

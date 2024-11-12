@@ -30,14 +30,6 @@ async function getSubcategoryData(subcategoryId: string) {
   return { subcategoryNames, subSubCategories };
 }
 
-interface SubcategoryPageProps {
-  params: {
-    subcategory?: string;
-    category?: string;
-    locale?: string;
-  };
-}
-
 interface SubSubCategory {
   id: string;
   [key: string]: any;
@@ -45,7 +37,7 @@ interface SubSubCategory {
 
 export default async function SubcategoryPage({
   params,
-}: SubcategoryPageProps) {
+}: any) {
   const t = await getTranslations("shop");
 
   // Await params before accessing properties

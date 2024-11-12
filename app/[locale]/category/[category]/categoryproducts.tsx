@@ -33,7 +33,6 @@ interface AttributesState {
 
 interface Product {
   id: number;
-  // add other product properties as needed
 }
 
 interface ProductsData {
@@ -93,9 +92,7 @@ export default function CategoryProducts({
   );
 
   // Construct products URL
-  const productsUrl = `${
-    process.env.NEXT_PUBLIC_BASE_URL
-  }/api/products/categoryProducts?categoryId=${categoryId}&page=${currentPage}&limit=12&minPrice=${
+  const productsUrl = `/api/products/categoryProducts?categoryId=${categoryId}&page=${currentPage}&limit=12&minPrice=${
     priceRange[0]
   }&maxPrice=${
     priceRange[1]
@@ -198,7 +195,7 @@ export default function CategoryProducts({
     selectedBrand,
   ]);
 
-  // Update maxPrice when maxPriceData changes
+
   useEffect(() => {
     if (maxPriceData?.maxPrice) {
       const newMaxPrice = maxPriceData.maxPrice;
@@ -207,7 +204,7 @@ export default function CategoryProducts({
     }
   }, [maxPriceData?.maxPrice]);
 
-  // Reset page when filters change
+
   useEffect(() => {
     setCurrentPage(1);
   }, [

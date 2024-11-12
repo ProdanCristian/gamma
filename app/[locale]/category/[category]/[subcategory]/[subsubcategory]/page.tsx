@@ -17,27 +17,24 @@ async function getSubSubCategoryData(subsubcategoryId: string) {
   return { subsubcategoryNames };
 }
 
-interface SubSubCategoryPageProps {
+interface Props {
   params: {
-    subsubcategory?: string;
-    subcategory?: string;
-    category?: string;
-    locale?: string;
+    subsubcategory: string;
+    subcategory: string;
+    category: string;
+    locale: string;
   };
 }
 
 export default async function SubSubCategoryPage({
   params,
-}: SubSubCategoryPageProps) {
+}: any) {
   const t = await getTranslations("shop");
-
-  // Await params before accessing properties
-  const parameters = await params;
-  const subsubcategorySlug = decodeURIComponent(
-    parameters.subsubcategory || ""
-  );
-  const subcategorySlug = decodeURIComponent(parameters.subcategory || "");
-  const categorySlug = decodeURIComponent(parameters.category || "");
+  
+  // Remove await for params since it's no longer a Promise
+  const subsubcategorySlug = decodeURIComponent(params.subsubcategory || "");
+  const subcategorySlug = decodeURIComponent(params.subcategory || "");
+  const categorySlug = decodeURIComponent(params.category || "");
   const locale = await getLocale();
 
   const [subsubcategoryName, subsubcategoryId] = subsubcategorySlug.split("_");

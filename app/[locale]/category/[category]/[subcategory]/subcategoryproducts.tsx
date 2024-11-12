@@ -97,9 +97,7 @@ export default function SubCategoryProducts({
   );
 
   // Construct products URL
-  const productsUrl = `${
-    process.env.NEXT_PUBLIC_BASE_URL
-  }/api/products/subCategoryProducts?subCategoryId=${subcategoryId}&page=${currentPage}&limit=12&minPrice=${
+  const productsUrl = `/api/products/subCategoryProducts?subCategoryId=${subcategoryId}&page=${currentPage}&limit=12&minPrice=${
     priceRange[0]
   }&maxPrice=${
     priceRange[1]
