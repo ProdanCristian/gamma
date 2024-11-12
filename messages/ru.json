@@ -156,8 +156,13 @@
     "title": "Поиск товаров"
   },
   "search": {
-    "searchPlaceholder": "Поиск товаов...",
-    "searchResults": "Резуьтаты поиска"
+    "currency": "Лей",
+    "searchPlaceholder": "Поиск товаров...",
+    "searchResults": "Результаты поиска",
+    "viewAllResults": "Посмотреть все результаты",
+    "noResults": "Результаты не найдены",
+    "bestseller": "Хит продаж",
+    "watchVideo": "Смотреть видео"
   },
   "auth": {
     "Welcome": "Добро пожаловать",
@@ -376,7 +381,7 @@
     "apply": "Применить",
     "total_savings": "Общая экономия",
     "login_required": "Требуется авторизация",
-    "login_to_apply_coupon": "Пожалуйста, войдит�� в систему, чтобы применить купон",
+    "login_to_apply_coupon": "Пожалуйста, войдит в систему, чтобы применить купон",
     "login_for_address": "Войдите в систему для управления адресом доставки",
     "login_button": "Войти",
     "have_account": "Уже есть аккаунт?",

@@ -154,8 +154,13 @@
     "title": "Caută produse"
   },
   "search": {
+    "currency": "Lei",
     "searchPlaceholder": "Caută produse...",
-    "searchResults": "Rezultate căutare"
+    "searchResults": "Rezultate căutare",
+    "viewAllResults": "Vezi toate rezultatele",
+    "noResults": "Nu s-au găsit rezultate",
+    "bestseller": "Popular",
+    "watchVideo": "Urmărește video"
   },
   "auth": {
     "Welcome": "Bine ați venit",
@@ -338,7 +343,7 @@
     "product_price": "Preț produs",
     "coupon_applied": "Cupon aplicat",
     "no_orders": "Nu aveți comenzi",
-    "payment_method": "Metoda de plată"
+    "payment_method": "Metoda de plat"
   },
   "checkout": {
     "title": "Finalizare comandă",
