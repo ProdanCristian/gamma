@@ -183,18 +183,22 @@ const CategoryList = ({ locale }) => {
 
       <div className="gap-4 p-2 w-full overflow-y-auto">
         {isLoading
-          ? [1, 2, 3].map((index) => (
+          ? // Show 3 empty blocks with skeletons while loading
+            [...Array(3)].map((_, index) => (
               <div
-                key={index}
+                key={`skeleton-${index}`}
                 className="break-inside-avoid p-3 bg-[#3A3B4A] rounded-lg mb-4"
               >
-                <Skeleton className="h-8 w-3/4 mb-4" />
-                <Skeleton className="h-48 w-full mb-4" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-2/3" />
-                  <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-4 w-3/4" />
+                <h3 className="text-xl font-semibold">
+                  <div className="h-6 w-3/4"></div>
+                </h3>
+                <div className="my-2">
+                  <div className="h-48 w-full rounded-md"></div>
                 </div>
+                <ul className="space-y-2">
+                  <li className="text-base text-gray-300"></li>
+                  <li className="text-base text-gray-300"></li>
+                </ul>
               </div>
             ))
           : subcategories.map((subcategory) => (
@@ -215,18 +219,25 @@ const CategoryList = ({ locale }) => {
                     href={generateSubcategoryLink(subcategory)}
                     className="block w-full"
                   >
-                    {subcategory.images?.length > 0 && (
-                      <Image
-                        src={subcategory.images[0]}
-                        alt={getSubcategoryName(subcategory)}
-                        width={400}
-                        height={192}
-                        className={`w-full h-48 object-cover rounded-md hover:opacity-80 transition-opacity ${
-                          !imageLoaded[subcategory.id] ? "hidden" : ""
-                        }`}
-                        priority
-                        onLoad={() => handleImageLoad(subcategory.id)}
-                      />
+                    {subcategory.images?.length > 0 ? (
+                      <>
+                        {!imageLoaded[subcategory.id] && (
+                          <Skeleton className="w-full h-48 rounded-md" />
+                        )}
+                        <Image
+                          src={subcategory.images[0]}
+                          alt={getSubcategoryName(subcategory)}
+                          width={400}
+                          height={192}
+                          className={`w-full h-48 object-cover rounded-md hover:opacity-80 transition-opacity ${
+                            !imageLoaded[subcategory.id] ? "hidden" : ""
+                          }`}
+                          priority
+                          onLoad={() => handleImageLoad(subcategory.id)}
+                        />
+                      </>
+                    ) : (
+                      <Skeleton className="w-full h-48 rounded-md" />
                     )}
                   </Link>
                 </div>

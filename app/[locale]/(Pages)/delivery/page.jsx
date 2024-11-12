@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { useLocale } from "next-intl";
 
 export default function Delivery() {
@@ -36,8 +35,8 @@ export default function Delivery() {
                 </h2>
                 <p>
                   {locale === "ro"
-                    ? "Se efectuează în decurs 1 - 7 zile lucrătoare de la procesarea comenzii. Costul livrării pentru comanda până la 1000 lei - 80 lei, pentru comenzile care depășesc 1000 lei - GRATUIT."
-                    : "Доставка осуществляется в течение 1 - 7 рабочих дней с момента обработки заказа. Стоимость доставки для заказов до 1000 леев - 80 леев, для заказов свыше 1000 леев - БЕСПЛАТНО."}
+                    ? "Se efectuează în decurs 1 - 7 zile lucrătoare de la procesarea comenzii. Costul livrării pentru comanda până la 500 lei - 50 lei, pentru comenzile care depășesc 500 lei - GRATUIT."
+                    : "Доставка осуществляется в течение 1 - 7 рабочих дней с момента обработки заказа. Стоимость доставки для заказов до 500 леев - 50 леев, для заказов свыше 500 леев - БЕСПЛАТНО."}
                 </p>
               </section>
 
@@ -49,8 +48,8 @@ export default function Delivery() {
                 </h2>
                 <p>
                   {locale === "ro"
-                    ? "Trușeni, Vatra, Ghidighici, Grătiești, Hulboaca, Stăuceni, Goianul Nou, Dumbrava, Durlești, Codru, Bacioi, Sangera, Bubuieci, Colonița, Tohatin, Cricova, Ciorescu, Vadul lui Vodă, Condrița, Dobrogea, Humulești - comanda minimă va fi de 1000 lei și costul livrării în suburbii va fi de 50 lei."
-                    : "Трушены, Ватра, Гидигич, Грэтишти, Хулбоака, Стауцень, Новый Гоян, Думбрава, Дурлешть, Кодру, Бачой, Сэнджера, Бубуечи, Колоница, Тохатин, Крикова, Чореску, Вадул-луй-Водэ, Кондрита, Доброджа, Хумулешть - минимальный заказ составит 1000 леев, а стоимость доставки в пригороды - 50 леев."}
+                    ? "Trușeni, Vatra, Ghidighici, Grătiești, Hulboaca, Stăuceni, Goianul Nou, Dumbrava, Durlești, Codru, Bacioi, Sangera, Bubuieci, Colonița, Tohatin, Cricova, Ciorescu, Vadul lui Vodă, Condrița, Dobrogea, Humulești - costul livrării în suburbii va fi de 60 lei. Pentru comenzile care depășesc 500 lei - GRATUIT."
+                    : "Трушены, Ватра, Гидигич, Грэтишти, Хулбоака, Стауцень, Новый Гоян, Думбрава, Дурлешть, Кодру, Бачой, Сэнджера, Бубуечи, Колоница, Тохатин, Крикова, Чореску, Вадул-луй-Водэ, Кондрита, Доброджа, Хумулешть - стоимость доставки в пригороды - 60 леев. Для заказов свыше 500 леев - БЕСПЛАТНО."}
                 </p>
               </section>
 
@@ -62,8 +61,8 @@ export default function Delivery() {
                 </h2>
                 <p>
                   {locale === "ro"
-                    ? "Comanda minimă va fi de 1000 lei și costul livrării prin Moldova - 80 lei. Pentru comenzile care depășesc 800 lei - GRATUIT."
-                    : "Минимальный заказ составит 1000 леев, а стоимость доставки по Молдове - 80 леев. Для заказов свыше 800 леев - БЕСПЛАТНО."}
+                    ? "Costul livrării prin Moldova - 60 lei. Pentru comenzile care depășesc 500 lei - GRATUIT."
+                    : "Стоимость доставки по Молдове - 60 леев. Для заказов свыше 500 леев - БЕСПЛАТНО."}
                 </p>
               </section>
 

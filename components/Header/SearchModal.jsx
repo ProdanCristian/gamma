@@ -51,12 +51,12 @@ const VideoModal = ({ videoUrl, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center"
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4"
       onMouseDown={(e) => e.stopPropagation()}
     >
       <div
         ref={modalRef}
-        className="relative w-[90%] max-w-4xl aspect-video"
+        className="relative w-full max-w-4xl aspect-video"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="absolute -top-10 right-0 z-50">
@@ -222,10 +222,10 @@ const SearchModal = ({ isOpen, onClose }) => {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center h-screen">
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start md:items-center justify-center h-screen overflow-y-auto">
         <div
           ref={modalRef}
-          className="bg-white w-[85%] min-w-[60%] dark:bg-charade-900 max-w-4xl rounded-lg shadow-lg py-10 p-6 md:p-10 relative"
+          className="bg-white w-full md:w-[95%] min-w-0 md:min-w-[60%] dark:bg-charade-900 max-w-4xl rounded-lg shadow-lg py-6 md:py-10 px-4 md:px-10 relative mt-4 md:mt-0 mx-4 md:mx-0"
         >
           <div className="flex items-center mb-6 w-full justify-between">
             <PiMagnifyingGlass
@@ -238,7 +238,7 @@ const SearchModal = ({ isOpen, onClose }) => {
               placeholder={t("searchPlaceholder")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-grow bg-transparent outline-none text-primary dark:text-white text-xl placeholder-primary/50 dark:placeholder-white/50"
+              className="flex-grow bg-transparent outline-none text-primary dark:text-white text-base md:text-xl placeholder-primary/50 dark:placeholder-white/50"
               autoFocus
             />
             <button
@@ -257,12 +257,12 @@ const SearchModal = ({ isOpen, onClose }) => {
               </div>
             ) : searchResults.length > 0 ? (
               <div className="space-y-4">
-                <div className="max-h-[60vh] overflow-y-auto space-y-4 pr-2">
+                <div className="max-h-[50vh] md:max-h-[60vh] overflow-y-auto space-y-4 pr-2">
                   {searchResults.slice(0, 5).map((product) => (
                     <div
                       key={product.id}
                       onClick={() => handleProductClick(product)}
-                      className="relative flex items-center space-x-4 p-3 border border-gray-200 dark:border-charade-800 hover:bg-gray-100 dark:hover:bg-charade-800 rounded-lg cursor-pointer transition-colors overflow-hidden"
+                      className="relative block md:flex md:items-center space-y-3 md:space-y-0 md:space-x-4 p-3 border border-gray-200 dark:border-charade-800 hover:bg-gray-100 dark:hover:bg-charade-800 rounded-lg cursor-pointer transition-colors overflow-hidden"
                     >
                       {/* Product tags container */}
                       <div className="absolute top-0 right-0 flex flex-col gap-1 z-10">
@@ -274,7 +274,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                         )}
                       </div>
 
-                      <div className="relative w-16 h-16 flex-shrink-0">
+                      <div className="relative w-20 h-20 md:w-16 md:h-16 flex-shrink-0 mx-auto md:mx-0">
                         <Image
                           src={getImagePath(product.main_image)}
                           alt={
@@ -285,17 +285,17 @@ const SearchModal = ({ isOpen, onClose }) => {
                         />
                       </div>
 
-                      <div className="flex-grow pr-16">
-                        <h3 className="font-medium">
+                      <div className="flex-grow pr-4 md:pr-16 text-center md:text-left">
+                        <h3 className="font-medium text-sm md:text-base">
                           {locale === "ro" ? product.name_ro : product.name_ru}
                         </h3>
                         <div className="mt-1">
                           {product.has_discount ? (
-                            <div className="flex items-center space-x-2">
-                              <span className="line-through text-gray-400">
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                              <span className="line-through text-gray-400 text-sm">
                                 {formatPrice(product.price)}
                               </span>
-                              <span className="text-red-500 font-medium">
+                              <span className="text-red-500 font-medium text-sm">
                                 {formatPrice(product.discounted_price)}
                               </span>
                               <span className="bg-red-100 text-red-600 px-2 py-0.5 rounded-full text-xs">
@@ -303,7 +303,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                               </span>
                             </div>
                           ) : (
-                            <span className="font-medium">
+                            <span className="font-medium text-sm">
                               {formatPrice(product.price)}
                             </span>
                           )}
@@ -312,7 +312,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                         {product.video && (
                           <button
                             onClick={(e) => handleVideoClick(e, product.video)}
-                            className="mt-2 flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg transition-colors"
+                            className="mt-2 flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg transition-colors mx-auto md:mx-0"
                           >
                             <PiYoutubeLogo size={20} />
                             <span className="text-sm">{t("watchVideo")}</span>
@@ -331,13 +331,15 @@ const SearchModal = ({ isOpen, onClose }) => {
                     );
                     onClose();
                   }}
-                  className="w-full py-3 text-center text-primary dark:text-white hover:bg-gray-100 dark:hover:bg-charade-800 rounded-lg transition-colors mt-4"
+                  className="w-full py-3 text-center bg-accent text-primary dark:text-white hover:bg-gray-100 dark:hover:bg-charade-800 rounded-lg transition-colors mt-4 text-sm md:text-base"
                 >
                   {t("viewAllResults")}
                 </button>
               </div>
             ) : searchTerm ? (
-              <p className="text-center py-4">{t("noResults")}</p>
+              <p className="text-center py-4 text-sm md:text-base">
+                {t("noResults")}
+              </p>
             ) : null}
           </div>
         </div>
