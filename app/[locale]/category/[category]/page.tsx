@@ -8,6 +8,9 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import SubCategoryCard from "@/components/CategoriesCards/SubCategoryCard";
+import { Metadata } from "next";
+import Script from "next/script";
+import Link from "next/link";
 
 const formatCategoryName = (slug: string): string => {
   if (!slug) return "";
@@ -30,11 +33,64 @@ async function getCategoryData(categoryId: string) {
   return { categoryNames, subcategories };
 }
 
+// Add generateMetadata
+export async function generateMetadata({ params }: any): Promise<Metadata> {
+  const category = params?.category;
+  const [categoryName, categoryId] = decodeURIComponent(category || "").split(
+    "_"
+  );
 
+  if (!categoryId) {
+    return {
+      title: "Category Not Found",
+    };
+  }
 
-export default async function CategoryPage({
-  params,
-}: any) {
+  const { categoryNames } = await getCategoryData(categoryId);
+  const locale = params.locale;
+
+  const getCategoryTitle = () => {
+    if (locale === "ro") {
+      return (
+        categoryNames?.data?.Nume_Categorie_RO ||
+        formatCategoryName(categoryName)
+      );
+    } else if (locale === "ru") {
+      return (
+        categoryNames?.data?.Nume_Categorie_RU ||
+        formatCategoryName(categoryName)
+      );
+    }
+    return formatCategoryName(categoryName);
+  };
+
+  return {
+    title: `${getCategoryTitle()} | Your Shop Name`,
+    description:
+      locale === "ru"
+        ? `Исследуйте нашу коллекцию ${getCategoryTitle().toLowerCase()}`
+        : `Explorează colecția noastră de ${getCategoryTitle().toLowerCase()}`,
+    openGraph: {
+      title: getCategoryTitle(),
+      description:
+        locale === "ru"
+          ? `Исследуйте нашу коллекцию ${getCategoryTitle().toLowerCase()}`
+          : `Explorează colecția noastră de ${getCategoryTitle().toLowerCase()}`,
+      type: "website",
+      locale: locale,
+      siteName: locale === "ru" ? "Ваш магазин" : "Magazinul Dvs",
+    },
+    alternates: {
+      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/category/${category}`,
+      languages: {
+        ru: `/ru/category/${category}`,
+        ro: `/ro/category/${category}`,
+      },
+    },
+  };
+}
+
+export default async function CategoryPage({ params }: any) {
   const t = await getTranslations("shop");
   const locale = await getLocale();
 
@@ -73,46 +129,99 @@ export default async function CategoryPage({
     return formatCategoryName(categoryName);
   };
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: getCategoryName(),
+    description:
+      locale === "ru"
+        ? `Исследуйте нашу коллекцию ${getCategoryName().toLowerCase()}`
+        : `Explorează colecția noastră de ${getCategoryName().toLowerCase()}`,
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: locale === "ru" ? "Главная" : "Acasă",
+          item: process.env.NEXT_PUBLIC_BASE_URL,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: getCategoryName(),
+          item: `${process.env.NEXT_PUBLIC_BASE_URL}/category/${category}`,
+        },
+      ],
+    },
+  };
+
   return (
-    <div className="max-w-[1250px] w-[90vw] mx-auto">
-      <h1 className="text-3xl text-charade-900 dark:text-gray-100 font-bold mt-6">
-        {getCategoryName()}
-      </h1>
-
-      {subcategories?.data?.length > 0 && (
-        <Carousel
-          className="relative w-full px-0 py-8"
-          opts={{
-            align: "start",
-            dragFree: true,
-          }}
-        >
-          <CarouselContent className="-ml-2 md:-ml-4 w-[60%] md:w-full">
-            {subcategories.data.map((subcategory: any) => (
-              <CarouselItem
-                key={subcategory.id}
-                className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/6"
-              >
-                <SubCategoryCard
-                  subcategory={subcategory}
-                  locale={locale}
-                  path={`/${locale}/category/${categoryName}_${categoryId}`}
-                />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <div className="hidden sm:block">
-            <CarouselPrevious className="absolute -left-4 md:-left-10" />
-            <CarouselNext className="absolute -right-4 md:-right-10" />
-          </div>
-        </Carousel>
-      )}
-
-      <CategoryProducts
-        categoryId={categoryId}
-        categoryName={categoryName}
-        locale={locale}
+    <>
+      <Script
+        id="category-structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-    </div>
+      <div className="max-w-[1250px] w-[90vw] mx-auto">
+        <nav aria-label="Breadcrumb" className="py-4">
+          <ol className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+            <li>
+              <Link
+                href="/"
+                className="hover:text-gray-900 dark:hover:text-gray-200"
+              >
+                {locale === "ru" ? "Главная" : "Acasă"}
+              </Link>
+            </li>
+            <li>/</li>
+            <li>
+              <span className="text-gray-900 dark:text-gray-200">
+                {getCategoryName()}
+              </span>
+            </li>
+          </ol>
+        </nav>
+
+        <h1 className="text-3xl text-charade-900 dark:text-gray-100 font-bold mt-6">
+          {getCategoryName()}
+        </h1>
+
+        {subcategories?.data?.length > 0 && (
+          <Carousel
+            className="relative w-full px-0 py-8"
+            opts={{
+              align: "start",
+              dragFree: true,
+            }}
+          >
+            <CarouselContent className="-ml-2 md:-ml-4 w-[60%] md:w-full">
+              {subcategories.data.map((subcategory: any) => (
+                <CarouselItem
+                  key={subcategory.id}
+                  className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/6"
+                >
+                  <SubCategoryCard
+                    subcategory={subcategory}
+                    locale={locale}
+                    path={`/${locale}/category/${categoryName}_${categoryId}`}
+                  />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="hidden sm:block">
+              <CarouselPrevious className="absolute -left-4 md:-left-10" />
+              <CarouselNext className="absolute -right-4 md:-right-10" />
+            </div>
+          </Carousel>
+        )}
+
+        <CategoryProducts
+          categoryId={categoryId}
+          categoryName={categoryName}
+          locale={locale}
+        />
+      </div>
+    </>
   );
 }

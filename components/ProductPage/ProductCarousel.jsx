@@ -12,7 +12,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-export default function ProductCarousel({ images }) {
+export default function ProductCarousel({ images, altText }) {
   const [api, setApi] = useState();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [thumbnailApi, setThumbnailApi] = useState();
@@ -49,7 +49,7 @@ export default function ProductCarousel({ images }) {
                 <CardContent className="flex aspect-square items-center justify-center p-2">
                   <Image
                     src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${image.path}`}
-                    alt={image.title || `Product image ${index + 1}`}
+                    alt={`${altText} - ${index + 1}`}
                     width={600}
                     height={600}
                     className="object-contain"
@@ -87,7 +87,7 @@ export default function ProductCarousel({ images }) {
               >
                 <Image
                   src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${image.path}`}
-                  alt={image.title || `Thumbnail ${index + 1}`}
+                  alt={`Thumbnail ${index + 1}`}
                   width={150}
                   height={150}
                   className="object-cover"

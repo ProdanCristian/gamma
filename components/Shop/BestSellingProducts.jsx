@@ -61,7 +61,7 @@ const TopProductsCarousel = ({ marketingData }) => {
       </div>
 
       <div className="block lg:flex gap-4">
-        <div className="lg:w-[400px] h-[300px] relative flex-shrink-0">
+        <div className="lg:w-[400px] h-[160px] md:h-[270px] relative flex-shrink-0">
           {computedBanner2Url && (
             <Image
               src={computedBanner2Url}

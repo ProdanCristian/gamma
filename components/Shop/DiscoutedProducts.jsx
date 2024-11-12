@@ -68,8 +68,8 @@ const DiscountCarousel = ({ marketingData }) => {
           <Image
             src={computedBanner1Url}
             alt="Reduceri de Nerefuzat!"
-            className="h-[200px] object-cover w-full md:h-[260px]"
-            width={1200}
+            className="h-[125px] object-cover w-full md:h-[270px]"
+            width={1500}
             height={260}
             priority
           />

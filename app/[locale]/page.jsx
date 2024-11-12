@@ -71,7 +71,7 @@ export default async function Page({ params }) {
       <DiscountedProducts marketingData={marketingData} />
       <BestSellingProducts marketingData={marketingData} />
       <div className="max-w-[1250px] w-[90vw] mx-auto mt-10">
-        <div className="w-full h-[200px] lg:h-[250px] relative">
+        <div className="w-full h-[125px] lg:h-[250px] relative">
           {banner3 && (
             <Image
               src={banner3}
