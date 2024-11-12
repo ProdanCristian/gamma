@@ -160,7 +160,11 @@
     "viewAllResults": "Vezi toate rezultatele",
     "noResults": "Nu s-au găsit rezultate",
     "bestseller": "Popular",
-    "watchVideo": "Urmărește video"
+    "watchVideo": "Urmărește video",
+    "loading": "Se încarcă...",
+    "searchResults": "Rezultate căutare",
+    "noResults": "Nu s-au găsit rezultate",
+    "Found Products": "{count, plural, =0 {Nu s-au găsit produse} one {# produs găsit} few {# produse găsite} other {# produse găsite}}"
   },
   "auth": {
     "Welcome": "Bine ați venit",

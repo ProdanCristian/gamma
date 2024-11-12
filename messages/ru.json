@@ -45,7 +45,7 @@
     "saving": "Сохранение...",
     "cancel": "Отмена",
     "success": "Успешно",
-    "address_updated": "Адрес успешно обновлен",
+    "address_updated": "дрес успешно обновлен",
     "error": "Ошибка",
     "update_failed": "Не удалось обновить адрес",
     "generic_error": "Что-то пошло не так",
@@ -162,7 +162,9 @@
     "viewAllResults": "Посмотреть все результаты",
     "noResults": "Результаты не найдены",
     "bestseller": "Хит продаж",
-    "watchVideo": "Смотреть видео"
+    "watchVideo": "Смотреть видео",
+    "loading": "Загрузка...",
+    "Found Products": "{count, plural, =0 {Товары не найдены} one {Найден # товар} few {Найдено # товара} other {Найдено # товаров}}"
   },
   "auth": {
     "Welcome": "Добро пожаловать",
@@ -306,7 +308,7 @@
     "name": "Имя",
     "phone": "Телефон",
     "product_details": "Детали товара",
-    "quantity": "Количество",
+    "quantity": "Кличество",
     "currency": "лей",
     "subtotal": "Промежуточый итог",
     "delivery": "Доставка",
