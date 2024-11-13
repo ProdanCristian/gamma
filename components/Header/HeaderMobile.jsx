@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { ModeToggle } from "./ModeToggle";
 import User from "./User";
 import LangSwitcher from "@/components/Header/LangSwitcher";
+import { useScrollDirection } from "../hooks/useScrollDirection";
 
 export default function MobileHeader() {
   const { theme, systemTheme } = useTheme();
@@ -14,6 +15,7 @@ export default function MobileHeader() {
   const [lightLogo, setLightLogo] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const pathname = usePathname();
+  const showHeader = useScrollDirection();
 
   useEffect(() => {
     setShowModal(false);
@@ -56,7 +58,11 @@ export default function MobileHeader() {
   const currentTheme = theme === "system" ? systemTheme : theme;
 
   return (
-    <div className="md:hidden flex justify-between items-center w-full h-[77px] border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-charade-950/80 backdrop-filter backdrop-blur-lg px-3 fixed top-0 z-20">
+    <div
+      className={`md:hidden fixed flex justify-between items-center w-full h-[77px] border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-charade-950/80 backdrop-filter backdrop-blur-lg px-3 top-0 z-20 transition-transform duration-300 ${
+        showHeader ? "translate-y-0" : "-translate-y-full"
+      }`}
+    >
       <Link href="/">
         <div className="h-12 w-[130px] ml-2">
           {blackLogo && lightLogo && (
