@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import useSWR from "swr";
 import SmallProductCard from "@/components/Shop/SmallProductCard";
 import { useTranslations, useLocale } from "next-intl";
@@ -67,6 +67,12 @@ interface FilterSidebarProps {
   hideBestsellerFilter?: boolean;
 }
 
+const swrConfig = {
+  revalidateOnFocus: false,
+  revalidateOnReconnect: false,
+  dedupingInterval: 1000,
+};
+
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const BestsellersPage = () => {
@@ -118,53 +124,83 @@ const BestsellersPage = () => {
     }).format(price);
   };
 
-  // Modified URLs to always include bestsellers=true
-  const maxPriceUrl = `/api/products/maxPrice?bestsellers=true&discounted=${showDiscounted}${Object.entries(
-    selectedAttributes
-  )
-    .filter(([_, value]) => value !== "all")
-    .map(([id, value]) => `&attr_${id}=${encodeURIComponent(String(value))}`)
-    .join("")}`;
+  // Add refs for tracking initial renders
+  const isInitialMount = useRef(true);
+  const isInitialUrlUpdate = useRef(true);
+  const isInitialPageReset = useRef(true);
 
-  const apiUrl = `/api/products/allProducts?page=${currentPage}&limit=${productsPerPage}&minPrice=${
-    priceRange[0]
-  }&maxPrice=${priceRange[1]}&bestsellers=true&discounted=${showDiscounted}${
-    selectedColor ? `&color=${selectedColor}` : ""
-  }${selectedBrand ? `&brand=${selectedBrand}` : ""}${Object.entries(
-    selectedAttributes
-  )
-    .filter(([_, value]) => value !== "all")
-    .map(([id, value]) => `&attr_${id}=${encodeURIComponent(String(value))}`)
-    .join("")}`;
+  // Memoize the URLs
+  const maxPriceUrl = useMemo(() => {
+    return `/api/products/maxPrice?bestsellers=true&discounted=${showDiscounted}${Object.entries(
+      selectedAttributes
+    )
+      .filter(([_, value]) => value !== "all")
+      .map(([id, value]) => `&attr_${id}=${encodeURIComponent(String(value))}`)
+      .join("")}`;
+  }, [showDiscounted, selectedAttributes]);
 
-  // Add the missing SWR hooks for fetching data
-  const { data: maxPriceData } = useSWR<MaxPriceResponse>(maxPriceUrl, fetcher);
-  const { data, error, isLoading } = useSWR<ApiResponse>(apiUrl, fetcher);
+  const apiUrl = useMemo(() => {
+    return `/api/products/allProducts?page=${currentPage}&limit=${productsPerPage}&minPrice=${
+      priceRange[0]
+    }&maxPrice=${priceRange[1]}&bestsellers=true&discounted=${showDiscounted}${
+      selectedColor ? `&color=${selectedColor}` : ""
+    }${selectedBrand ? `&brand=${selectedBrand}` : ""}${Object.entries(
+      selectedAttributes
+    )
+      .filter(([_, value]) => value !== "all")
+      .map(([id, value]) => `&attr_${id}=${encodeURIComponent(String(value))}`)
+      .join("")}`;
+  }, [
+    currentPage,
+    priceRange,
+    showDiscounted,
+    selectedColor,
+    selectedBrand,
+    selectedAttributes,
+  ]);
+
+  // Update SWR calls with configuration
+  const { data: maxPriceData } = useSWR<MaxPriceResponse>(
+    maxPriceUrl,
+    fetcher,
+    swrConfig
+  );
+  const { data, error, isLoading } = useSWR<ApiResponse>(
+    apiUrl,
+    fetcher,
+    swrConfig
+  );
   const { data: attributesData } = useSWR(
     "/api/products/bestSellingFilters/attributes",
-    fetcher
+    fetcher,
+    swrConfig
   );
   const { data: colorsData } = useSWR(
     "/api/products/bestSellingFilters/colors",
-    fetcher
+    fetcher,
+    swrConfig
   );
   const { data: brandsData } = useSWR(
     "/api/products/bestSellingFilters/brands",
-    fetcher
+    fetcher,
+    swrConfig
   );
 
   const products = data?.products || [];
   const totalPages = data?.pagination?.totalPages || 1;
   const totalProducts = data?.pagination?.totalProducts || 0;
 
-  // Add the missing useEffect for maxPrice
+  // Update maxPrice effect with initial render check
   useEffect(() => {
-    if (maxPriceData?.maxPrice) {
+    if (maxPriceData?.maxPrice && isInitialMount.current) {
       const newMaxPrice = maxPriceData.maxPrice;
       setMaxPrice(newMaxPrice);
-      setPriceRange([0, newMaxPrice]);
+      if (!searchParams.get("maxPrice")) {
+        setPriceRange([priceRange[0], newMaxPrice]);
+      }
+      isInitialMount.current = false;
     }
-  }, [maxPriceData?.maxPrice]);
+  }, [maxPriceData?.maxPrice, searchParams, priceRange]);
 
   // Add the missing page change handler
   const handlePageChange = (pageNumber: number) => {
@@ -198,8 +234,13 @@ const BestsellersPage = () => {
     );
   };
 
-  // Add effect to reset URL when filters are cleared
+  // Update URL effect with initial render check
   useEffect(() => {
+    if (isInitialUrlUpdate.current) {
+      isInitialUrlUpdate.current = false;
+      return;
+    }
+
     const hasActiveFilters =
       priceRange[0] > 0 ||
       priceRange[1] < maxPrice ||
@@ -223,8 +264,13 @@ const BestsellersPage = () => {
     selectedBrand,
   ]);
 
-  // Add new effect to reset page when filters change
+  // Update page reset effect with initial render check
   useEffect(() => {
+    if (isInitialPageReset.current) {
+      isInitialPageReset.current = false;
+      return;
+    }
+
     setCurrentPage(1);
   }, [
     priceRange,

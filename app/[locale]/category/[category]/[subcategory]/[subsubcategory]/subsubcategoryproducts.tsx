@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, useMemo, Suspense } from "react";
 import useSWR from "swr";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,6 +48,12 @@ interface ProductsData {
     totalPages: number;
   };
 }
+
+const swrConfig = {
+  revalidateOnFocus: false,
+  revalidateOnReconnect: false,
+  dedupingInterval: 1000,
+};
 
 const fetcher = async (url: string) => {
   const response = await fetch(url);
@@ -100,55 +106,72 @@ export default function SubSubCategoryProducts({
     searchParams.get("brand")
   );
 
-  // Construct products URL
-  const productsUrl = `/api/products/subSubCategoryProducts?subSubCategoryId=${subsubcategoryId}&page=${currentPage}&limit=12&minPrice=${
-    priceRange[0]
-  }&maxPrice=${
-    priceRange[1]
-  }&bestsellers=${showBestsellers}&discounted=${showDiscounted}${
-    selectedColor ? `&color=${selectedColor}` : ""
-  }${selectedBrand ? `&brand=${selectedBrand}` : ""}${Object.entries(
-    selectedAttributes
-  )
-    .filter(([_, value]) => value !== "all")
-    .map(([id, value]) => `&attr_${id}=${encodeURIComponent(value)}`)
-    .join("")}`;
+  // Add refs for tracking initial renders
+  const isInitialMount = useRef(true);
+  const isInitialUrlUpdate = useRef(true);
+  const isInitialPageReset = useRef(true);
 
-  // Fetch products data
+  // Memoize the URLs
+  const productsUrl = useMemo(() => {
+    return `/api/products/subSubCategoryProducts?subSubCategoryId=${subsubcategoryId}&page=${currentPage}&limit=12&minPrice=${
+      priceRange[0]
+    }&maxPrice=${
+      priceRange[1]
+    }&bestsellers=${showBestsellers}&discounted=${showDiscounted}${
+      selectedColor ? `&color=${selectedColor}` : ""
+    }${selectedBrand ? `&brand=${selectedBrand}` : ""}${Object.entries(
+      selectedAttributes
+    )
+      .filter(([_, value]) => value !== "all")
+      .map(([id, value]) => `&attr_${id}=${encodeURIComponent(value)}`)
+      .join("")}`;
+  }, [
+    subsubcategoryId,
+    currentPage,
+    priceRange,
+    showBestsellers,
+    showDiscounted,
+    selectedColor,
+    selectedBrand,
+    selectedAttributes,
+  ]);
+
+  const maxPriceUrl = useMemo(() => {
+    return `/api/products/maxPrice?subSubCategoryId=${subsubcategoryId}&bestsellers=${showBestsellers}&discounted=${showDiscounted}${Object.entries(
+      selectedAttributes
+    )
+      .filter(([_, value]) => value !== "all")
+      .map(([id, value]) => `&attr_${id}=${encodeURIComponent(value)}`)
+      .join("")}`;
+  }, [subsubcategoryId, showBestsellers, showDiscounted, selectedAttributes]);
+
+  // Update SWR calls with configuration
   const {
     data: productsData,
     error: productsError,
     isLoading,
-  } = useSWR<ProductsData>(productsUrl, fetcher);
+  } = useSWR<ProductsData>(productsUrl, fetcher, swrConfig);
+
+  const { data: attributesData } = useSWR(
+    `/api/products/subSubCategoryFilters/attributes?subSubCategoryId=${subsubcategoryId}`,
+    fetcher,
+    swrConfig
+  );
+  const { data: colorsData } = useSWR(
+    `/api/products/subSubCategoryFilters/colors?subSubCategoryId=${subsubcategoryId}`,
+    fetcher,
+    swrConfig
+  );
+  const { data: brandsData } = useSWR(
+    `/api/products/subSubCategoryFilters/brands?subSubCategoryId=${subsubcategoryId}`,
+    fetcher,
+    swrConfig
+  );
+  const { data: maxPriceData } = useSWR(maxPriceUrl, fetcher, swrConfig);
 
   const products = productsData?.products || [];
   const totalPages = productsData?.pagination?.totalPages || 1;
   const totalProducts = productsData?.pagination?.totalProducts || 0;
-
-  // Fetch filter data
-  const { data: attributesData } = useSWR(
-    `/api/products/subSubCategoryFilters/attributes?subSubCategoryId=${subsubcategoryId}`,
-    fetcher
-  );
-  const { data: colorsData } = useSWR(
-    `/api/products/subSubCategoryFilters/colors?subSubCategoryId=${subsubcategoryId}`,
-    fetcher
-  );
-  const { data: brandsData } = useSWR(
-    `/api/products/subSubCategoryFilters/brands?subSubCategoryId=${subsubcategoryId}`,
-    fetcher
-  );
-
-  // Construct maxPrice URL
-  const maxPriceUrl = `/api/products/maxPrice?subSubCategoryId=${subsubcategoryId}&bestsellers=${showBestsellers}&discounted=${showDiscounted}${Object.entries(
-    selectedAttributes
-  )
-    .filter(([_, value]) => value !== "all")
-    .map(([id, value]) => `&attr_${id}=${encodeURIComponent(value)}`)
-    .join("")}`;
-
-  // Fetch maxPrice
-  const { data: maxPriceData } = useSWR(maxPriceUrl, fetcher);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ro-MD", {
@@ -191,9 +214,43 @@ export default function SubSubCategoryProducts({
     );
   };
 
-  // Update URL when filters change
+  // Update maxPrice effect with initial render check
   useEffect(() => {
-    updateUrlWithFilters();
+    if (maxPriceData?.maxPrice && isInitialMount.current) {
+      const newMaxPrice = maxPriceData.maxPrice;
+      setMaxPrice(newMaxPrice);
+      if (!searchParams.get("maxPrice")) {
+        setPriceRange([priceRange[0], newMaxPrice]);
+      }
+      isInitialMount.current = false;
+    }
+  }, [maxPriceData?.maxPrice, searchParams, priceRange]);
+
+  // Update URL effect with initial render check
+  useEffect(() => {
+    if (isInitialUrlUpdate.current) {
+      isInitialUrlUpdate.current = false;
+      return;
+    }
+
+    const hasActiveFilters =
+      priceRange[0] > 0 ||
+      priceRange[1] < maxPrice ||
+      showBestsellers ||
+      showDiscounted ||
+      selectedColor ||
+      selectedBrand ||
+      Object.values(selectedAttributes).some((value) => value !== "all") ||
+      currentPage > 1;
+
+    if (!hasActiveFilters) {
+      router.push(
+        `/${locale}/category/${categoryName}_${categoryId}/${subcategoryName}_${subcategoryId}/${subsubcategoryName}_${subsubcategoryId}`,
+        { scroll: false }
+      );
+    } else {
+      updateUrlWithFilters();
+    }
   }, [
     currentPage,
     priceRange,
@@ -204,17 +261,13 @@ export default function SubSubCategoryProducts({
     selectedBrand,
   ]);
 
-  // Update maxPrice when maxPriceData changes
+  // Update page reset effect with initial render check
   useEffect(() => {
-    if (maxPriceData?.maxPrice) {
-      const newMaxPrice = maxPriceData.maxPrice;
-      setMaxPrice(newMaxPrice);
-      setPriceRange([0, newMaxPrice]);
+    if (isInitialPageReset.current) {
+      isInitialPageReset.current = false;
+      return;
     }
-  }, [maxPriceData?.maxPrice]);
 
-  // Reset page when filters change
-  useEffect(() => {
     setCurrentPage(1);
   }, [
     priceRange,

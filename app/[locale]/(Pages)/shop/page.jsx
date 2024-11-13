@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import useSWR from "swr";
 import SmallProductCard from "@/components/Shop/SmallProductCard";
 import { useTranslations, useLocale } from "next-intl";
@@ -22,6 +22,12 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
 import Link from "next/link";
+
+const swrConfig = {
+  revalidateOnFocus: false,
+  revalidateOnReconnect: false,
+  dedupingInterval: 1000,
+};
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
@@ -62,27 +68,40 @@ const ShopPage = () => {
     searchParams.get("brand") || null
   );
 
-  const maxPriceUrl = `/api/products/maxPrice?bestsellers=${showBestsellers}&discounted=${showDiscounted}${Object.entries(
-    selectedAttributes
-  )
-    .filter(([_, value]) => value !== "all")
-    .map(([id, value]) => `&attr_${id}=${encodeURIComponent(value)}`)
-    .join("")}`;
-  const apiUrl = `/api/products/allProducts?page=${currentPage}&limit=${productsPerPage}&minPrice=${
-    priceRange[0]
-  }&maxPrice=${
-    priceRange[1]
-  }&bestsellers=${showBestsellers}&discounted=${showDiscounted}${
-    selectedColor ? `&color=${selectedColor}` : ""
-  }${selectedBrand ? `&brand=${selectedBrand}` : ""}${Object.entries(
-    selectedAttributes
-  )
-    .filter(([_, value]) => value !== "all")
-    .map(([id, value]) => `&attr_${id}=${encodeURIComponent(value)}`)
-    .join("")}`;
+  const maxPriceUrl = useMemo(() => {
+    return `/api/products/maxPrice?bestsellers=${showBestsellers}&discounted=${showDiscounted}${Object.entries(
+      selectedAttributes
+    )
+      .filter(([_, value]) => value !== "all")
+      .map(([id, value]) => `&attr_${id}=${encodeURIComponent(value)}`)
+      .join("")}`;
+  }, [showBestsellers, showDiscounted, selectedAttributes]);
 
-  const { data: maxPriceData } = useSWR(maxPriceUrl, fetcher);
-  const { data, error, isLoading } = useSWR(apiUrl, fetcher);
+  const apiUrl = useMemo(() => {
+    return `/api/products/allProducts?page=${currentPage}&limit=${productsPerPage}&minPrice=${
+      priceRange[0]
+    }&maxPrice=${
+      priceRange[1]
+    }&bestsellers=${showBestsellers}&discounted=${showDiscounted}${
+      selectedColor ? `&color=${selectedColor}` : ""
+    }${selectedBrand ? `&brand=${selectedBrand}` : ""}${Object.entries(
+      selectedAttributes
+    )
+      .filter(([_, value]) => value !== "all")
+      .map(([id, value]) => `&attr_${id}=${encodeURIComponent(value)}`)
+      .join("")}`;
+  }, [
+    currentPage,
+    priceRange,
+    showBestsellers,
+    showDiscounted,
+    selectedColor,
+    selectedBrand,
+    selectedAttributes,
+  ]);
+
+  const { data: maxPriceData } = useSWR(maxPriceUrl, fetcher, swrConfig);
+  const { data, error, isLoading } = useSWR(apiUrl, fetcher, swrConfig);
 
   const products = data?.products || [];
   const totalPages = data?.pagination?.totalPages || 1;
@@ -90,24 +109,34 @@ const ShopPage = () => {
 
   const { data: attributesData } = useSWR(
     "/api/products/allFilters/attributes",
-    fetcher
+    fetcher,
+    swrConfig
   );
   const { data: colorsData } = useSWR(
     "/api/products/allFilters/colors",
-    fetcher
+    fetcher,
+    swrConfig
   );
   const { data: brandsData } = useSWR(
     "/api/products/allFilters/brands",
-    fetcher
+    fetcher,
+    swrConfig
   );
 
+  const isInitialMount = useRef(true);
+  const isInitialUrlUpdate = useRef(true);
+  const isInitialPageReset = useRef(true);
+
   useEffect(() => {
-    if (maxPriceData?.maxPrice) {
+    if (maxPriceData?.maxPrice && isInitialMount.current) {
       const newMaxPrice = maxPriceData.maxPrice;
       setMaxPrice(newMaxPrice);
-      setPriceRange([0, newMaxPrice]);
+      if (!searchParams.get("maxPrice")) {
+        setPriceRange([priceRange[0], newMaxPrice]);
+      }
+      isInitialMount.current = false;
     }
-  }, [maxPriceData?.maxPrice]);
+  }, [maxPriceData?.maxPrice, searchParams, priceRange]);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -149,6 +178,11 @@ const ShopPage = () => {
   };
 
   useEffect(() => {
+    if (isInitialUrlUpdate.current) {
+      isInitialUrlUpdate.current = false;
+      return;
+    }
+
     const hasActiveFilters =
       priceRange[0] > 0 ||
       priceRange[1] < maxPrice ||
@@ -174,8 +208,12 @@ const ShopPage = () => {
     selectedBrand,
   ]);
 
-  // Add new effect to reset page when filters change
   useEffect(() => {
+    if (isInitialPageReset.current) {
+      isInitialPageReset.current = false;
+      return;
+    }
+
     setCurrentPage(1);
   }, [
     priceRange,
