@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import useSWR from "swr";
+import { useStableQuery } from "@/hooks/useAbortableSWR";
 import SmallProductCard from "@/components/Shop/SmallProductCard";
 import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -159,32 +159,48 @@ const BestsellersPage = () => {
     selectedAttributes,
   ]);
 
-  // Update SWR calls with configuration
-  const { data: maxPriceData } = useSWR<MaxPriceResponse>(
-    maxPriceUrl,
-    fetcher,
-    swrConfig
+  // Memoize query keys
+  const queryKeys = useMemo(
+    () => ({
+      products: apiUrl,
+      maxPrice: maxPriceUrl,
+      attributes: "/api/products/bestSellingFilters/attributes",
+      colors: "/api/products/bestSellingFilters/colors",
+      brands: "/api/products/bestSellingFilters/brands",
+    }),
+    [apiUrl, maxPriceUrl]
   );
-  const { data, error, isLoading } = useSWR<ApiResponse>(
-    apiUrl,
-    fetcher,
-    swrConfig
-  );
-  const { data: attributesData } = useSWR(
-    "/api/products/bestSellingFilters/attributes",
-    fetcher,
-    swrConfig
-  );
-  const { data: colorsData } = useSWR(
-    "/api/products/bestSellingFilters/colors",
-    fetcher,
-    swrConfig
-  );
-  const { data: brandsData } = useSWR(
-    "/api/products/bestSellingFilters/brands",
-    fetcher,
-    swrConfig
-  );
+
+  // Update data fetching with new abort handling
+  const { data, error, isLoading, mutate } = useStableQuery(queryKeys.products);
+  const { data: maxPriceData } = useStableQuery(queryKeys.maxPrice);
+  const { data: attributesData } = useStableQuery(queryKeys.attributes);
+  const { data: colorsData } = useStableQuery(queryKeys.colors);
+  const { data: brandsData } = useStableQuery(queryKeys.brands);
+
+  // Add computed loading and error states
+  const isLoadingProducts = isLoading && !data;
+  const hasError =
+    error && !(error instanceof Error && error.name === "AbortError");
+
+  // Update error handling with retry
+  useEffect(() => {
+    if (hasError) {
+      const retryTimer = setTimeout(() => {
+        mutate();
+      }, 1000);
+
+      return () => clearTimeout(retryTimer);
+    }
+  }, [hasError, mutate]);
+
+  // Optional debug logging for development
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      console.log("Products data:", data);
+      console.log("Loading state:", isLoading);
+    }
+  }, [data, isLoading]);
 
   const products = data?.products || [];
   const totalPages = data?.pagination?.totalPages || 1;
@@ -411,46 +427,51 @@ const BestsellersPage = () => {
 
           {/* Products Section */}
           <div className="flex-1">
-            {/* Products Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6">
-              {isLoading
-                ? Array(12)
+            {hasError ? (
+              <div className="text-red-500 text-center py-8">
+                {t("Error Loading Products")}
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6">
+                {isLoadingProducts ? (
+                  Array(12)
                     .fill(0)
                     .map((_, index) => (
                       <SmallProductCard key={index} product={{}} loading />
                     ))
-                : products.map((product: Product) => (
+                ) : products.length > 0 ? (
+                  products.map((product: Product) => (
                     <SmallProductCard key={product.id} product={product} />
-                  ))}
-            </div>
-
-            {/* No products found message */}
-            {!isLoading && products.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-16 text-muted-foreground space-y-4">
-                <PiShoppingCartSimple className="w-16 h-16" />
-                <div className="text-xl font-medium">{t("We're Sorry")}</div>
-                <div className="text-center max-w-md">{t("sorry_message")}</div>
-                <Button
-                  onClick={() => {
-                    setShowDiscounted(false);
-                    setPriceRange([0, maxPrice]);
-                    setSelectedAttributes({});
-                    setSelectedColor(null);
-                    setSelectedBrand(null);
-                    setCurrentPage(1);
-                    const currentPath = window.location.pathname;
-                    window.history.replaceState({}, "", currentPath);
-                    router.refresh();
-                  }}
-                  className="mt-4"
-                >
-                  {t("Reset Filters")}
-                </Button>
+                  ))
+                ) : (
+                  <div className="col-span-full flex flex-col items-center justify-center py-16 text-muted-foreground space-y-4">
+                    <PiShoppingCartSimple className="w-16 h-16" />
+                    <div className="text-xl font-medium">
+                      {t("We're Sorry")}
+                    </div>
+                    <div className="text-center max-w-md">
+                      {t("sorry_message")}
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setShowDiscounted(false);
+                        setPriceRange([0, maxPrice]);
+                        setSelectedAttributes({});
+                        setSelectedColor(null);
+                        setSelectedBrand(null);
+                        setCurrentPage(1);
+                        router.replace(`/${locale}/shop/bestsellers`);
+                      }}
+                    >
+                      {t("Reset Filters")}
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
 
             {/* Pagination */}
-            {totalPages > 1 && (
+            {!isLoadingProducts && totalPages > 1 && (
               <div className="flex justify-center gap-2 mt-8">
                 <Button
                   variant="outline"

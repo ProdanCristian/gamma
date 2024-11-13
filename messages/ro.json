@@ -4,6 +4,9 @@
     "site_description": "Descoperă o gamă largă de produse la prețuri competitive. Livrare rapidă în toată Moldova."
   },
   "shop": {
+    "Previous Page": "Pagina anterioară",
+    "Next Page": "Pagina următoare",
+    "Go to Page": "Mergi la pagina",
     "Bestselling Products": "Produse populare",
     "Reset": "Resetează",
     "Discounted Products": "Produse cu reducere",

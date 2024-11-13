@@ -1,8 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useState, useEffect, useRef, useMemo, Suspense } from "react";
-import useSWR from "swr";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useStableQuery } from "@/hooks/useAbortableSWR";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -43,18 +43,6 @@ interface ProductsData {
     totalPages: number;
   };
 }
-
-const swrConfig = {
-  revalidateOnFocus: false,
-  revalidateOnReconnect: false,
-  dedupingInterval: 1000,
-};
-
-const fetcher = async (url: string) => {
-  const response = await fetch(url);
-  const data = await response.json();
-  return data;
-};
 
 export default function CategoryProducts({
   categoryId,
@@ -136,29 +124,54 @@ export default function CategoryProducts({
       .join("")}`;
   }, [categoryId, showBestsellers, showDiscounted, selectedAttributes]);
 
-  // Update SWR calls with configuration
+  // Memoize query keys
+  const queryKeys = useMemo(
+    () => ({
+      products: productsUrl,
+      maxPrice: maxPriceUrl,
+      attributes: `/api/products/categoryFilters/attributes?categoryId=${categoryId}`,
+      colors: `/api/products/categoryFilters/colors?categoryId=${categoryId}`,
+      brands: `/api/products/categoryFilters/brands?categoryId=${categoryId}`,
+    }),
+    [productsUrl, maxPriceUrl, categoryId]
+  );
+
+  // Update data fetching with useStableQuery
   const {
     data: productsData,
     error: productsError,
     isLoading,
-  } = useSWR<ProductsData>(productsUrl, fetcher, swrConfig);
+    mutate,
+  } = useStableQuery(queryKeys.products);
+  const { data: maxPriceData } = useStableQuery(queryKeys.maxPrice);
+  const { data: attributesData } = useStableQuery(queryKeys.attributes);
+  const { data: colorsData } = useStableQuery(queryKeys.colors);
+  const { data: brandsData } = useStableQuery(queryKeys.brands);
 
-  const { data: attributesData } = useSWR(
-    `/api/products/categoryFilters/attributes?categoryId=${categoryId}`,
-    fetcher,
-    swrConfig
-  );
-  const { data: colorsData } = useSWR(
-    `/api/products/categoryFilters/colors?categoryId=${categoryId}`,
-    fetcher,
-    swrConfig
-  );
-  const { data: brandsData } = useSWR(
-    `/api/products/categoryFilters/brands?categoryId=${categoryId}`,
-    fetcher,
-    swrConfig
-  );
-  const { data: maxPriceData } = useSWR(maxPriceUrl, fetcher, swrConfig);
+  // Add computed loading and error states
+  const isLoadingProducts = isLoading && !productsData;
+  const hasError =
+    productsError &&
+    !(productsError instanceof Error && productsError.name === "AbortError");
+
+  // Update error handling with retry
+  useEffect(() => {
+    if (hasError) {
+      const retryTimer = setTimeout(() => {
+        mutate();
+      }, 1000);
+
+      return () => clearTimeout(retryTimer);
+    }
+  }, [hasError, mutate]);
+
+  // Optional debug logging for development
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      console.log("Products data:", productsData);
+      console.log("Loading state:", isLoading);
+    }
+  }, [productsData, isLoading]);
 
   const products = productsData?.products || [];
   const totalPages = productsData?.pagination?.totalPages || 1;
@@ -269,50 +282,24 @@ export default function CategoryProducts({
   ]);
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <>
-        <div className="mb-4 w-full flex justify-between md:flex-row-reverse">
-          {totalProducts !== undefined &&
-            t.rich("Found Products", { count: totalProducts })}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" className="lg:hidden">
-                <PiFunnelSimple className="h-5 w-5 mr-2" />
-                {t("Filters")}
-              </Button>
-            </SheetTrigger>
-            <SheetContent
-              side="left"
-              className="w-[300px] sm:w-[350px] p-0 border-r-accent dark:bg-charade-900"
-            >
-              <SheetHeader className="p-6 pb-0">
-                <SheetTitle>{t("Filters")}</SheetTitle>
-              </SheetHeader>
-              <FilterSidebar
-                showDiscounted={showDiscounted}
-                setShowDiscounted={setShowDiscounted}
-                showBestsellers={showBestsellers}
-                setShowBestsellers={setShowBestsellers}
-                priceRange={priceRange}
-                setPriceRange={setPriceRange}
-                maxPrice={maxPrice}
-                selectedAttributes={selectedAttributes}
-                setSelectedAttributes={setSelectedAttributes}
-                selectedColor={selectedColor}
-                setSelectedColor={setSelectedColor}
-                selectedBrand={selectedBrand}
-                setSelectedBrand={setSelectedBrand}
-                attributesData={attributesData}
-                colorsData={colorsData}
-                brandsData={brandsData}
-                formatPrice={formatPrice}
-              />
-            </SheetContent>
-          </Sheet>
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-6 min-h-screen">
-          <div className="hidden lg:block">
+    <>
+      <div className="mb-4 w-full flex justify-between md:flex-row-reverse">
+        {totalProducts !== undefined &&
+          t.rich("Found Products", { count: totalProducts })}
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline" className="lg:hidden">
+              <PiFunnelSimple className="h-5 w-5 mr-2" />
+              {t("Filters")}
+            </Button>
+          </SheetTrigger>
+          <SheetContent
+            side="left"
+            className="w-[300px] sm:w-[350px] p-0 border-r-accent dark:bg-charade-900"
+          >
+            <SheetHeader className="p-6 pb-0">
+              <SheetTitle>{t("Filters")}</SheetTitle>
+            </SheetHeader>
             <FilterSidebar
               showDiscounted={showDiscounted}
               setShowDiscounted={setShowDiscounted}
@@ -332,18 +319,48 @@ export default function CategoryProducts({
               brandsData={brandsData}
               formatPrice={formatPrice}
             />
-          </div>
+          </SheetContent>
+        </Sheet>
+      </div>
 
-          <div className="flex-1">
+      <div className="flex flex-col md:flex-row gap-6 min-h-screen">
+        <div className="hidden lg:block">
+          <FilterSidebar
+            showDiscounted={showDiscounted}
+            setShowDiscounted={setShowDiscounted}
+            showBestsellers={showBestsellers}
+            setShowBestsellers={setShowBestsellers}
+            priceRange={priceRange}
+            setPriceRange={setPriceRange}
+            maxPrice={maxPrice}
+            selectedAttributes={selectedAttributes}
+            setSelectedAttributes={setSelectedAttributes}
+            selectedColor={selectedColor}
+            setSelectedColor={setSelectedColor}
+            selectedBrand={selectedBrand}
+            setSelectedBrand={setSelectedBrand}
+            attributesData={attributesData}
+            colorsData={colorsData}
+            brandsData={brandsData}
+            formatPrice={formatPrice}
+          />
+        </div>
+
+        <div className="flex-1">
+          {hasError ? (
+            <div className="text-red-500 text-center py-8">
+              {t("Error Loading Products")}
+            </div>
+          ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6">
-              {isLoading ? (
+              {isLoadingProducts ? (
                 Array(12)
                   .fill(0)
                   .map((_, index) => (
                     <SmallProductCard key={index} product={{}} loading />
                   ))
               ) : products.length > 0 ? (
-                products.map((product) => (
+                products.map((product: Product) => (
                   <SmallProductCard key={product.id} product={product} />
                 ))
               ) : (
@@ -353,65 +370,64 @@ export default function CategoryProducts({
                   <div className="text-center max-w-md">
                     {t("sorry_message")}
                   </div>
-                  <button
+                  <Button
                     onClick={() => {
                       setShowDiscounted(false);
                       setShowBestsellers(false);
                       setPriceRange([0, maxPrice]);
                       setSelectedAttributes({});
-                      setSelectedColor("");
-                      setSelectedBrand("");
+                      setSelectedColor(null);
+                      setSelectedBrand(null);
                       setCurrentPage(1);
                       router.push(
                         `/${locale}/category/${categoryName}_${categoryId}`
                       );
                     }}
-                    className="mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
                   >
                     {t("Reset Filters")}
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>
+          )}
 
-            {totalPages > 1 && (
-              <div className="flex justify-center gap-2 mt-8">
-                <Button
-                  variant="outline"
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  aria-label={t("previous_page")}
-                >
-                  <PiArrowLeft aria-hidden="true" />
-                </Button>
+          {!isLoadingProducts && totalPages > 1 && (
+            <div className="flex justify-center gap-2 mt-8">
+              <Button
+                variant="outline"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                aria-label={t("previous_page")}
+              >
+                <PiArrowLeft aria-hidden="true" />
+              </Button>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? "default" : "outline"}
-                      onClick={() => handlePageChange(page)}
-                      aria-label={t("go_to_page", { page })}
-                      aria-current={currentPage === page ? "page" : undefined}
-                    >
-                      {page}
-                    </Button>
-                  )
-                )}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "default" : "outline"}
+                    onClick={() => handlePageChange(page)}
+                    aria-label={t("go_to_page", { page })}
+                    aria-current={currentPage === page ? "page" : undefined}
+                  >
+                    {page}
+                  </Button>
+                )
+              )}
 
-                <Button
-                  variant="outline"
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  aria-label={t("next_page")}
-                >
-                  <PiArrowRight aria-hidden="true" />
-                </Button>
-              </div>
-            )}
-          </div>
+              <Button
+                variant="outline"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                aria-label={t("next_page")}
+              >
+                <PiArrowRight aria-hidden="true" />
+              </Button>
+            </div>
+          )}
         </div>
-      </>
-    </Suspense>
+      </div>
+    </>
   );
 }

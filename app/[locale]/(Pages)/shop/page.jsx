@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import useSWR from "swr";
 import SmallProductCard from "@/components/Shop/SmallProductCard";
 import { useTranslations, useLocale } from "next-intl";
@@ -22,6 +28,7 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
 import Link from "next/link";
+import { useStableQuery } from "@/hooks/useAbortableSWR";
 
 const swrConfig = {
   revalidateOnFocus: false,
@@ -100,28 +107,47 @@ const ShopPage = () => {
     selectedAttributes,
   ]);
 
-  const { data: maxPriceData } = useSWR(maxPriceUrl, fetcher, swrConfig);
-  const { data, error, isLoading } = useSWR(apiUrl, fetcher, swrConfig);
+  const queryKeys = useMemo(
+    () => ({
+      products: apiUrl,
+      maxPrice: maxPriceUrl,
+      attributes: "/api/products/allFilters/attributes",
+      colors: "/api/products/allFilters/colors",
+      brands: "/api/products/allFilters/brands",
+    }),
+    [apiUrl, maxPriceUrl]
+  );
+
+  const { data, error, isLoading, mutate } = useStableQuery(queryKeys.products);
+  const { data: maxPriceData } = useStableQuery(queryKeys.maxPrice);
+  const { data: attributesData } = useStableQuery(queryKeys.attributes);
+  const { data: colorsData } = useStableQuery(queryKeys.colors);
+  const { data: brandsData } = useStableQuery(queryKeys.brands);
+
+  const isLoadingProducts = isLoading && !data;
+  const hasError =
+    error && !(error instanceof Error && error.name === "AbortError");
+
+  useEffect(() => {
+    if (hasError) {
+      const retryTimer = setTimeout(() => {
+        mutate();
+      }, 1000);
+
+      return () => clearTimeout(retryTimer);
+    }
+  }, [hasError, mutate]);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      console.log("Products data:", data);
+      console.log("Loading state:", isLoading);
+    }
+  }, [data, isLoading]);
 
   const products = data?.products || [];
   const totalPages = data?.pagination?.totalPages || 1;
   const totalProducts = data?.pagination?.totalProducts || 0;
-
-  const { data: attributesData } = useSWR(
-    "/api/products/allFilters/attributes",
-    fetcher,
-    swrConfig
-  );
-  const { data: colorsData } = useSWR(
-    "/api/products/allFilters/colors",
-    fetcher,
-    swrConfig
-  );
-  const { data: brandsData } = useSWR(
-    "/api/products/allFilters/brands",
-    fetcher,
-    swrConfig
-  );
 
   const isInitialMount = useRef(true);
   const isInitialUrlUpdate = useRef(true);
@@ -177,27 +203,51 @@ const ShopPage = () => {
     );
   };
 
+  const updateFilters = useCallback((updates) => {
+    const {
+      priceRange: newPriceRange,
+      showBestsellers: newBestsellers,
+      showDiscounted: newDiscounted,
+      selectedAttributes: newAttributes,
+      selectedColor: newColor,
+      selectedBrand: newBrand,
+    } = updates;
+
+    batch(() => {
+      if (newPriceRange) setPriceRange(newPriceRange);
+      if (newBestsellers !== undefined) setShowBestsellers(newBestsellers);
+      if (newDiscounted !== undefined) setShowDiscounted(newDiscounted);
+      if (newAttributes) setSelectedAttributes(newAttributes);
+      if (newColor !== undefined) setSelectedColor(newColor);
+      if (newBrand !== undefined) setSelectedBrand(newBrand);
+    });
+  }, []);
+
   useEffect(() => {
     if (isInitialUrlUpdate.current) {
       isInitialUrlUpdate.current = false;
       return;
     }
 
-    const hasActiveFilters =
-      priceRange[0] > 0 ||
-      priceRange[1] < maxPrice ||
-      showBestsellers ||
-      showDiscounted ||
-      selectedColor ||
-      selectedBrand ||
-      Object.values(selectedAttributes).some((value) => value !== "all") ||
-      currentPage > 1;
+    const debounceTimer = setTimeout(() => {
+      const hasActiveFilters =
+        priceRange[0] > 0 ||
+        priceRange[1] < maxPrice ||
+        showBestsellers ||
+        showDiscounted ||
+        selectedColor ||
+        selectedBrand ||
+        Object.values(selectedAttributes).some((value) => value !== "all") ||
+        currentPage > 1;
 
-    if (!hasActiveFilters) {
-      router.replace(`/${locale}/shop`, { scroll: false });
-    } else {
-      updateUrlWithFilters();
-    }
+      if (!hasActiveFilters) {
+        router.replace(`/${locale}/shop`, { scroll: false });
+      } else {
+        updateUrlWithFilters();
+      }
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
   }, [
     currentPage,
     priceRange,
@@ -322,10 +372,6 @@ const ShopPage = () => {
           </Sheet>
         </div>
 
-        {/* Show error state if any */}
-        {error && (
-          <div className="text-red-500 mb-4">{t("Error Loading Products")}</div>
-        )}
         <div className="flex flex-col md:flex-row gap-6 min-h-screen">
           {/* Filter Sidebar Component - Hidden on mobile */}
           <div className="hidden lg:block">
@@ -352,46 +398,47 @@ const ShopPage = () => {
 
           {/* Products Section - Right Side */}
           <div className="flex-1">
-            {/* Products Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6">
-              {isLoading
-                ? Array(12)
+            {hasError ? (
+              <div className="text-red-500 text-center py-8">
+                {t("Error Loading Products")}
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6">
+                {isLoadingProducts ? (
+                  Array(12)
                     .fill(0)
                     .map((_, index) => (
                       <SmallProductCard key={index} product={{}} loading />
                     ))
-                : products.map((product) => (
+                ) : products.length > 0 ? (
+                  products.map((product) => (
                     <SmallProductCard key={product.id} product={product} />
-                  ))}
-            </div>
-
-            {/* Show "No products found" message when needed */}
-            {!isLoading && products.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-16 text-muted-foreground space-y-4">
-                <PiShoppingCartSimple className="w-16 h-16" />
-                <div className="text-xl font-medium">{t("We're Sorry")}</div>
-                <div className="text-center max-w-md">{t("sorry_message")}</div>
-                <button
-                  onClick={() => {
-                    // First reset all states
-                    setShowDiscounted(false);
-                    setShowBestsellers(false);
-                    setPriceRange([0, maxPrice]);
-                    setSelectedAttributes({});
-                    setSelectedColor("");
-                    setSelectedBrand("");
-                    setCurrentPage(1);
-
-                    // Clear URL by replacing current history state
-                    window.history.replaceState({}, "", `/${locale}/shop`);
-
-                    // Force a re-fetch of the data
-                    router.refresh();
-                  }}
-                  className="mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-                >
-                  {t("Reset Filters")}
-                </button>
+                  ))
+                ) : (
+                  <div className="col-span-full flex flex-col items-center justify-center py-16 text-muted-foreground space-y-4">
+                    <PiShoppingCartSimple className="w-16 h-16" />
+                    <div className="text-xl font-medium">
+                      {t("We're Sorry")}
+                    </div>
+                    <div className="text-center max-w-md">
+                      {t("sorry_message")}
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setShowDiscounted(false);
+                        setShowBestsellers(false);
+                        setPriceRange([0, maxPrice]);
+                        setSelectedAttributes({});
+                        setSelectedColor(null);
+                        setSelectedBrand(null);
+                        setCurrentPage(1);
+                        router.replace(`/${locale}/shop`);
+                      }}
+                    >
+                      {t("Reset Filters")}
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
 

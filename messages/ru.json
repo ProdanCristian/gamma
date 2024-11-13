@@ -1,5 +1,8 @@
 {
   "shop": {
+    "Previous Page": "Предыдущая страница",
+    "Next Page": "Следующая страница",
+    "Go to Page": "Перейти на страницу",
     "Bestselling Products": "Хиты продаж",
     "Discounted Products": "Товары со скидкой",
     "Reset": "Сбросить",
