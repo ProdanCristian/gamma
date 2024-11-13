@@ -224,11 +224,15 @@ export default function DiscountsPage() {
   ]);
 
   // Add structured data for SEO
+  if (!t) return null; // Early return if translations aren't loaded
+
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: t("Discounted Products"),
-    description: t.rich("Found Products", { count: totalProducts }).toString(),
+    name: (t as any)("Discounted Products"),
+    description: (t as any)
+      .rich("Found Products", { count: totalProducts || 0 })
+      .toString(),
     breadcrumb: {
       "@type": "BreadcrumbList",
       itemListElement: [
@@ -247,14 +251,14 @@ export default function DiscountsPage() {
         {
           "@type": "ListItem",
           position: 3,
-          name: t("Discounted Products"),
+          name: (t as any)("Discounted Products"),
           item: `${process.env.NEXT_PUBLIC_BASE_URL}/${locale}/shop/discounts`,
         },
       ],
     },
     offers: {
       "@type": "AggregateOffer",
-      offerCount: totalProducts,
+      offerCount: totalProducts || 0,
       availability: "https://schema.org/InStock",
     },
   };
