@@ -9,12 +9,13 @@ export function useScrollDirection() {
       const currentScrollY = window.scrollY;
 
       if (currentScrollY === 0) {
+        // Immediately show header when at top
         setShouldShow(true);
-      } else if (currentScrollY > lastScrollY) {
-        // Scrolling down
+      } else if (currentScrollY > lastScrollY && currentScrollY > 77) {
+        // Hide header when scrolling down and past header height
         setShouldShow(false);
-      } else {
-        // Scrolling up
+      } else if (currentScrollY < lastScrollY) {
+        // Show header when scrolling up
         setShouldShow(true);
       }
 

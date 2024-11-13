@@ -16,6 +16,7 @@ export default function MobileHeader() {
   const [showModal, setShowModal] = useState(false);
   const pathname = usePathname();
   const showHeader = useScrollDirection();
+  const lastScrollY = useScrollDirection();
 
   useEffect(() => {
     setShowModal(false);
@@ -60,7 +61,7 @@ export default function MobileHeader() {
   return (
     <div
       className={`md:hidden fixed flex justify-between items-center w-full h-[77px] border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-charade-950/80 backdrop-filter backdrop-blur-lg px-3 top-0 z-20 transition-transform duration-300 ${
-        showHeader ? "translate-y-0" : "-translate-y-full"
+        showHeader || lastScrollY === 0 ? "translate-y-0" : "-translate-y-full"
       }`}
     >
       <Link href="/">
