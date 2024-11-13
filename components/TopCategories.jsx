@@ -58,6 +58,8 @@ export default function TopCategories({ categories }) {
                     src={category.imagePath}
                     alt={locale === "ru" ? category.nameRu : category.nameRo}
                     className="max-w-full max-h-full w-auto h-auto object-contain rounded-lg"
+                    loading="lazy"
+                    priority={false}
                   />
                 </div>
               </div>

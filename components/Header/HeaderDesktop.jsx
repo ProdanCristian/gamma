@@ -4,7 +4,8 @@ import SearchBar from "./SearchBar";
 import User from "./User";
 import Link from "next/link";
 import CartIcon from "../CartIcon";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import Image from "next/image";
 
 async function getLogo() {
   try {
@@ -27,16 +28,20 @@ async function getLogo() {
 export default async function HeaderDesktop() {
   const logoUrl = await getLogo();
   const locale = await getLocale();
+  const t = await getTranslations("navigation");
 
   return (
     <div className="hidden md:flex justify-between items-center h-[75px] bg-charade-900 max-w-[1350px] w-[95%] rounded-2xl mx-auto mt-2 z-50 sticky top-3">
       <div className="flex justify-between items-center w-full">
         <div className="h-12 w-[150px] ml-5">
-          <Link href="/" className="cursor-pointer">
-            <img
+          <Link href="/" className="cursor-pointer" aria-label={t("home")}>
+            <Image
               src={logoUrl}
-              alt="Logo"
+              alt="Gamma Logo"
+              width={150}
+              height={48}
               className="h-full w-full object-contain"
+              priority={true}
             />
           </Link>
         </div>
@@ -44,7 +49,7 @@ export default async function HeaderDesktop() {
         <div className="flex items-center mr-5">
           <CartIcon size={26} marginRight="mr-4" />
           <User />
-          <Link href={`/${locale}/wishlist`}>
+          <Link href={`/${locale}/wishlist`} aria-label={t("wishlist")}>
             <PiHeart
               size={26}
               className="mr-4 cursor-pointer text-white hover:text-accent transition-colors"

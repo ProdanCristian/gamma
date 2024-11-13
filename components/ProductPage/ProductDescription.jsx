@@ -227,13 +227,16 @@ const ProductDescription = ({
                     }`}
                   >
                     {showVariantImages && (
-                      <div className="relative w-full pt-[100%] rounded-lg overflow-hidden mb-2">
+                      <div className="relative aspect-square w-full rounded-lg overflow-hidden mb-2">
                         {imagePath && (
                           <Image
                             src={imagePath}
                             alt={variants[0].Nume_Produs_RO}
                             fill
+                            sizes="(max-width: 768px) 33vw, 25vw"
                             className="object-cover rounded-lg"
+                            loading="lazy"
+                            priority={false}
                           />
                         )}
                       </div>
@@ -300,13 +303,17 @@ const ProductDescription = ({
 
       <div className="flex flex-col sm:flex-row justify-between items-start md:items-center gap-4">
         {currentProduct.Stock > 0 && (
-          <div className="flex  items-center gap-4 sm:w-auto">
-            <label className="text-base font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
+          <div className="flex items-center gap-4 sm:w-auto">
+            <label
+              htmlFor="quantity-input"
+              className="text-base font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap"
+            >
               {t("quantity")}
             </label>
             <div className="flex items-center">
               <button
                 onClick={() => handleQuantityChange(quantity - 1)}
+                aria-label={t("decrease_quantity")}
                 className="px-3 py-1 border border-gray-300 rounded-l-lg hover:bg-gray-100 
                   dark:border-gray-600 dark:hover:bg-gray-700"
                 disabled={quantity <= 1}
@@ -314,6 +321,7 @@ const ProductDescription = ({
                 -
               </button>
               <input
+                id="quantity-input"
                 type="number"
                 min="1"
                 max={currentProduct.Stock}
@@ -323,9 +331,11 @@ const ProductDescription = ({
                 }
                 className="w-16 text-center border-y border-gray-300 py-1 
                   dark:border-gray-600 dark:bg-charade-800"
+                aria-label={t("quantity")}
               />
               <button
                 onClick={() => handleQuantityChange(quantity + 1)}
+                aria-label={t("increase_quantity")}
                 className="px-3 py-1 border border-gray-300 rounded-r-lg hover:bg-gray-100 
                   dark:border-gray-600 dark:hover:bg-gray-700"
                 disabled={quantity >= currentProduct.Stock}
@@ -340,6 +350,7 @@ const ProductDescription = ({
           <button
             disabled={currentProduct.Stock <= 0}
             onClick={handleOrderNow}
+            aria-label={t("order_now")}
             className={`dark:bg-accent bg-accent dark:hover:bg-gray-100
               hover:bg-charade-900 py-[8px] text-charade-950 hover:text-white dark:text-charade-950 text-sm font-semibold px-4 rounded-lg flex
               items-center justify-center content-center w-full transition-colors duration-200
@@ -353,6 +364,7 @@ const ProductDescription = ({
           <button
             disabled={currentProduct.Stock <= 0}
             onClick={handleAddToCart}
+            aria-label={t("add_to_cart")}
             className={`hover:text-[#47e194] transition-colors duration-200
               ${
                 currentProduct.Stock <= 0 ? "opacity-50 cursor-not-allowed" : ""

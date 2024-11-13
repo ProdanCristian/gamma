@@ -26,6 +26,7 @@ export default function ImageCarousel({ sliders }) {
                   draggable={false}
                   alt="Slider image"
                   priority={index === 0}
+                  loading={index === 0 ? "eager" : "lazy"}
                 />
               </div>
             </CarouselItem>

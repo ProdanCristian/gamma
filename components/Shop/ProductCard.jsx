@@ -202,9 +202,10 @@ const ProductCard = ({ product, loading = false }) => {
               <Image
                 alt={productData.name}
                 src={productData.image}
-                className="max-w-full max-h-[160px] w-auto h-auto object-contain group-hover:opacity-90 transition-opacity duration-200 "
+                className="max-w-full max-h-[160px] w-auto h-auto object-contain group-hover:opacity-90 transition-opacity duration-200"
                 width={160}
                 height={160}
+                loading="lazy"
               />
             </div>
           ) : (
@@ -259,6 +260,7 @@ const ProductCard = ({ product, loading = false }) => {
         <button
           onClick={addToCart}
           disabled={isOutOfStock}
+          aria-label={t("add_to_cart")}
           className={`transition-colors duration-200 hover:text-[#47e194] ${
             isOutOfStock
               ? "opacity-50 cursor-not-allowed hover:text-current"

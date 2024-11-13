@@ -5,7 +5,8 @@ import Script from "next/script";
 import Link from "next/link";
 
 export async function generateMetadata({ params }) {
-  const locale = params.locale;
+  const resolvedParams = await params;
+  const locale = resolvedParams.locale;
 
   const title = locale === "ru" ? "О Gamma | Gamma" : "Despre Gamma | Gamma";
   const description =
@@ -41,8 +42,9 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default function About() {
-  const locale = useLocale();
+export default async function About({ params }) {
+  const resolvedParams = await params;
+  const locale = resolvedParams.locale;
 
   const structuredData = {
     "@context": "https://schema.org",

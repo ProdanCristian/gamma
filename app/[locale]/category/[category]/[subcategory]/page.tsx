@@ -44,11 +44,13 @@ interface SubSubCategory {
 }
 
 export async function generateMetadata({ params }: any): Promise<Metadata> {
-  const subcategorySlug = decodeURIComponent(params.subcategory || "");
-  const categorySlug = decodeURIComponent(params.category || "");
+  const resolvedParams = await params;
+  const subcategorySlug = decodeURIComponent(resolvedParams.subcategory || "");
+  const categorySlug = decodeURIComponent(resolvedParams.category || "");
+  const locale = resolvedParams.locale;
+
   const [subcategoryName, subcategoryId] = subcategorySlug.split("_");
   const [categoryName, categoryId] = categorySlug.split("_");
-  const locale = params.locale;
 
   if (!subcategoryId) {
     return {
@@ -76,6 +78,8 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
     return formatCategoryName(subcategoryName);
   };
 
+  const fullPath = `/category/${categorySlug}/${subcategorySlug}`;
+
   return {
     title: `${getSubcategoryTitle()} | Gamma`,
     description:
@@ -90,12 +94,13 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
           : `Gamă largă de ${getSubcategoryTitle().toLowerCase()}`,
       type: "website",
       locale: locale,
+      siteName: "Gamma",
     },
     alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/category/${categorySlug}/${subcategorySlug}`,
+      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/${locale}${fullPath}`,
       languages: {
-        ru: `/ru/category/${categorySlug}/${subcategorySlug}`,
-        ro: `/ro/category/${categorySlug}/${subcategorySlug}`,
+        "ru-MD": `${process.env.NEXT_PUBLIC_BASE_URL}/ru${fullPath}`,
+        "ro-MD": `${process.env.NEXT_PUBLIC_BASE_URL}/ro${fullPath}`,
       },
     },
   };
@@ -103,12 +108,11 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
 
 export default async function SubcategoryPage({ params }: any) {
   const t = await getTranslations("shop");
-
-  // Await params before accessing properties
-  const parameters = await params;
-  const subcategorySlug = decodeURIComponent(parameters.subcategory || "");
-  const categorySlug = decodeURIComponent(parameters.category || "");
   const locale = await getLocale();
+
+  const resolvedParams = await params;
+  const subcategorySlug = decodeURIComponent(resolvedParams.subcategory || "");
+  const categorySlug = decodeURIComponent(resolvedParams.category || "");
 
   const [subcategoryName, subcategoryId] = subcategorySlug.split("_");
   const [categoryName, categoryId] = categorySlug.split("_");

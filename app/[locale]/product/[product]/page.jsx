@@ -16,6 +16,8 @@ import Link from "next/link";
 import { Metadata } from "next";
 import Script from "next/script";
 import { headers } from "next/headers";
+import YouTubeFacade from "@/components/ProductPage/YouTubeFacade";
+import Image from "next/image";
 
 async function getProduct(productId) {
   try {
@@ -70,8 +72,13 @@ async function getSimilarProducts(subSubCategoryId) {
 }
 
 export async function generateMetadata({ params, searchParams }) {
-  const { product, locale } = params;
-  const { state } = searchParams;
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+
+  const product = resolvedParams.product;
+  const locale = resolvedParams.locale;
+  const state = resolvedSearchParams.state;
+
   const productId = product.split("_")[1];
 
   let productData;
@@ -133,10 +140,10 @@ export async function generateMetadata({ params, searchParams }) {
       ],
     },
     alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/product/${product}`,
+      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/${locale}/product/${product}`,
       languages: {
-        ru: `/ru/product/${product}`,
-        ro: `/ro/product/${product}`,
+        "ru-MD": `${process.env.NEXT_PUBLIC_BASE_URL}/ru/product/${product}`,
+        "ro-MD": `${process.env.NEXT_PUBLIC_BASE_URL}/ro/product/${product}`,
       },
     },
     robots: {
@@ -150,8 +157,12 @@ export async function generateMetadata({ params, searchParams }) {
 }
 
 export default async function ProductPage({ params, searchParams }) {
-  const { product, locale } = await params;
-  const { state } = await searchParams;
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+
+  const product = resolvedParams.product;
+  const locale = resolvedParams.locale;
+  const state = resolvedSearchParams.state;
 
   const productId = product.split("_")[1];
 
@@ -359,16 +370,18 @@ export default async function ProductPage({ params, searchParams }) {
                 <div className="mt-20 space-y-4 pt-16 border-t border-gray-200 dark:border-charade-700">
                   {videos.map((videoUrl, index) => {
                     const videoId = videoUrl.split("v=")[1];
+                    const videoTitle = `${
+                      locale === "ru"
+                        ? productData.data.Nume_Produs_RU
+                        : productData.data.Nume_Produs_RO
+                    } - Video ${index + 1}`;
+
                     return (
-                      <div key={index} className="relative pb-[56.25%] h-0">
-                        <iframe
-                          className="absolute top-0 left-0 w-full h-full rounded-lg"
-                          src={`https://www.youtube.com/embed/${videoId}`}
-                          title={`Product video ${index + 1}`}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      </div>
+                      <YouTubeFacade
+                        key={index}
+                        videoId={videoId}
+                        title={videoTitle}
+                      />
                     );
                   })}
                 </div>
@@ -376,20 +389,20 @@ export default async function ProductPage({ params, searchParams }) {
             </article>
 
             <div className="lg:w-[50%]">
-              <ul>
+              <div className="space-y-2">
                 {productData.data.brand_name && (
-                  <p className="mb-2 text-gray-600 dark:text-gray-400 text-lg">
+                  <div className="mb-2 text-gray-600 dark:text-gray-400 text-lg">
                     {productData.data.brand_name}
-                  </p>
+                  </div>
                 )}
-                <li className="dark:text-white text-charade-950 font-semibold text-4xl min-h-[48px]">
-                  <h1>
-                    {locale === "ru"
-                      ? productData.data.Nume_Produs_RU
-                      : productData.data.Nume_Produs_RO}
-                  </h1>
-                </li>
+                <h1 className="dark:text-white text-charade-950 font-semibold text-4xl min-h-[48px]">
+                  {locale === "ru"
+                    ? productData.data.Nume_Produs_RU
+                    : productData.data.Nume_Produs_RO}
+                </h1>
+              </div>
 
+              <ul>
                 <li className="border-t py-8 min-h-[200px] dark:border-charade-700">
                   <p className="text-gray-600 dark:text-gray-300 font-normal text-base">
                     {locale === "ru"
@@ -428,7 +441,14 @@ export default async function ProductPage({ params, searchParams }) {
 
                 <li className="border-t w-full pt-8 mt-8 dark:border-charade-700" />
                 <li className="flex bg-gray-100 rounded-lg p-1 justify-center">
-                  <img src="/Payments.png" alt="Payments" className="w-64" />
+                  <div className="relative w-64 h-16">
+                    <img
+                      src="/Payments.png"
+                      alt="Payments"
+                      className="absolute inset-0 w-full h-full object-contain"
+                      loading="lazy"
+                    />
+                  </div>
                 </li>
               </ul>
             </div>

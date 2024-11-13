@@ -22,7 +22,13 @@
     "All Brands": "Все бренды",
     "Reset Filters": "Сбросить фильтры",
     "Clear All": "Очистить все",
-    "Apply": "Применить"
+    "Apply": "Применить",
+    "previous_page": "Предыдущая страница",
+    "next_page": "Следующая страница",
+    "go_to_page": "Перейти на страницу {page}",
+    "price_range_slider": "Ползунок диапазона цен",
+    "min_price_thumb": "Ползунок минимальной цены",
+    "max_price_thumb": "Ползунок максимальной цены"
   },
   "address": {
     "suburban": "Пригород",
@@ -149,11 +155,13 @@
     "discounts": "Скидки",
     "about": "О нас",
     "contact": "Контакты",
-    "delivery": "Доставка",
-    "bestsellers": "Хиты продаж"
+    "delivery": "Дставка",
+    "bestsellers": "Хиты продаж",
+    "home": "Главная страница",
+    "wishlist": "Список желаний"
   },
   "SearchBar": {
-    "title": "Поиск товаров"
+    "title": "Поиск торов"
   },
   "search": {
     "currency": "Лей",
@@ -181,7 +189,7 @@
     "addresses_title": "Адреса",
     "orders_title": "Заказы",
     "Logout": "Выйти",
-    "user_registered_successfully": "Регистрация успешна",
+    "user_registered_successfully": "��егистрация успешна",
     "internal_error": "Произошла ошибка. Попробуйте еще раз.",
     "invalid_credentials": "Неверный email или пароль",
     "login_successful": "Вход выполнен успешно",
@@ -213,6 +221,7 @@
     "email_change_restricted": "Электронная почта не может быть изменена дя аккаунтов Google или Facebook"
   },
   "contact": {
+    "home": "Главная",
     "contact_us": "Свяжитесь с нами",
     "your_name": "Ваше имя",
     "name": "Имя",
@@ -260,7 +269,20 @@
     "street": "Страда Святого Георгия 6, Кишинёв, Молдова",
     "subscription_success_message": "Спасибо за подписку! Купон на скидку 5% отправлен на ваш email.",
     "already_subscribed_message": "Этот email уже подписан на нашу рассылку.",
-    "subscription_error": "Ошибка при подписке. Пожалуйста, попробуйте позже."
+    "subscription_error": "Ошибка при подписке. Пожалуйста, попробуйте позже.",
+    "call_us": "Позвоните нам",
+    "newsletter_signup": "Форма подписки на рассылку",
+    "email_input": "Введите адрес электронной почты",
+    "subscribe_button": "Подписаться на рассылку",
+    "home_link": "Вернуться на главную страницу",
+    "phone_contact": "Позвоните нам по номеру 079867092",
+    "email_contact": "Напишите нам на info@gamma.md",
+    "address_link": "Найдите нас на Google Maps",
+    "accepted_payment_methods": "Принимаемые способы оплаты",
+    "facebook_link": "Следите за нами на Facebook",
+    "instagram_link": "Следите за нами в Instagram",
+    "app_store_link": "Скачать приложение для iPhone",
+    "play_store_link": "Скачать приложение для Android"
   },
   "home": {
     "discounted_products_title": "Неоспоримые скидки",
@@ -273,7 +295,10 @@
     "no_images_found": "Изображения не найдены",
     "fifty_percent_off": "Скидка 50%",
     "order_now": "Заказать сейчас",
-    "lei": "Лей"
+    "lei": "Лей",
+    "add_to_cart": "Добавить в корзину",
+    "add_to_wishlist": "Добавить в изранное",
+    "remove_from_wishlist": "Удалить из избранного"
   },
   "product": {
     "order_now": "Заказать сейчас",
@@ -285,7 +310,10 @@
     "out_of_stock": "Нет в наличи",
     "units": "единиц",
     "unit": "единица",
-    "quantity": "Количество"
+    "quantity": "Количество",
+    "add_to_cart": "Добавить в корзину",
+    "decrease_quantity": "Уменьшить количество",
+    "increase_quantity": "Увеличить количество"
   },
   "discounts": {
     "title": "Товары со скидкой",
@@ -294,7 +322,7 @@
   },
   "Category": {
     "invalidCategoryId": "Неверный идентификатор категории или подкатегории",
-    "checkUrlAndTryAgain": "Пожалуйста, проверьте URL и попробуйте снова",
+    "checkUrlAndTryAgain": "Пожалуйста, проверьте URL и попр��буйте снова",
     "noSubSubCategories": "Подподкатегории не найдены",
     "errorLoadingData": "Ошибка при загрузке данных подкатегории",
     "tryAgainLater": "Пожалуйста, повторите попытку позже"
@@ -374,7 +402,7 @@
     "order_placed": "Ваш заказ успешно размещен",
     "generic_error": "Произошла ошибка. Пожалуйста, попробуйте снова",
     "address_fetch_error": "Не удалось загрузить адрес",
-    "no_address": "У вас нет сохраненного адреса",
+    "no_address": "У вас нет сохраннного адреса",
     "add_address": "Добавить адрес",
     "change_address": "Изменить адрес",
     "currency": "лей",
@@ -410,5 +438,9 @@
     "invalid_email": "Неверный формат email",
     "invalid_phone": "Неверный формат номера телефона",
     "address_required": "Адрес доставки обязателен"
+  },
+  "metadata": {
+    "site_title": "Gamma - Всё, что вы ищете, в одном месте",
+    "site_description": "Откройте для себя широкий ассортимент товаров по конкурентным ценм. Бстрая доставка по всей Молдове."
   }
 }

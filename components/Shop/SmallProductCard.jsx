@@ -182,21 +182,28 @@ const SmallProductCard = ({ product, loading = false }) => {
                 className="max-w-full max-h-full w-auto h-auto object-contain group-hover:opacity-90 transition-opacity duration-200"
                 width={120}
                 height={120}
+                loading="lazy"
               />
             </div>
           ) : (
             <div className="w-16 h-auto" />
           )}
         </div>
-        <PiHeartFill
+        <button
           onClick={toggleWishlist}
+          aria-label={
+            isInWishlist(productData.id)
+              ? t("remove_from_wishlist")
+              : t("add_to_wishlist")
+          }
           className={`absolute top-2 left-2 hover:scale-110 transition-transform duration-200 ${
             isInWishlist(productData.id)
               ? "text-red-500"
               : "text-gray-300 dark:text-gray-600"
           }`}
-          size={24}
-        />
+        >
+          <PiHeartFill size={24} aria-hidden="true" />
+        </button>
 
         <div className="space-y-2">
           <h2
@@ -225,6 +232,7 @@ const SmallProductCard = ({ product, loading = false }) => {
         <button
           onClick={buyNow}
           disabled={isOutOfStock}
+          aria-label={isOutOfStock ? t("out_of_stock") : t("order_now")}
           className={`dark:bg-gray-500 bg-gray-600 hover:bg-charade-900 dark:hover:bg-charade-900 py-1 text-white text-xs sm:text-sm font-semibold px-2 rounded-lg flex items-center justify-center w-full transition-colors duration-200 ${
             isOutOfStock
               ? "opacity-50 cursor-not-allowed hover:bg-gray-600 dark:hover:bg-gray-500"
@@ -232,18 +240,19 @@ const SmallProductCard = ({ product, loading = false }) => {
           }`}
         >
           {isOutOfStock ? t("out_of_stock") : t("order_now")}
-          <PiCursorClick className="ml-1" size={20} />
+          <PiCursorClick className="ml-1" aria-hidden="true" size={20} />
         </button>
         <button
           onClick={addToCart}
           disabled={isOutOfStock}
+          aria-label={isOutOfStock ? t("out_of_stock") : t("add_to_cart")}
           className={`transition-colors duration-200 hover:text-[#47e194] ${
             isOutOfStock
               ? "opacity-50 cursor-not-allowed hover:text-current"
               : ""
           }`}
         >
-          <PiShoppingCartSimple size={28} />
+          <PiShoppingCartSimple size={28} aria-hidden="true" />
         </button>
       </div>
     </div>

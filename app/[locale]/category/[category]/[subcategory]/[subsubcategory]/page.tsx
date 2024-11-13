@@ -43,16 +43,18 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: any): Promise<Metadata> {
-  const subsubcategorySlug = decodeURIComponent(params.subsubcategory || "");
-  const subcategorySlug = decodeURIComponent(params.subcategory || "");
-  const categorySlug = decodeURIComponent(params.category || "");
+  const resolvedParams = await params;
+  const subsubcategorySlug = decodeURIComponent(
+    resolvedParams.subsubcategory || ""
+  );
+  const subcategorySlug = decodeURIComponent(resolvedParams.subcategory || "");
+  const categorySlug = decodeURIComponent(resolvedParams.category || "");
+  const locale = resolvedParams.locale;
 
   // Extract all IDs from slugs
   const [subsubcategoryName, subsubcategoryId] = subsubcategorySlug.split("_");
   const [subcategoryName, subcategoryId] = subcategorySlug.split("_");
   const [categoryName, categoryId] = categorySlug.split("_");
-
-  const locale = params.locale;
 
   if (!subsubcategoryId || !subcategoryId || !categoryId) {
     return {
@@ -78,6 +80,8 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
     return formatCategoryName(subsubcategoryName);
   };
 
+  const fullPath = `/category/${categorySlug}/${subcategorySlug}/${subsubcategorySlug}`;
+
   return {
     title: `${getSubSubCategoryTitle()} | Gamma`,
     description:
@@ -92,12 +96,13 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
           : `Cea mai bună selecție de ${getSubSubCategoryTitle().toLowerCase()}`,
       type: "website",
       locale: locale,
+      siteName: "Gamma",
     },
     alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/category/${categorySlug}/${subcategorySlug}/${subsubcategorySlug}`,
+      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/${locale}${fullPath}`,
       languages: {
-        ru: `/ru/category/${categorySlug}/${subcategorySlug}/${subsubcategorySlug}`,
-        ro: `/ro/category/${categorySlug}/${subcategorySlug}/${subsubcategorySlug}`,
+        "ru-MD": `${process.env.NEXT_PUBLIC_BASE_URL}/ru${fullPath}`,
+        "ro-MD": `${process.env.NEXT_PUBLIC_BASE_URL}/ro${fullPath}`,
       },
     },
   };
@@ -105,12 +110,14 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
 
 export default async function SubSubCategoryPage({ params }: any) {
   const t = await getTranslations("shop");
-
-  // Remove await for params since it's no longer a Promise
-  const subsubcategorySlug = decodeURIComponent(params.subsubcategory || "");
-  const subcategorySlug = decodeURIComponent(params.subcategory || "");
-  const categorySlug = decodeURIComponent(params.category || "");
   const locale = await getLocale();
+
+  const resolvedParams = await params;
+  const subsubcategorySlug = decodeURIComponent(
+    resolvedParams.subsubcategory || ""
+  );
+  const subcategorySlug = decodeURIComponent(resolvedParams.subcategory || "");
+  const categorySlug = decodeURIComponent(resolvedParams.category || "");
 
   const [subsubcategoryName, subsubcategoryId] = subsubcategorySlug.split("_");
   const [subcategoryName, subcategoryId] = subcategorySlug.split("_");
@@ -261,7 +268,7 @@ export default async function SubSubCategoryPage({ params }: any) {
         </nav>
 
         {/* Add title heading */}
-        <h1 className="text-3xl text-charade-900 dark:text-gray-100 font-bold mt-6">
+        <h1 className="text-3xl text-charade-900 dark:text-gray-100 font-bold my-6">
           {getSubSubCategoryName()}
         </h1>
 

@@ -1,5 +1,5 @@
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { ThemeProvider } from "@/components/Providers/ThemeProvider";
@@ -14,8 +14,27 @@ import Footer from "@/components/Footer/Footer";
 import BottomBarMobile from "@/components/Footer/BottomBarMobile";
 import Cart from "@/components/Cart";
 import FastOrder from "@/components/FastOrder";
+
+export async function generateMetadata({ params }) {
+  const resolvedParams = await params;
+  const locale = resolvedParams.locale;
+
+  const isValidLocale = routing.locales.includes(locale);
+  if (!isValidLocale) {
+    notFound();
+  }
+
+  const t = await getTranslations("metadata");
+
+  return {
+    title: t("site_title"),
+    description: t("site_description"),
+  };
+}
+
 export default async function LocaleLayout({ children, params }) {
-  const { locale } = await params;
+  const resolvedParams = await params;
+  const locale = resolvedParams.locale;
 
   const isValidLocale = routing.locales.includes(locale);
   if (!isValidLocale) {

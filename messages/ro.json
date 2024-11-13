@@ -1,4 +1,8 @@
 {
+  "metadata": {
+    "site_title": "Gamma - Tot ce cauți, într-un singur loc",
+    "site_description": "Descoperă o gamă largă de produse la prețuri competitive. Livrare rapidă în toată Moldova."
+  },
   "shop": {
     "Bestselling Products": "Produse populare",
     "Reset": "Resetează",
@@ -22,7 +26,13 @@
     "All Brands": "Toate brandurile",
     "Reset Filters": "Resetează filtrele",
     "Clear All": "Șterge tot",
-    "Apply": "Aplică"
+    "Apply": "Aplică",
+    "previous_page": "Pagina anterioară",
+    "next_page": "Pagina următoare",
+    "go_to_page": "Mergi la pagina {page}",
+    "price_range_slider": "Glisorul intervalului de preț",
+    "min_price_thumb": "Glisorul prețului minim",
+    "max_price_thumb": "Glisorul prețului maxim"
   },
   "address": {
     "delivery_address": "Adresă de livrare",
@@ -148,7 +158,9 @@
     "about": "Despre noi",
     "contact": "Contacte",
     "delivery": "Livrare",
-    "bestsellers": "Produse populare"
+    "bestsellers": "Produse populare",
+    "home": "Pagina principală",
+    "wishlist": "Lista de dorințe"
   },
   "SearchBar": {
     "title": "Caută produse"
@@ -156,14 +168,12 @@
   "search": {
     "currency": "Lei",
     "searchPlaceholder": "Caută produse...",
-    "searchResults": "Rezultate căutare",
     "viewAllResults": "Vezi toate rezultatele",
     "noResults": "Nu s-au găsit rezultate",
     "bestseller": "Popular",
     "watchVideo": "Urmărește video",
     "loading": "Se încarcă...",
     "searchResults": "Rezultate căutare",
-    "noResults": "Nu s-au găsit rezultate",
     "Found Products": "{count, plural, =0 {Nu s-au găsit produse} one {# produs găsit} few {# produse găsite} other {# produse găsite}}"
   },
   "auth": {
@@ -213,6 +223,7 @@
     "email_change_restricted": "Emailul nu poate fi modificat pentru conturile Google sau Facebook"
   },
   "contact": {
+    "home": "Acasă",
     "contact_us": "Contactează-ne",
     "your_name": "Numele dumneavoastră",
     "name": "Numele",
@@ -260,7 +271,20 @@
     "street": "Strada Sfîntul Gheorghe 6, Chișinău, Moldova",
     "subscription_success_message": "Vă mulțumim pentru abonare! Un cupon de reducere de 5% a fost trimis pe email-ul dvs.",
     "already_subscribed_message": "Acest email este deja abonat la newsletter-ul nostru.",
-    "subscription_error": "Eroare la abonare. Vă rugăm să încercați din nou mai târziu."
+    "subscription_error": "Eroare la abonare. Vă rugăm să încercați din nou mai târziu.",
+    "call_us": "Sunați-ne acum",
+    "newsletter_signup": "Formular de abonare la newsletter",
+    "email_input": "Introduceți adresa de email",
+    "subscribe_button": "Abonare la newsletter",
+    "home_link": "Înapoi la pagina principală",
+    "phone_contact": "Sunați-ne la 079867092",
+    "email_contact": "Trimiteți-ne un email la info@gamma.md",
+    "address_link": "Găsiți-ne pe Google Maps",
+    "accepted_payment_methods": "Metode de plată acceptate",
+    "facebook_link": "Urmăriți-ne pe Facebook",
+    "instagram_link": "Urmăriți-ne pe Instagram",
+    "app_store_link": "Descărcați aplicația pentru iPhone",
+    "play_store_link": "Descărcați aplicația pentru Android"
   },
   "home": {
     "free_delivery_info": "Livrare gratuită la comenzi de peste 500 lei",
@@ -273,7 +297,10 @@
     "no_images_found": "Nu s-au găsit imagini",
     "fifty_percent_off": "50% reducere",
     "order_now": "Comandă acum",
-    "lei": "Lei"
+    "lei": "Lei",
+    "add_to_cart": "Adaugă în coș",
+    "add_to_wishlist": "Adaugă la favorite",
+    "remove_from_wishlist": "Elimină din favorite"
   },
   "product": {
     "order_now": "Comandă acum",
@@ -281,11 +308,14 @@
     "select_variant": "Selectează variantă",
     "choose_option": "Alegeți o variantă",
     "select_color": "Selectează culoarea",
-    "in_stock": "În stoc",
+    "in_stock": "��n stoc",
     "out_of_stock": "Stoc epuizat",
     "units": "unități",
     "unit": "unitate",
-    "quantity": "Cantitate"
+    "quantity": "Cantitate",
+    "add_to_cart": "Adaugă în coș",
+    "decrease_quantity": "Micșorează cantitatea",
+    "increase_quantity": "Mărește cantitatea"
   },
   "discounts": {
     "title": "Produse cu reducere",

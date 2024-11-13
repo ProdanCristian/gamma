@@ -118,6 +118,7 @@ export default function Footer() {
             <form
               onSubmit={handleSubmit}
               className="flex md:flex-row gap-2 flex-grow w-full lg:w-auto"
+              aria-label={t("newsletter_signup")}
             >
               <input
                 value={email}
@@ -126,8 +127,13 @@ export default function Footer() {
                 placeholder={t("email_placeholder")}
                 className="flex-grow text-white items-center justify-center bg-white/10 rounded-xl px-4 py-3 transition-colors hover:bg-white/20 focus:outline-none"
                 required
+                aria-label={t("email_input")}
               />
-              <button type="submit" className="bg-accent rounded-lg p-2">
+              <button
+                type="submit"
+                className="bg-accent rounded-lg p-2"
+                aria-label={t("subscribe_button")}
+              >
                 {t("subscribe")}
               </button>
             </form>
@@ -136,13 +142,15 @@ export default function Footer() {
 
         <div className="max-w-[1250px] w-[90%] mx-auto justify-between my-10 flex flex-col md:flex-row">
           <div className="flex flex-col gap-4 justify-center items-center md:items-start md:w-1/3">
-            <Link href="/" locale={false}>
+            <Link href="/" locale={false} aria-label={t("home_link")}>
               <div className="h-12 w-[150px]">
                 {blackLogo && lightLogo && (
                   <img
                     src={currentTheme === "dark" ? lightLogo : blackLogo}
                     alt={t("logo_alt")}
                     className="h-full w-full"
+                    loading="lazy"
+                    aria-hidden="true"
                   />
                 )}
               </div>
@@ -151,24 +159,43 @@ export default function Footer() {
               {t("footer_description")}
             </p>
 
-            <a href="tel:+079867092" className="flex items-center gap-2">
+            <a
+              href="tel:022897007"
+              className="flex items-center gap-2"
+              aria-label={t("phone_contact")}
+            >
               <div className="flex relative bg-accent p-2 rounded-full w-[40px] h-[40px] items-center justify-center">
-                <PiPhoneCall className="text-white" size={30} />
+                <PiPhoneCall
+                  className="text-white"
+                  size={30}
+                  aria-hidden="true"
+                />
               </div>
-              <p className="text-gray-500">079867092</p>
+              <p className="text-gray-500">022897007</p>
             </a>
-            <a href="mailto:info@gamma.md" className="flex items-center gap-2">
+
+            <a
+              href="mailto:info@gamma.md"
+              className="flex items-center gap-2"
+              aria-label={t("email_contact")}
+            >
               <div className="flex bg-accent p-2 rounded-full w-[40px] h-[40px] items-center justify-center">
-                <PiEnvelope className="text-white" size={30} />
+                <PiEnvelope
+                  className="text-white"
+                  size={30}
+                  aria-hidden="true"
+                />
               </div>
               <p className="text-gray-500">info@gamma.md</p>
             </a>
+
             <a
               href="https://www.google.com/maps/search/?api=1&query=Strada+Sfîntul+Gheorghe+6,+Chișinău,+Moldova"
               className="flex justify-center md:justify-start items-center md:items-start gap-2 w-auto"
+              aria-label={t("address_link")}
             >
               <div className="flex bg-accent p-2 rounded-full w-[40px] h-[40px] items-center justify-center">
-                <PiMapPin className="text-white" size={30} />
+                <PiMapPin className="text-white" size={30} aria-hidden="true" />
               </div>
               <p className="text-gray-500 justify-center w-[50%]">
                 {t("street")}
@@ -210,18 +237,60 @@ export default function Footer() {
               {t("follow_us")}
             </h2>
             <div className="flex gap-2 w-full justify-center md:justify-start my-4">
-              <PiFacebookLogo className="text-gray-500" size={35} />
-              <PiInstagramLogo className="text-gray-500" size={35} />
+              <PiFacebookLogo
+                className="text-gray-500 hover:text-accent transition-colors cursor-pointer"
+                size={35}
+                role="img"
+                aria-label="Facebook"
+                onClick={() => {
+                  window.open(
+                    "https://www.facebook.com/gammamarketplace/",
+                    "_blank"
+                  );
+                }}
+              />
+              <PiInstagramLogo
+                className="text-gray-500 hover:text-accent transition-colors cursor-pointer"
+                size={35}
+                role="img"
+                aria-label="Instagram"
+                onClick={() => {
+                  window.open(
+                    "https://www.instagram.com/gamma.moldova/",
+                    "_blank"
+                  );
+                }}
+              />
             </div>
             <h2 className="text-xl font-bold mb-4 text-charade-950 dark:text-white">
               {t("mobile_app")}
             </h2>
-            <div className="flex w-full bg-charade-950 p-2 rounded-xl border-2 border-gray-500 items-center justify-center gap-2 mb-2">
-              <img src="/Apple.svg" alt="app-store" className="h-7" />
+            <div
+              className="flex w-full bg-charade-950 p-2 rounded-xl border-2 border-gray-500 items-center justify-center gap-2 mb-2"
+              role="link"
+              aria-label={t("download_for_iphone")}
+            >
+              <img
+                src="/Apple.svg"
+                alt="App Store"
+                className="h-7"
+                loading="lazy"
+                aria-hidden="true"
+              />
               <h3 className="text-white">{t("download_for_iphone")}</h3>
             </div>
-            <div className="flex w-full bg-charade-950 p-2 rounded-xl border-2 border-gray-500 items-center justify-center gap-2">
-              <img src="/Playstore.svg" alt="app-store" className="h-7" />
+            <div
+              className="flex w-full bg-charade-950 p-2 rounded-xl border-2 border-gray-500 items-center justify-center gap-2"
+              role="link"
+              aria-label={t("download_for_android")}
+            >
+              <img
+                src="/Playstore.svg"
+                alt="Play Store"
+                className="h-7"
+                loading="lazy"
+                aria-hidden="true"
+              />
               <h3 className="text-white">{t("download_for_android")}</h3>
             </div>
           </div>
@@ -238,7 +307,13 @@ export default function Footer() {
           <div className="flex items-center space-x-4">
             <p className="text-sm text-gray-500">{t("payments_methods")}</p>
             <div className="flex gap-2 h-10">
-              <img src="/Payments.png" alt="payments" className="h-full" />
+              <img
+                src="/Payments.png"
+                alt={t("accepted_payment_methods")}
+                className="h-full"
+                loading="lazy"
+                aria-label={t("accepted_payment_methods")}
+              />
             </div>
           </div>
         </div>

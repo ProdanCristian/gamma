@@ -25,10 +25,8 @@ interface AttributeMap {
   [key: string]: string;
 }
 
-// Add TypeScript interfaces
 interface Product {
   id: string;
-  // Add other product properties as needed
 }
 
 interface PaginationData {
@@ -88,7 +86,6 @@ export default function DiscountsPage() {
     searchParams.get("brand")
   );
 
-  // Format price function
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ro-MD", {
       style: "currency",
@@ -97,7 +94,6 @@ export default function DiscountsPage() {
     }).format(price);
   };
 
-  // Modified URLs to always include discounted=true
   const maxPriceUrl = `/api/products/maxPrice?bestsellers=${showBestsellers}&discounted=true${Object.entries(
     selectedAttributes
   )

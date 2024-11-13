@@ -330,8 +330,9 @@ export default function SubCategoryProducts({
                 variant="outline"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
+                aria-label={t("previous_page")}
               >
-                <PiArrowLeft />
+                <PiArrowLeft aria-hidden="true" />
               </Button>
 
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
@@ -340,6 +341,8 @@ export default function SubCategoryProducts({
                     key={page}
                     variant={currentPage === page ? "default" : "outline"}
                     onClick={() => handlePageChange(page)}
+                    aria-label={t("go_to_page", { page })}
+                    aria-current={currentPage === page ? "page" : undefined}
                   >
                     {page}
                   </Button>
@@ -350,8 +353,9 @@ export default function SubCategoryProducts({
                 variant="outline"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
+                aria-label={t("next_page")}
               >
-                <PiArrowRight />
+                <PiArrowRight aria-hidden="true" />
               </Button>
             </div>
           )}

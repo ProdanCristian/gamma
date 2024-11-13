@@ -148,7 +148,7 @@ const MobileNavBar = () => {
 
           {/* Bottom Bar Icons */}
           <div className="flex items-end pb-5 justify-between w-[90%] px-5 h-[70px] transition-opacity duration-300 absolute bottom-0 z-20 bg-charade-900">
-            <a href="tel:079867092">
+            <a href="tel:022897007" aria-label={t("call_us")}>
               <PiPhone
                 size={33}
                 className="text-white cursor-pointer hover:text-accent transition-colors"

@@ -35,7 +35,10 @@ async function getCategoryData(categoryId: string) {
 
 // Add generateMetadata
 export async function generateMetadata({ params }: any): Promise<Metadata> {
-  const category = params?.category;
+  const resolvedParams = await params;
+  const category = resolvedParams?.category;
+  const locale = resolvedParams.locale;
+
   const [categoryName, categoryId] = decodeURIComponent(category || "").split(
     "_"
   );
@@ -47,7 +50,6 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   }
 
   const { categoryNames } = await getCategoryData(categoryId);
-  const locale = params.locale;
 
   const getCategoryTitle = () => {
     if (locale === "ro") {
@@ -78,13 +80,13 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
           : `Explorează colecția noastră de ${getCategoryTitle().toLowerCase()}`,
       type: "website",
       locale: locale,
-      siteName: locale === "ru" ? "Ваш магазин" : "Magazinul Dvs",
+      siteName: "Gamma",
     },
     alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/category/${category}`,
+      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/${locale}/category/${category}`,
       languages: {
-        ru: `/ru/category/${category}`,
-        ro: `/ro/category/${category}`,
+        "ru-MD": `${process.env.NEXT_PUBLIC_BASE_URL}/ru/category/${category}`,
+        "ro-MD": `${process.env.NEXT_PUBLIC_BASE_URL}/ro/category/${category}`,
       },
     },
   };
@@ -94,8 +96,8 @@ export default async function CategoryPage({ params }: any) {
   const t = await getTranslations("shop");
   const locale = await getLocale();
 
-  // Await params before accessing category
-  const category = (await params)?.category;
+  const resolvedParams = await params;
+  const category = resolvedParams?.category;
   const categorySlug = decodeURIComponent(category || "");
 
   // Split the category slug into name and ID parts
