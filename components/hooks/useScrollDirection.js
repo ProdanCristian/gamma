@@ -8,7 +8,9 @@ export function useScrollDirection() {
     const controlNavbar = () => {
       const currentScrollY = window.scrollY;
 
-      if (currentScrollY > lastScrollY) {
+      if (currentScrollY === 0) {
+        setShouldShow(true);
+      } else if (currentScrollY > lastScrollY) {
         // Scrolling down
         setShouldShow(false);
       } else {
