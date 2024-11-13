@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import useSWR from "swr";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,7 +35,6 @@ interface AttributesState {
 
 interface Product {
   id: number;
-  // add other product properties as needed
 }
 
 interface ProductsData {
@@ -222,24 +221,50 @@ export default function SubCategoryProducts({
   ]);
 
   return (
-    <>
-      <div className="mb-4 w-full flex justify-between md:flex-row-reverse">
-        {totalProducts !== undefined &&
-          t.rich("Found Products", { count: totalProducts })}
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" className="lg:hidden">
-              <PiFunnelSimple className="h-5 w-5 mr-2" />
-              {t("Filters")}
-            </Button>
-          </SheetTrigger>
-          <SheetContent
-            side="left"
-            className="w-[300px] sm:w-[350px] p-0 border-r-accent dark:bg-charade-900"
-          >
-            <SheetHeader className="p-6 pb-0">
-              <SheetTitle>{t("Filters")}</SheetTitle>
-            </SheetHeader>
+    <Suspense fallback={<div>Loading...</div>}>
+      <>
+        <div className="mb-4 w-full flex justify-between md:flex-row-reverse">
+          {totalProducts !== undefined &&
+            t.rich("Found Products", { count: totalProducts })}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="lg:hidden">
+                <PiFunnelSimple className="h-5 w-5 mr-2" />
+                {t("Filters")}
+              </Button>
+            </SheetTrigger>
+            <SheetContent
+              side="left"
+              className="w-[300px] sm:w-[350px] p-0 border-r-accent dark:bg-charade-900"
+            >
+              <SheetHeader className="p-6 pb-0">
+                <SheetTitle>{t("Filters")}</SheetTitle>
+              </SheetHeader>
+              <FilterSidebar
+                showDiscounted={showDiscounted}
+                setShowDiscounted={setShowDiscounted}
+                showBestsellers={showBestsellers}
+                setShowBestsellers={setShowBestsellers}
+                priceRange={priceRange}
+                setPriceRange={setPriceRange}
+                maxPrice={maxPrice}
+                selectedAttributes={selectedAttributes}
+                setSelectedAttributes={setSelectedAttributes}
+                selectedColor={selectedColor}
+                setSelectedColor={setSelectedColor}
+                selectedBrand={selectedBrand}
+                setSelectedBrand={setSelectedBrand}
+                attributesData={attributesData}
+                colorsData={colorsData}
+                brandsData={brandsData}
+                formatPrice={formatPrice}
+              />
+            </SheetContent>
+          </Sheet>
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-6 min-h-screen">
+          <div className="hidden lg:block">
             <FilterSidebar
               showDiscounted={showDiscounted}
               setShowDiscounted={setShowDiscounted}
@@ -259,108 +284,86 @@ export default function SubCategoryProducts({
               brandsData={brandsData}
               formatPrice={formatPrice}
             />
-          </SheetContent>
-        </Sheet>
-      </div>
+          </div>
 
-      <div className="flex flex-col md:flex-row gap-6 min-h-screen">
-        <div className="hidden lg:block">
-          <FilterSidebar
-            showDiscounted={showDiscounted}
-            setShowDiscounted={setShowDiscounted}
-            showBestsellers={showBestsellers}
-            setShowBestsellers={setShowBestsellers}
-            priceRange={priceRange}
-            setPriceRange={setPriceRange}
-            maxPrice={maxPrice}
-            selectedAttributes={selectedAttributes}
-            setSelectedAttributes={setSelectedAttributes}
-            selectedColor={selectedColor}
-            setSelectedColor={setSelectedColor}
-            selectedBrand={selectedBrand}
-            setSelectedBrand={setSelectedBrand}
-            attributesData={attributesData}
-            colorsData={colorsData}
-            brandsData={brandsData}
-            formatPrice={formatPrice}
-          />
-        </div>
-
-        <div className="flex-1">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6">
-            {isLoading ? (
-              Array(12)
-                .fill(0)
-                .map((_, index) => (
-                  <SmallProductCard key={index} product={{}} loading />
+          <div className="flex-1">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6">
+              {isLoading ? (
+                Array(12)
+                  .fill(0)
+                  .map((_, index) => (
+                    <SmallProductCard key={index} product={{}} loading />
+                  ))
+              ) : products.length > 0 ? (
+                products.map((product) => (
+                  <SmallProductCard key={product.id} product={product} />
                 ))
-            ) : products.length > 0 ? (
-              products.map((product) => (
-                <SmallProductCard key={product.id} product={product} />
-              ))
-            ) : (
-              <div className="col-span-full flex flex-col items-center justify-center py-16 text-muted-foreground space-y-4">
-                <PiShoppingCartSimple className="w-16 h-16" />
-                <div className="text-xl font-medium">{t("We're Sorry")}</div>
-                <div className="text-center max-w-md">{t("sorry_message")}</div>
-                <button
-                  onClick={() => {
-                    setShowDiscounted(false);
-                    setShowBestsellers(false);
-                    setPriceRange([0, maxPrice]);
-                    setSelectedAttributes({});
-                    setSelectedColor("");
-                    setSelectedBrand("");
-                    setCurrentPage(1);
-                    router.push(
-                      `/${locale}/category/${categoryName}_${categoryId}/${subcategoryName}_${subcategoryId}`
-                    );
-                  }}
-                  className="mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+              ) : (
+                <div className="col-span-full flex flex-col items-center justify-center py-16 text-muted-foreground space-y-4">
+                  <PiShoppingCartSimple className="w-16 h-16" />
+                  <div className="text-xl font-medium">{t("We're Sorry")}</div>
+                  <div className="text-center max-w-md">
+                    {t("sorry_message")}
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowDiscounted(false);
+                      setShowBestsellers(false);
+                      setPriceRange([0, maxPrice]);
+                      setSelectedAttributes({});
+                      setSelectedColor("");
+                      setSelectedBrand("");
+                      setCurrentPage(1);
+                      router.push(
+                        `/${locale}/category/${categoryName}_${categoryId}/${subcategoryName}_${subcategoryId}`
+                      );
+                    }}
+                    className="mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                  >
+                    {t("Reset Filters")}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-8">
+                <Button
+                  variant="outline"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  aria-label={t("previous_page")}
                 >
-                  {t("Reset Filters")}
-                </button>
+                  <PiArrowLeft aria-hidden="true" />
+                </Button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      onClick={() => handlePageChange(page)}
+                      aria-label={t("go_to_page", { page })}
+                      aria-current={currentPage === page ? "page" : undefined}
+                    >
+                      {page}
+                    </Button>
+                  )
+                )}
+
+                <Button
+                  variant="outline"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  aria-label={t("next_page")}
+                >
+                  <PiArrowRight aria-hidden="true" />
+                </Button>
               </div>
             )}
           </div>
-
-          {totalPages > 1 && (
-            <div className="flex justify-center gap-2 mt-8">
-              <Button
-                variant="outline"
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                aria-label={t("previous_page")}
-              >
-                <PiArrowLeft aria-hidden="true" />
-              </Button>
-
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
-                    onClick={() => handlePageChange(page)}
-                    aria-label={t("go_to_page", { page })}
-                    aria-current={currentPage === page ? "page" : undefined}
-                  >
-                    {page}
-                  </Button>
-                )
-              )}
-
-              <Button
-                variant="outline"
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                aria-label={t("next_page")}
-              >
-                <PiArrowRight aria-hidden="true" />
-              </Button>
-            </div>
-          )}
         </div>
-      </div>
-    </>
+      </>
+    </Suspense>
   );
 }
