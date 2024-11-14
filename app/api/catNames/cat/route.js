@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { cache } from "@/lib/redis/cache";
 
 export async function GET(request) {
   try {
@@ -11,6 +12,13 @@ export async function GET(request) {
         { success: false, error: "Missing id parameter" },
         { status: 400 }
       );
+    }
+
+    // Try to get from cache first
+    const CACHE_KEY = `category:${id}:names`;
+    const cachedData = await cache.get(CACHE_KEY);
+    if (cachedData) {
+      return NextResponse.json({ success: true, data: cachedData });
     }
 
     const sqlQuery = `
@@ -27,6 +35,9 @@ export async function GET(request) {
         { status: 404 }
       );
     }
+
+    // Cache the result for 1 hour
+    await cache.set(CACHE_KEY, result.rows[0], 3600);
 
     return NextResponse.json({ success: true, data: result.rows[0] });
   } catch (error) {

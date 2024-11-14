@@ -1,8 +1,17 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { cache } from "@/lib/redis/cache";
+
+const CACHE_KEY = "categories:all";
+const CACHE_TTL = 3600;
 
 export async function GET() {
   try {
+    const cachedData = await cache.get(CACHE_KEY);
+    if (cachedData) {
+      return NextResponse.json({ success: true, data: cachedData });
+    }
+
     const query = `
       SELECT *
       FROM public."nc_pka4___Categorii"
@@ -10,6 +19,8 @@ export async function GET() {
     `;
 
     const res = await db.query(query);
+
+    await cache.set(CACHE_KEY, res.rows, CACHE_TTL);
 
     return NextResponse.json({ success: true, data: res.rows });
   } catch (error) {

@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 import { meilisearchClient } from "@/lib/meilisearch";
+import { cache } from "@/lib/redis/cache";
+
+const CACHE_KEY_PREFIX = "meilisearch:search";
+const CACHE_TTL = 3600; // 1 hour
 
 export async function POST(request) {
   try {
@@ -92,6 +96,9 @@ export async function POST(request) {
       await index.addDocuments(batch);
     }
 
+    // Clear all search caches when reindexing
+    await cache.clearPrefix(CACHE_KEY_PREFIX);
+
     await new Promise((resolve) => setTimeout(resolve, 2000));
     const stats = await index.getStats();
 
@@ -129,6 +136,25 @@ export async function GET(request) {
     const showDiscounted = url.searchParams.get("discounted") === "true";
     const colorId = url.searchParams.get("color");
     const brandId = url.searchParams.get("brand");
+
+    // Create a unique cache key based on all search parameters
+    const cacheKey = `${CACHE_KEY_PREFIX}:${JSON.stringify({
+      q: query,
+      page,
+      limit,
+      minPrice,
+      maxPrice,
+      showBestsellers,
+      showDiscounted,
+      colorId,
+      brandId,
+    })}`;
+
+    // Try to get from cache first
+    const cachedResults = await cache.get(cacheKey);
+    if (cachedResults) {
+      return NextResponse.json(cachedResults);
+    }
 
     const index = meilisearchClient.index("products");
     const filterConditions = [];
@@ -205,7 +231,7 @@ export async function GET(request) {
       };
     });
 
-    return NextResponse.json({
+    const response = {
       success: true,
       hits: transformedHits,
       pagination: {
@@ -214,7 +240,12 @@ export async function GET(request) {
         totalHits: results.estimatedTotalHits,
         productsPerPage: limit,
       },
-    });
+    };
+
+    // Cache the transformed results
+    await cache.set(cacheKey, response, CACHE_TTL);
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error("Search Error:", error);
     return NextResponse.json(
@@ -269,6 +300,9 @@ export async function PUT(request) {
 
     const index = meilisearchClient.index("products");
     await index.updateDocuments([transformedProduct]);
+
+    // Clear search caches when updating a product
+    await cache.clearPrefix(CACHE_KEY_PREFIX);
 
     return NextResponse.json({
       success: true,

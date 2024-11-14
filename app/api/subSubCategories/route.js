@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { cache } from "@/lib/redis/cache";
 
 export async function GET(request) {
   try {
@@ -11,6 +12,13 @@ export async function GET(request) {
         { success: false, error: "Subcategory ID is required" },
         { status: 400 }
       );
+    }
+
+    // Try to get from cache first
+    const CACHE_KEY = `subsubcategories:subcategory:${subcategoryId}`;
+    const cachedData = await cache.get(CACHE_KEY);
+    if (cachedData) {
+      return NextResponse.json({ success: true, data: cachedData });
     }
 
     const query = `
@@ -25,6 +33,9 @@ export async function GET(request) {
     `;
 
     const result = await db.query(query, [subcategoryId]);
+
+    // Cache the result for 1 hour
+    await cache.set(CACHE_KEY, result.rows, 3600);
 
     return NextResponse.json({
       success: true,

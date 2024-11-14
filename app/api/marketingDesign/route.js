@@ -1,10 +1,20 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { cache } from "@/lib/redis/cache";
+
+const CACHE_KEY = "marketing:design:data";
+const CACHE_TTL = 3600; // 1 hour
 
 export async function GET() {
   const NEXT_PUBLIC_MEDIA_URL = process.env.NEXT_PUBLIC_MEDIA_URL;
 
   try {
+    // Try to get from cache first
+    const cachedData = await cache.get(CACHE_KEY);
+    if (cachedData) {
+      return NextResponse.json({ success: true, data: cachedData });
+    }
+
     const query = `
       SELECT *
       FROM public."nc_ssxn___Marketing-Design"
@@ -20,9 +30,9 @@ export async function GET() {
           const parsed = JSON.parse(items);
           return parsed.map((item) =>
             item.path
-              ? `${NEXT_PUBLIC_MEDIA_URL}${item.path.startsWith("/") ? "" : "/"}${
-                  item.path
-                }`
+              ? `${NEXT_PUBLIC_MEDIA_URL}${
+                  item.path.startsWith("/") ? "" : "/"
+                }${item.path}`
               : ""
           );
         } catch {
@@ -44,6 +54,9 @@ export async function GET() {
         Banner3_RU_: extractFullUrls(row.Banner3_RU_),
       };
     });
+
+    // Cache the processed data
+    await cache.set(CACHE_KEY, processedData, CACHE_TTL);
 
     return NextResponse.json({ success: true, data: processedData });
   } catch (error) {

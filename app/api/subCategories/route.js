@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { cache } from "@/lib/redis/cache";
 
 export async function GET(request) {
   const searchParams = request.nextUrl.searchParams;
@@ -14,6 +15,13 @@ export async function GET(request) {
   }
 
   try {
+    // Try to get from cache first
+    const CACHE_KEY = `subcategories:category:${categoryId}`;
+    const cachedData = await cache.get(CACHE_KEY);
+    if (cachedData) {
+      return NextResponse.json({ success: true, data: cachedData });
+    }
+
     const subcategoriesQuery = `
       SELECT id, "Nume_SubCategorie_RO", "Nume__SubCategorie_RU", "nc_pka4___Categorii_id", "Images"
       FROM public."nc_pka4___SubCategorii"
@@ -70,6 +78,9 @@ export async function GET(request) {
         })),
       };
     });
+
+    // Cache the formatted data for 1 hour
+    await cache.set(CACHE_KEY, formattedData, 3600);
 
     return NextResponse.json({ success: true, data: formattedData });
   } catch (error) {

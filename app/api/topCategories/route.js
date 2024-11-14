@@ -1,10 +1,20 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { cache } from "@/lib/redis/cache";
+
+const CACHE_KEY = "categories:top";
+const CACHE_TTL = 3600; // 1 hour
 
 export async function GET() {
   const NEXT_PUBLIC_MEDIA_URL = process.env.NEXT_PUBLIC_MEDIA_URL;
 
   try {
+    // Try to get from cache first
+    const cachedData = await cache.get(CACHE_KEY);
+    if (cachedData) {
+      return NextResponse.json({ success: true, categories: cachedData });
+    }
+
     const query = `
       SELECT 
         sub.*,
@@ -46,6 +56,9 @@ export async function GET() {
           : null,
       };
     });
+
+    // Cache the processed data
+    await cache.set(CACHE_KEY, topCategories, CACHE_TTL);
 
     return NextResponse.json({
       success: true,

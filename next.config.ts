@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "media.ecommband.com",
+        hostname: "media.gamma.md",
       },
       {
         protocol: "https",
