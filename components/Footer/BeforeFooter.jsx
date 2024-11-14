@@ -40,7 +40,7 @@ export default function BenefitsSection() {
             key={index}
             className="bg-green-100 min-h-[90px] items-center rounded-xl flex justify-center p-4 gap-4"
           >
-            <div className="flex gap-4 items-center w-[80%]">
+            <div className="flex gap-4 items-center w-[80%] md:w-full">
               <div className="flex-shrink-0 flex items-center justify-center p-2 w-12 h-12 bg-accent rounded-full">
                 <benefit.icon className="text-white" size={30} />
               </div>
