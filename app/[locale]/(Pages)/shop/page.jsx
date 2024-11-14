@@ -449,8 +449,9 @@ const ShopPage = () => {
                   variant="outline"
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
+                  aria-label={t("Previous Page")}
                 >
-                  <PiArrowLeft />
+                  <PiArrowLeft aria-hidden="true" />
                 </Button>
 
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
@@ -459,6 +460,8 @@ const ShopPage = () => {
                       key={page}
                       variant={currentPage === page ? "default" : "outline"}
                       onClick={() => handlePageChange(page)}
+                      aria-label={t("Go to Page") + " " + page}
+                      aria-current={currentPage === page ? "page" : undefined}
                     >
                       {page}
                     </Button>
@@ -469,8 +472,9 @@ const ShopPage = () => {
                   variant="outline"
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
+                  aria-label={t("Next Page")}
                 >
-                  <PiArrowRight />
+                  <PiArrowRight aria-hidden="true" />
                 </Button>
               </div>
             )}
