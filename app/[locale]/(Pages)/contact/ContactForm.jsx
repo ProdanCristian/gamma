@@ -1,16 +1,37 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { PiPhoneCallThin, PiEnvelopeThin, PiMapPinThin } from "react-icons/pi";
 import Script from "next/script";
 import Link from "next/link";
+import {
+  formatPhoneNumber,
+  stripPhonePrefix,
+  handlePhoneKeyDown,
+} from "@/lib/utils/phoneUtils";
 
-export default function ContactForm() {
+export default function ContactForm({ initialUserData }) {
   const t = useTranslations("contact");
   const locale = useLocale();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState("idle");
+  const [phone, setPhone] = useState("+373 ");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    if (initialUserData) {
+      const fullName = `${initialUserData.Nume || ""} ${
+        initialUserData.Prenume || ""
+      }`.trim();
+      setName(fullName);
+      setEmail(initialUserData.Email || "");
+      if (initialUserData.Numar_Telefon) {
+        setPhone(formatPhoneNumber(`+373${initialUserData.Numar_Telefon}`));
+      }
+    }
+  }, [initialUserData]);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -41,6 +62,11 @@ export default function ContactForm() {
     },
   };
 
+  const handlePhoneChange = (e) => {
+    const formattedPhone = formatPhoneNumber(e.target.value);
+    setPhone(formattedPhone);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -49,7 +75,7 @@ export default function ContactForm() {
     const formData = new FormData(e.currentTarget);
     const data = {
       name: formData.get("name"),
-      phone: formData.get("tel"),
+      phone: stripPhonePrefix(phone).toString(),
       email: formData.get("email"),
       message: formData.get("message"),
     };
@@ -60,18 +86,20 @@ export default function ContactForm() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          to: "support@gamma.md",
-          ...data,
-        }),
+        body: JSON.stringify(data),
       });
 
-      if (!response.ok) throw new Error("Failed to send message");
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to send message");
+      }
 
       setSubmitStatus("success");
       e.target.reset();
+      setPhone("+373 ");
     } catch (error) {
-      console.error("Failed to send message:", error);
+      console.error("Failed to send message:", error.message);
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
@@ -121,6 +149,8 @@ export default function ContactForm() {
                   type="text"
                   id="name"
                   name="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   placeholder={t("name")}
                   className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                   required
@@ -138,6 +168,10 @@ export default function ContactForm() {
                   type="tel"
                   id="tel"
                   name="tel"
+                  value={phone}
+                  onChange={handlePhoneChange}
+                  onKeyDown={handlePhoneKeyDown}
+                  maxLength={13}
                   placeholder={t("phone_number")}
                   className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                   required
@@ -155,6 +189,8 @@ export default function ContactForm() {
                   type="email"
                   id="email"
                   name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email"
                   className="p-2 dark:bg-[#4A4B59] bg-white mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                   required
@@ -213,7 +249,7 @@ export default function ContactForm() {
                 <div className="flex relative bg-accent p-2 rounded-full w-[35px] h-[35px] items-center justify-center">
                   <PiPhoneCallThin className="text-white" size={20} />
                 </div>
-                <p className="text-gray-500 text-sm hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                <p className="text-gray-500 text-base hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                   022897007
                 </p>
               </a>
@@ -225,7 +261,7 @@ export default function ContactForm() {
                 <div className="flex bg-accent p-2 rounded-full w-[35px] h-[35px] items-center justify-center">
                   <PiEnvelopeThin className="text-white" size={20} />
                 </div>
-                <p className="text-gray-500 text-sm hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                <p className="text-gray-500 text-base hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                   support@gamma.md
                 </p>
               </a>
@@ -239,7 +275,7 @@ export default function ContactForm() {
                 <div className="flex bg-accent p-2 rounded-full w-[35px] h-[35px] items-center justify-center">
                   <PiMapPinThin className="text-white" size={20} />
                 </div>
-                <p className="text-gray-500 text-sm hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                <p className="text-gray-500 text-base hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                   {locale === "ru"
                     ? "Страда Святого Георгия 6, Кишинёв, Молдова"
                     : "Strada Sfîntul Gheorghe 6, Chișinău, Moldova"}

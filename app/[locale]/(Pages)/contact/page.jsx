@@ -1,5 +1,7 @@
 import ContactForm from "./ContactForm";
 import { headers } from "next/headers";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function generateMetadata({ params: paramsPromise }) {
   const headersList = await headers();
@@ -49,6 +51,29 @@ export async function generateMetadata({ params: paramsPromise }) {
 }
 
 export default async function Page({ params }) {
-  const resolvedParams = await params;
-  return <ContactForm />;
+  const session = await getServerSession(authOptions);
+  let userData = null;
+
+  if (session?.user?.email) {
+    try {
+      const headersList = await headers();
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/profile`,
+        {
+          headers: {
+            Cookie: headersList.get("cookie") || "",
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        userData = data.user;
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  }
+
+  return <ContactForm initialUserData={userData} />;
 }

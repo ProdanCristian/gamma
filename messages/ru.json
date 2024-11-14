@@ -192,7 +192,7 @@
     "addresses_title": "Адреса",
     "orders_title": "Заказы",
     "Logout": "Выйти",
-    "user_registered_successfully": "��егистрация успешна",
+    "user_registered_successfully": "егистрация успешна",
     "internal_error": "Произошла ошибка. Попробуйте еще раз.",
     "invalid_credentials": "Неверный email или пароль",
     "login_successful": "Вход выполнен успешно",
@@ -224,6 +224,10 @@
     "email_change_restricted": "Электронная почта не может быть изменена дя аккаунтов Google или Facebook"
   },
   "contact": {
+    "thank_you_for_contact": "Спасибо за обращение к нам",
+    "confirmation_message": "Мы получили ваше сообщение.",
+    "we_will_contact_soon": "Наша команда изучит ваше сообщение и свяжется с вами как можно скорее.",
+    "contact_form": "Форма контакта",
     "home": "Главная",
     "contact_us": "Свяжитесь с нами",
     "your_name": "Ваше имя",
@@ -236,7 +240,23 @@
     "message_error": "Произошла ошибка. Попробуйте еще раз.",
     "sending": "Отправка...",
     "send": "Отправить",
-    "contacts": "Контакты"
+    "contacts": "Контакты",
+    "missing_fields": "Отсутствуют обязательные поля",
+    "smtp_verified": "SMTP-соединение успешно проверено",
+    "smtp_error": "Ошибка проверки SMTP",
+    "email_config_error": "Ошибка конфигурации электронной почты",
+    "new_submission_from": "Новое сообщение от {name}",
+    "new_contact_submission": "Новое сообщение",
+    "not_provided": "Не указано",
+    "email_sent": "Письмо успешно отправлено",
+    "email_error": "Ошибка отправки письма",
+    "failed_to_send": "Не удалось отправить письмо",
+    "db_error": "Ошибка сохранения в базе данных",
+    "form_submitted": "Форма успешно отправлена",
+    "submission_error": "Ошибка отправки формы",
+    "failed_to_submit": "Не удалось отправить форму",
+    "reply_to_sender": "Ответить отправителю",
+    "all_rights_reserved": "Все права защищены"
   },
   "benefits": {
     "free_delivery_title": "Бесплатная доставка",
@@ -325,7 +345,7 @@
   },
   "Category": {
     "invalidCategoryId": "Неверный идентификатор категории или подкатегории",
-    "checkUrlAndTryAgain": "Пожалуйста, проверьте URL и попр��буйте снова",
+    "checkUrlAndTryAgain": "Пожалуйста, проверьте URL и попрбуйте снова",
     "noSubSubCategories": "Подподкатегории не найдены",
     "errorLoadingData": "Ошибка при загрузке данных подкатегории",
     "tryAgainLater": "Пожалуйста, повторите попытку позже"
@@ -378,7 +398,7 @@
     "product_price": "Цена товара",
     "coupon_applied": "Применен купон",
     "no_orders": "У вас нет заказов",
-    "payment_method": "Способ оплаты"
+    "payment_method": "Способ опла��ы"
   },
   "checkout": {
     "title": "Оформление заказа",

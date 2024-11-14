@@ -11,11 +11,11 @@ export interface DeliveryRules {
 export const DELIVERY_RULES: Record<DeliveryZone, DeliveryRules> = {
   in_city: {
     cost: 50,
-    freeDeliveryThreshold: 500,
+    freeDeliveryThreshold: 1000,
   },
   outside_city: {
     cost: 60,
-    freeDeliveryThreshold: 500,
+    freeDeliveryThreshold: 1000,
   },
 };
 

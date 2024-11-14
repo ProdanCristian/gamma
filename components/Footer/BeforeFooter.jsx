@@ -38,16 +38,20 @@ export default function BenefitsSection() {
         {benefits.map((benefit, index) => (
           <div
             key={index}
-            className="bg-green-100 h-[90px] rounded-xl flex items-center justify-center gap-4 p-2"
+            className="bg-green-100 min-h-[90px] items-center rounded-xl flex justify-center p-4 gap-4"
           >
-            <div className="flex items-center justify-center p-2 w-12 h-12 bg-accent rounded-full">
-              <benefit.icon className="text-white" size={30} />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold dark:text-charade-950 text-charade-900">
-                {benefit.title}
-              </h3>
-              <p className="text-[13px] text-gray-500">{benefit.description}</p>
+            <div className="flex gap-4 items-center w-[80%]">
+              <div className="flex-shrink-0 flex items-center justify-center p-2 w-12 h-12 bg-accent rounded-full">
+                <benefit.icon className="text-white" size={30} />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold dark:text-charade-950 text-charade-900 text-left">
+                  {benefit.title}
+                </h3>
+                <p className="text-[13px] text-gray-500 text-left">
+                  {benefit.description}
+                </p>
+              </div>
             </div>
           </div>
         ))}
