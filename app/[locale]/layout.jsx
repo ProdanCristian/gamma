@@ -29,6 +29,17 @@ export async function generateMetadata({ params }) {
   return {
     title: t("site_title"),
     description: t("site_description"),
+    icons: {
+      icon: [{ url: "/favicon/favicon.ico" }],
+      apple: [
+        {
+          url: "/favicon/apple-touch-icon.png",
+          sizes: "180x180",
+          type: "image/png",
+        },
+      ],
+    },
+    manifest: "/favicon/site.webmanifest",
   };
 }
 
@@ -47,7 +58,25 @@ export default async function LocaleLayout({ children, params }) {
     <html lang={locale} suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon/favicon.ico" sizes="any" />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon/favicon-16x16.png"
+        />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/favicon/apple-touch-icon.png"
+        />
+        <link rel="manifest" href="/favicon/site.webmanifest" />
       </head>
       <body className="antialiased">
         <NextIntlClientProvider messages={messages} locale={locale}>
