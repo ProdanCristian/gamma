@@ -64,7 +64,6 @@ export default async function LocaleLayout({ children, params }) {
           sizes="180x180"
           href="/favicon/apple-touch-icon.png"
         />
-        <link rel="manifest" href="/favicon/site.webmanifest" />
       </head>
       <body className="antialiased">
         <NextIntlClientProvider messages={messages} locale={locale}>
