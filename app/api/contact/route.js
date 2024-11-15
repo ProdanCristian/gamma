@@ -60,7 +60,7 @@ export async function POST(req) {
                   <tr>
                     <td style="text-align: center;">
                       <img src="${
-                        process.env.NEXT_PUBLIC_BASE_URL
+                        process.env.NEXTAUTH_URL
                       }/logo.png" alt="Gamma Logo" style="height: 50px; width: auto; vertical-align: middle;">
                       <span style="color: white; margin-left: 20px; font-size: 24px; vertical-align: middle;">${t(
                         "contact_form"
@@ -165,7 +165,7 @@ export async function POST(req) {
                   <tr>
                     <td style="text-align: center;">
                       <img src="${
-                        process.env.NEXT_PUBLIC_BASE_URL
+                        process.env.NEXTAUTH_URL
                       }/Gamma.png" alt="Gamma Logo" style="height: 50px; width: auto; vertical-align: middle;">
                     </td>
                   </tr>
