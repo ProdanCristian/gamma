@@ -77,12 +77,12 @@ export default async function Delivery({ params }) {
     },
     eligibleTransactionVolume: {
       "@type": "PriceSpecification",
-      price: "500",
+      price: "1000",
       priceCurrency: "MDL",
     },
     freeDeliveryThreshold: {
       "@type": "PriceSpecification",
-      price: "500",
+      price: "1000",
       priceCurrency: "MDL",
     },
   };
@@ -150,8 +150,8 @@ export default async function Delivery({ params }) {
                   </h2>
                   <p>
                     {locale === "ru"
-                      ? "Доставка осуществляется в течение 1 - 7 рабочих дней с момента обработки заказа. Стоимость доставки для заказов до 500 леев - 50 леев, для заказов свыше 500 леев - БЕСПЛАТНО."
-                      : "Se efectuează în decurs 1 - 7 zile lucrătoare de la procesarea comenzii. Costul livrării pentru comanda până la 500 lei - 50 lei, pentru comenzile care depășesc 500 lei - GRATUIT."}
+                      ? "Доставка осуществляется в течение 1 - 7 рабочих дней с момента обработки заказа. Стоимость доставки для заказов до 1000 леев - 50 леев, для заказов свыше 1000 леев - БЕСПЛАТНО."
+                      : "Se efectuează în decurs 1 - 7 zile lucrătoare de la procesarea comenzii. Costul livrării pentru comanda până la 1000 lei - 50 lei, pentru comenzile care depășesc 1000 lei - GRATUIT."}
                   </p>
                 </section>
 
@@ -163,8 +163,8 @@ export default async function Delivery({ params }) {
                   </h2>
                   <p>
                     {locale === "ru"
-                      ? "Трушены, Ватра, Гидигич, Грэтишти, Хулбоака, Стауцень, Новый Гоян, Думбрава, Дурлешть, Кодру, Бачой, Сэнджера, Бубуечи, Колоница, Тохатин, Крикова, Чореску, Вадул-луй-Водэ, Кондрита, Доброджа, Хумулешть - стоимость доставки в пригороды - 60 леев. Для заказов свыше 500 леев - БЕСПЛАТНО."
-                      : "Trușeni, Vatra, Ghidighici, Grătiești, Hulboaca, Stăuceni, Goianul Nou, Dumbrava, Durlești, Codru, Bacioi, Sangera, Bubuieci, Colonița, Tohatin, Cricova, Ciorescu, Vadul lui Vodă, Condrița, Dobrogea, Humulești - costul livrării în suburbii va fi de 60 lei. Pentru comenzile care depășesc 500 lei - GRATUIT."}
+                      ? "Трушены, Ватра, Гидигич, Грэтишти, Хулбоака, Стауцень, Новый Гоян, Думбрава, Дурлешть, Кодру, Бачой, Сэнджера, Бубуечи, Колоница, Тохатин, Крикова, Чореску, Вадул-луй-Водэ, Кондрита, Доброджа, Хумулешть - стоимость доставки в пригороды - 60 леев. Для заказов свыше 1000 леев - БЕСПЛАТНО."
+                      : "Trușeni, Vatra, Ghidighici, Grătiești, Hulboaca, Stăuceni, Goianul Nou, Dumbrava, Durlești, Codru, Bacioi, Sangera, Bubuieci, Colonița, Tohatin, Cricova, Ciorescu, Vadul lui Vodă, Condrița, Dobrogea, Humulești - costul livrării în suburbii va fi de 60 lei. Pentru comenzile care depășesc 1000 lei - GRATUIT."}
                   </p>
                 </section>
 
@@ -176,8 +176,8 @@ export default async function Delivery({ params }) {
                   </h2>
                   <p>
                     {locale === "ru"
-                      ? "Стоимость доставки по Молдове - 60 леев. Для заказов свыше 500 леев - БЕСПЛАТНО."
-                      : "Costul livrării prin Moldova - 60 lei. Pentru comenzile care depășesc 500 lei - GRATUIT."}
+                      ? "Стоимость доставки по Молдове - 60 леев. Для заказов свыше 1000 леев - БЕСПЛАТНО."
+                      : "Costul livrării prin Moldova - 60 lei. Pentru comenzile care depășesc 1000 lei - GRATUIT."}
                   </p>
                 </section>
 

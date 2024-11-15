@@ -14,6 +14,7 @@ import Footer from "@/components/Footer/Footer";
 import BottomBarMobile from "@/components/Footer/BottomBarMobile";
 import Cart from "@/components/Cart";
 import FastOrder from "@/components/FastOrder";
+import MessageChat from "@/components/messageChat";
 
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
@@ -39,7 +40,6 @@ export async function generateMetadata({ params }) {
         },
       ],
     },
-    manifest: "/favicon/site.webmanifest",
   };
 }
 
@@ -84,6 +84,7 @@ export default async function LocaleLayout({ children, params }) {
               <BottomBarMobile />
               <Cart />
               <FastOrder />
+              <MessageChat />
             </AuthProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
