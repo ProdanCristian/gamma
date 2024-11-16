@@ -20,6 +20,7 @@ import {
   stripPhonePrefix,
   handlePhoneKeyDown,
 } from "@/lib/utils/phoneUtils";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 interface UserProfile {
   Nume: string;
@@ -38,13 +39,70 @@ export default function FastOrder() {
 
   const { isOpen, product, setOpen } = useFastOrderStore();
   const [quantity, setQuantity] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
   const params = useParams();
 
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [errors, setErrors] = useState({
+    name: "",
+    phone: "",
+  });
+
+  const handlePhoneChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedPhone = formatPhoneNumber(e.target.value);
     setPhone(formattedPhone);
+
+    if (session?.user && formattedPhone.length === 13) {
+      try {
+        const response = await fetch("/api/auth/update-profile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...userProfile,
+            Numar_Telefon: stripPhonePrefix(formattedPhone).toString(),
+          }),
+        });
+
+        if (!response.ok) {
+          console.error("Failed to update phone number in profile");
+        }
+      } catch (error) {
+        console.error("Error updating phone number:", error);
+      }
+    }
+  };
+
+  const handleNameChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = e.target.value;
+    setName(newName);
+
+    if (session?.user && newName.trim()) {
+      try {
+        const [firstName, ...restName] = newName.trim().split(" ");
+        const lastName = restName.join(" ");
+
+        const response = await fetch("/api/auth/update-profile", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...userProfile,
+            Nume: lastName || firstName,
+            Prenume: lastName ? firstName : "",
+          }),
+        });
+
+        if (!response.ok) {
+          console.error("Failed to update name in profile");
+        }
+      } catch (error) {
+        console.error("Error updating name:", error);
+      }
+    }
   };
 
   useEffect(() => {
@@ -104,16 +162,31 @@ export default function FastOrder() {
 
     if (!product) return;
 
-    if (!name.trim() || phone.length < 13) {
+    setErrors({ name: "", phone: "" });
+
+    let hasErrors = false;
+    if (!name.trim()) {
+      setErrors((prev) => ({ ...prev, name: t("name_required") }));
+      hasErrors = true;
+    }
+
+    if (phone.length < 13) {
+      setErrors((prev) => ({ ...prev, phone: t("phone_required") }));
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
       return;
     }
 
-    if (session?.user && (!userProfile?.Numar_Telefon || !userProfile?.Nume)) {
+    setIsSubmitting(true);
+
+    if (session?.user) {
       try {
         const [firstName, ...restName] = name.trim().split(" ");
         const lastName = restName.join(" ");
 
-        await fetch("/api/auth/update-profile", {
+        const response = await fetch("/api/auth/update-profile", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -121,15 +194,27 @@ export default function FastOrder() {
           body: JSON.stringify({
             Nume: lastName || firstName,
             Prenume: lastName ? firstName : "",
-            Numar_Telefon: stripPhonePrefix(phone),
+            Numar_Telefon: stripPhonePrefix(phone).toString(),
             Email: session.user.email,
             Provider: userProfile?.Provider || "credentials",
           }),
         });
+
+        if (!response.ok) {
+          console.error("Failed to update profile");
+        } else {
+          setUserProfile((prev) => ({
+            ...prev!,
+            Nume: lastName || firstName,
+            Prenume: lastName ? firstName : "",
+            Numar_Telefon: stripPhonePrefix(phone).toString(),
+          }));
+        }
       } catch (error) {
         console.error("Error updating profile:", error);
       }
     }
+
     const productPrice = hasDiscount
       ? parseFloat(product.discount!)
       : parseFloat(product.price);
@@ -148,7 +233,8 @@ export default function FastOrder() {
         body: JSON.stringify({
           userId: session?.user?.id,
           numePrenume: name,
-          numarTelefon: stripPhonePrefix(phone),
+          numarTelefon: stripPhonePrefix(phone).toString(),
+          email: session?.user?.email,
           productId: product.id,
           quantity: quantity,
           deliveryZone: deliveryZone,
@@ -215,6 +301,8 @@ export default function FastOrder() {
       }
     } catch (error) {
       console.error("Error creating order:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -383,12 +471,17 @@ export default function FastOrder() {
             <input
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={handleNameChange}
               placeholder={t("name_placeholder")}
-              className="dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full"
+              className={`dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full ${
+                errors.name ? "border-2 border-red-500" : ""
+              }`}
               required
               autoFocus={false}
             />
+            {errors.name && (
+              <span className="text-red-500 text-sm">{errors.name}</span>
+            )}
           </div>
           <div className="grid gap-2">
             <input
@@ -399,17 +492,32 @@ export default function FastOrder() {
               onKeyDown={handlePhoneKeyDown}
               maxLength={13}
               placeholder={t("phone_placeholder")}
-              className="dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full"
+              className={`dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full ${
+                errors.phone ? "border-2 border-red-500" : ""
+              }`}
               required
               autoFocus={false}
             />
+            {errors.phone && (
+              <span className="text-red-500 text-sm">{errors.phone}</span>
+            )}
           </div>
           <button
             type="submit"
+            disabled={isSubmitting}
             className="w-full bg-accent hover:bg-charade-900 text-white font-bold py-2 px-4 rounded-lg 
-              dark:bg-accent dark:hover:bg-white dark:hover:text-charade-900"
+              dark:bg-accent dark:hover:bg-white dark:hover:text-charade-900 
+              disabled:opacity-50 disabled:cursor-not-allowed
+              flex items-center justify-center gap-2"
           >
-            {t("get_call_now")}
+            {isSubmitting ? (
+              <>
+                <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin" />
+                {t("processing")}
+              </>
+            ) : (
+              t("get_call_now")
+            )}
           </button>
         </form>
       </DialogContent>

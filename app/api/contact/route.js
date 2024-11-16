@@ -5,8 +5,8 @@ import { getTranslations } from "next-intl/server";
 
 export async function POST(req) {
   try {
-    const t = await getTranslations("contact");
-    const { name, phone, email, message } = await req.json();
+    const { name, phone, email, message, locale } = await req.json();
+    const t = await getTranslations({ locale, namespace: "contact" });
 
     if (!name || !email || !message) {
       return NextResponse.json({ error: t("missing_fields") }, { status: 400 });
@@ -38,14 +38,14 @@ export async function POST(req) {
     const adminMailOptions = {
       from: {
         name: "Gamma Contact",
-        address: process.env.EMAIL_USER,
+        address: process.env.EMAIL_SUPPORT,
       },
-      to: process.env.EMAIL_USER,
+      to: process.env.EMAIL_SUPPORT,
       replyTo: email,
       subject: t("new_submission_from", { name }),
       html: `
         <!DOCTYPE html>
-        <html lang="en">
+        <html lang="${locale}">
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -53,28 +53,21 @@ export async function POST(req) {
         </head>
         <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
           <table role="presentation" style="width: 100%; border-collapse: collapse;">
-            <!-- Header -->
             <tr>
               <td style="padding: 20px 0; text-align: center; background-color: #343746;">
-                <table role="presentation" style="width: 100%; max-width: 1200px; margin: 0 auto;">
+                <table role="presentation" style="width: 100%; max-width: 600px; margin: 0 auto;">
                   <tr>
                     <td style="text-align: center;">
-                      <img src="${
-                        process.env.NEXTAUTH_URL
-                      }/logo.png" alt="Gamma Logo" style="height: 50px; width: auto; vertical-align: middle;">
-                      <span style="color: white; margin-left: 20px; font-size: 24px; vertical-align: middle;">${t(
-                        "contact_form"
-                      )}</span>
+                      <img src="https://gamma.md/Gamma.png" alt="Gamma Logo" style="height: 50px; width: auto; vertical-align: middle;">
                     </td>
                   </tr>
                 </table>
               </td>
             </tr>
             
-            <!-- Main Content -->
             <tr>
               <td style="padding: 40px 20px;">
-                <table role="presentation" style="width: 100%; max-width: 1200px; margin: 0 auto; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <table role="presentation" style="width: 100%; max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                   <tr>
                     <td style="padding: 30px;">
                       <h1 style="color: #333333; margin: 0 0 20px 0; font-size: 24px; text-align: center;">
@@ -125,14 +118,13 @@ export async function POST(req) {
               </td>
             </tr>
             
-            <!-- Footer -->
             <tr>
               <td style="padding: 20px; text-align: center; color: #666666; font-size: 12px;">
                 <p style="margin: 0;">© 2024 Gamma. ${t(
                   "all_rights_reserved"
                 )}</p>
-                <p style="margin: 10px 0 0 0;">
-                  Strada Sfîntul Gheorghe 6, Chișinău, Moldova | Tel: 022897007 | Email:info@gamma.md
+                <p style="margin: 10px 0 0 0; line-height: 1.4;">
+                  Strada Sfîntul Gheorghe 6, Chișinău, Moldova | Tel: 022897007 | Email: info@gamma.md
                 </p>
               </td>
             </tr>
@@ -145,13 +137,13 @@ export async function POST(req) {
     const senderMailOptions = {
       from: {
         name: "Gamma",
-        address: process.env.EMAIL_USER,
+        address: process.env.EMAIL_SUPPORT,
       },
       to: email,
       subject: t("thank_you_for_contact"),
       html: `
         <!DOCTYPE html>
-        <html lang="en">
+        <html lang="${locale}">
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -161,12 +153,10 @@ export async function POST(req) {
           <table role="presentation" style="width: 100%; border-collapse: collapse;">
             <tr>
               <td style="padding: 20px 0; text-align: center; background-color: #343746;">
-                <table role="presentation" style="width: 100%; max-width: 1200px; margin: 0 auto;">
+                <table role="presentation" style="width: 100%; max-width: 600px; margin: 0 auto;">
                   <tr>
                     <td style="text-align: center;">
-                      <img src="${
-                        process.env.NEXTAUTH_URL
-                      }/Gamma.png" alt="Gamma Logo" style="height: 50px; width: auto; vertical-align: middle;">
+                      <img src="https://gamma.md/Gamma.png" alt="Gamma Logo" style="height: 50px; width: auto; vertical-align: middle;">
                     </td>
                   </tr>
                 </table>
@@ -175,16 +165,20 @@ export async function POST(req) {
             
             <tr>
               <td style="padding: 40px 20px;">
-                <table role="presentation" style="width: 100%; max-width: 1200px; margin: 0 auto; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <table role="presentation" style="width: 100%; max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                   <tr>
-                    <td style="padding: 30px;">
-                      <h1 style="color: #333333; margin: 0 0 20px 0; font-size: 24px; text-align: center;">
+                    <td style="padding: 30px; text-align: center;">
+                      <h1 style="color: #333333; margin: 0 0 20px 0; font-size: 24px;">
                         ${t("thank_you_for_contact")}
                       </h1>
                       
-                      <div style="margin: 30px 0; padding: 20px; background-color: #f8f9fa; border-radius: 6px; color: #212529;">
-                        <p>${t("confirmation_message")}</p>
-                        <p>${t("we_will_contact_soon")}</p>
+                      <div style="color: #212529;">
+                        <p style="margin: 0 0 20px 0; line-height: 1.6;">${t(
+                          "confirmation_message"
+                        )}</p>
+                        <p style="margin: 0; line-height: 1.6;">${t(
+                          "we_will_contact_soon"
+                        )}</p>
                       </div>
                     </td>
                   </tr>
@@ -197,7 +191,7 @@ export async function POST(req) {
                 <p style="margin: 0;">© 2024 Gamma. ${t(
                   "all_rights_reserved"
                 )}</p>
-                <p style="margin: 10px 0 0 0;">
+                <p style="margin: 10px 0 0 0; line-height: 1.4;">
                   Strada Sfîntul Gheorghe 6, Chișinău, Moldova | Tel: 022897007 | Email: info@gamma.md
                 </p>
               </td>

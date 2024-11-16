@@ -13,6 +13,7 @@ import { LoginForm } from "@/components/auth/LoginForm";
 import { CouponSection } from "@/components/Checkout/CouponSection";
 import { UserInfoForm } from "@/components/Checkout/UserInfoForm";
 import { useOrderStore } from "@/lib/store/useOrderStore";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 interface ExtendedUser {
   id: string;
@@ -59,7 +60,10 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     let mounted = true;
-    if (mounted) setMounted(true);
+    if (mounted) {
+      setMounted(true);
+      window.scrollTo(0, 0);
+    }
     return () => {
       mounted = false;
       setMounted(false);
@@ -163,7 +167,8 @@ const CheckoutPage = () => {
       return false;
     }
 
-    if (!guestPhone.trim()) {
+    // Validate phone format (must be +373 followed by 8 digits)
+    if (!guestPhone.trim() || guestPhone.length < 13) {
       toast({
         title: t("checkout.error"),
         description: t("checkout.phone_required"),
@@ -183,12 +188,12 @@ const CheckoutPage = () => {
       return false;
     }
 
-    // Validate phone format
-    const phoneRegex = /^\+?[0-9]{8,}$/;
-    if (!phoneRegex.test(guestPhone.replace(/\s/g, ""))) {
+    // Validate phone format more strictly
+    const phoneRegex = /^\+373\s\d{8}$/;
+    if (!phoneRegex.test(guestPhone)) {
       toast({
         title: t("checkout.error"),
-        description: t("checkout.invalid_phone"),
+        description: t("checkout.invalid_phone_format"),
         variant: "destructive",
       });
       return false;
@@ -260,6 +265,7 @@ const CheckoutPage = () => {
           userId: session?.user?.id || null,
           numePrenume: guestName,
           numarTelefon: formattedPhone,
+          email: guestEmail,
           products: products,
           deliveryZone,
           isFreeDelivery: deliveryCost === 0,
@@ -268,6 +274,7 @@ const CheckoutPage = () => {
           couponDiscount: couponDiscount,
           total: total,
           paymentMethod,
+          locale: params.locale,
         }),
       });
 
@@ -559,9 +566,19 @@ const CheckoutPage = () => {
               !guestEmail ||
               !guestPhone
             }
-            className="w-full bg-accent hover:bg-charade-900 hover:text-white text-charade-900 dark:hover:bg-gray-100 dark:hover:text-charade-900 h-10 text-sm font-semibold"
+            className="w-full bg-accent hover:bg-charade-900 hover:text-white text-charade-900 
+              dark:hover:bg-gray-100 dark:hover:text-charade-900 h-10 text-sm font-semibold
+              disabled:opacity-50 disabled:cursor-not-allowed
+              flex items-center justify-center gap-2"
           >
-            {isLoading ? t("checkout.processing") : t("checkout.place_order")}
+            {isLoading ? (
+              <>
+                <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin" />
+                {t("checkout.processing")}
+              </>
+            ) : (
+              t("checkout.place_order")
+            )}
           </Button>
         </div>
       </div>

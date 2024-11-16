@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
+import { PiEye, PiEyeSlash } from "react-icons/pi";
 
 interface LoginFormProps {
   onClose: () => void;
@@ -11,16 +13,19 @@ interface LoginFormProps {
 
 export const LoginForm = ({ onClose }: LoginFormProps) => {
   const t = useTranslations();
+  const locale = useLocale();
   const [activeTab, setActiveTab] = useState("login");
 
   // Login states
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
 
   // Register states
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
 
   // Message states
   const [errorMessage, setErrorMessage] = useState("");
@@ -173,14 +178,35 @@ export const LoginForm = ({ onClose }: LoginFormProps) => {
                 autoComplete="email"
                 className="dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full"
               />
-              <input
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-                type="password"
-                placeholder={t("auth.Password")}
-                autoComplete="current-password"
-                className="dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full"
-              />
+              <div className="relative">
+                <input
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  type={showLoginPassword ? "text" : "password"}
+                  placeholder={t("auth.Password")}
+                  autoComplete="current-password"
+                  className="dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowLoginPassword(!showLoginPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showLoginPassword ? (
+                    <PiEyeSlash size={16} />
+                  ) : (
+                    <PiEye size={16} />
+                  )}
+                </button>
+              </div>
+              <div className="text-right">
+                <Link
+                  href={`/${locale}/forgot-password`}
+                  className="text-sm dark:text-white text-charade-950 hover:underline"
+                >
+                  {t("auth.forgot_password")}
+                </Link>
+              </div>
               <button
                 type="submit"
                 className="bg-charade-950 text-white p-2 rounded-lg"
@@ -228,14 +254,27 @@ export const LoginForm = ({ onClose }: LoginFormProps) => {
                 autoComplete="email"
                 className="dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full"
               />
-              <input
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                type="password"
-                placeholder={t("auth.Password")}
-                autoComplete="new-password"
-                className="dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full"
-              />
+              <div className="relative">
+                <input
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  type={showRegisterPassword ? "text" : "password"}
+                  placeholder={t("auth.Password")}
+                  autoComplete="new-password"
+                  className="dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showRegisterPassword ? (
+                    <PiEyeSlash size={16} />
+                  ) : (
+                    <PiEye size={16} />
+                  )}
+                </button>
+              </div>
               <button
                 type="submit"
                 className="bg-charade-950 text-white p-2 rounded-lg"

@@ -122,7 +122,10 @@
     "order_success": "Comandă plasată cu succes",
     "order_success_description": "Veți fi contactat în curând pentru confirmare",
     "order_error": "Eroare",
-    "order_error_description": "Nu am putut plasa comanda. Încercați din nou."
+    "order_error_description": "Nu am putut plasa comanda. Încercați din nou.",
+    "processing": "Se procesează...",
+    "name_required": "Vă rugăm să introduceți numele",
+    "phone_required": "Vă rugăm să introduceți un număr de telefon valid"
   },
   "Cart": {
     "title": "Coșul meu",
@@ -195,19 +198,39 @@
     "orders_title": "Comenzi",
     "Logout": "Deconectare",
     "user_registered_successfully": "Înregistrare reușită",
-    "internal_error": "A apărut o eroare. Vă rugăm să încercați din nou.",
     "invalid_credentials": "Email sau parolă invalide",
     "login_successful": "Autentificare reușită",
     "email_already_exists": "Acest email este deja înregistrat",
     "invalid_email_format": "Format email invalid",
     "password_too_short": "Parola trebuie să aibă cel puțin 6 caractere",
     "name_required": "Numele și prenumele sunt obligatorii",
-    "email_required": "Emailul este obligatoriu",
     "password_required": "Parola este obligatorie",
     "profile_updated": "Profilul a fost actualizat cu succes",
     "error_loading_data": "Nu s-au putut încărca datele",
     "generic_error": "A apărut o eroare",
-    "profile": "Profil"
+    "profile": "Profil",
+    "user_not_found": "Utilizatorul nu a fost găsit",
+    "email_required": "Email-ul este obligatoriu",
+    "reset_password_subject": "Resetare parolă",
+    "reset_password_heading": "Resetare parolă",
+    "reset_password_instructions": "Ați solicitat resetarea parolei. Faceți clic pe butonul de mai jos pentru a vă seta o nouă parolă.",
+    "reset_password_button": "Resetare parolă",
+    "reset_password_expiry": "Acest link expiră în 60 de minute.",
+    "all_rights_reserved": "Toate drepturile rezervate",
+    "reset_email_sent": "Un email cu instrucțiuni de resetare a fost trimis",
+    "missing_reset_info": "Informații lipsă pentru resetarea parolei",
+    "invalid_reset_token": "Token invalid sau expirat",
+    "password_reset_success": "Parola a fost resetată cu succes",
+    "passwords_dont_match": "Parolele nu se potrivesc",
+    "internal_error": "Eroare internă",
+    "forgot_password": "Ai uitat parola?",
+    "email_address": "Adresa de email",
+    "new_password": "Parolă nouă",
+    "confirm_password": "Confirmă parola",
+    "sending": "Se trimite...",
+    "send_reset_link": "Trimite link de resetare",
+    "resetting": "Se resetează...",
+    "reset_password": "Resetare parolă"
   },
   "profile": {
     "updating": "Se actualizează profilul...",
@@ -226,7 +249,7 @@
     "email_change_restricted": "Emailul nu poate fi modificat pentru conturile Google sau Facebook"
   },
   "contact": {
-    "thank_you_for_contact": "Vă mulțumim pentru contact",
+    "thank_you_for_contact": "Vă mulțumim pentru contactarea voastră",
     "confirmation_message": "Am primit mesajul dvs.",
     "we_will_contact_soon": "Echipa noastră va analiza mesajul dvs. și va contacta pe dvs. cât mai curând posibil.",
     "home": "Acasă",
@@ -307,7 +330,8 @@
     "facebook_link": "Urmăriți-ne pe Facebook",
     "instagram_link": "Urmăriți-ne pe Instagram",
     "app_store_link": "Descărcați aplicația pentru iPhone",
-    "play_store_link": "Descărcați aplicația pentru Android"
+    "play_store_link": "Descărcați aplicația pentru Android",
+    "developed_by": "Aplicație dezvoltată de"
   },
   "home": {
     "free_delivery_info": "Livrare gratuită la comenzi de peste 1000 lei",
@@ -400,7 +424,8 @@
     "product_price": "Preț produs",
     "coupon_applied": "Cupon aplicat",
     "no_orders": "Nu aveți comenzi",
-    "payment_method": "Metoda de plat"
+    "payment_method": "Metoda de plată",
+    "processing": "Se procesează..."
   },
   "checkout": {
     "title": "Finalizare comandă",
@@ -437,7 +462,7 @@
     "total_savings": "Economisești în total",
     "login_required": "Autentificare necesară",
     "login_to_apply_coupon": "Vă rugăm să vă autentificați pentru a aplica un cupon",
-    "login_for_address": "Autentificați-v�� pentru a gestiona adresa de livrare",
+    "login_for_address": "Autentificați-vă pentru a gestiona adresa de livrare",
     "login_button": "Autentificare",
     "have_account": "Aveți deja un cont?",
     "login_to_save_address": "Autentificați-vă pentru a salva adresa pentru comenzi viitoare",
@@ -462,6 +487,29 @@
     "phone_required": "Numărul de telefon este obligatoriu",
     "invalid_email": "Adresa de email nu este validă",
     "invalid_phone": "Numărul de telefon nu este valid",
-    "address_required": "Adresa de livrare este obligatorie"
+    "address_required": "Adresa de livrare este obligatorie",
+    "email_verification_success": "Verificare email reușită",
+    "email_verification_error": "Eroare la verificarea email-ului",
+    "email_sent_success": "Email trimis cu succes",
+    "email_send_error": "Eroare la trimiterea email-ului",
+    "order_error": "Eroare la plasarea comenzii",
+    "invalid_phone_format": "Format număr de telefon invalid. Folosiți formatul: +373 XXXXXXXX"
+  },
+  "orders": {
+    "order_confirmation": "Confirmare comandă",
+    "order_received": "Comandă primită",
+    "order_thank_you": "Vă mulțumim pentru comandă!",
+    "order_details": "Detalii comandă",
+    "product": "Produs",
+    "quantity": "Cantitate",
+    "price": "Preț",
+    "delivery_address": "Adresă livrare",
+    "phone": "Telefon",
+    "delivery_cost": "Cost livrare",
+    "total": "Total",
+    "free": "Gratis",
+    "coupon": "Cupon aplicat",
+    "hello": "Bună",
+    "currency": "lei"
   }
 }

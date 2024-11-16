@@ -3,7 +3,12 @@
 import { useState, useEffect } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useTranslations, useLocale } from "next-intl";
-import { PiChalkboardTeacherThin, PiSignOut } from "react-icons/pi";
+import {
+  PiChalkboardTeacherThin,
+  PiSignOut,
+  PiEye,
+  PiEyeSlash,
+} from "react-icons/pi";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -17,6 +22,8 @@ export default function AuthModal() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [userData, setUserData] = useState(null);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
 
   const { data: session } = useSession();
   const t = useTranslations("auth");
@@ -242,14 +249,35 @@ export default function AuthModal() {
               autoComplete="email"
               className="dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full"
             />
-            <input
-              value={loginPassword}
-              onChange={(e) => setLoginPassword(e.target.value)}
-              type="password"
-              placeholder={t("Password")}
-              autoComplete="current-password"
-              className="dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full"
-            />
+            <div className="relative">
+              <input
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                type={showLoginPassword ? "text" : "password"}
+                placeholder={t("Password")}
+                autoComplete="current-password"
+                className="dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full"
+              />
+              <button
+                type="button"
+                onClick={() => setShowLoginPassword(!showLoginPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {showLoginPassword ? (
+                  <PiEyeSlash size={16} />
+                ) : (
+                  <PiEye size={16} />
+                )}
+              </button>
+            </div>
+            <div className="text-right">
+              <Link
+                href={`/${locale}/forgot-password`}
+                className="text-sm dark:text-white text-charade-950 hover:underline"
+              >
+                {t("forgot_password")}
+              </Link>
+            </div>
             <button
               type="submit"
               className="bg-charade-950 text-white p-2 rounded-lg"
@@ -292,14 +320,27 @@ export default function AuthModal() {
               autoComplete="email"
               className="dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full"
             />
-            <input
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              type="password"
-              placeholder={t("Password")}
-              autoComplete="new-password"
-              className="dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full"
-            />
+            <div className="relative">
+              <input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type={showRegisterPassword ? "text" : "password"}
+                placeholder={t("Password")}
+                autoComplete="new-password"
+                className="dark:bg-[#4a4b59] bg-gray-100 rounded-lg p-2 w-full"
+              />
+              <button
+                type="button"
+                onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {showRegisterPassword ? (
+                  <PiEyeSlash size={16} />
+                ) : (
+                  <PiEye size={16} />
+                )}
+              </button>
+            </div>
             <button
               type="submit"
               className="bg-charade-950 text-white p-2 rounded-lg"

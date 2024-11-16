@@ -296,7 +296,38 @@ export default function Footer() {
           </div>
         </div>
       </div>
-
+      <div>
+        <div className="bg-charade-900 py-2">
+          <div className="max-w-[1250px] w-[90%] mx-auto">
+            <p className="text-sm text-gray-400 text-center flex items-center justify-center gap-2">
+              <span>{t("developed_by")}</span>
+              <a
+                href="https://prodan.digital"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-accent transition-colors font-bold text-lg flex items-center gap-1 group"
+              >
+                <span className="bg-gradient-to-b from-accent to-accent-light bg-clip-text text-transparent">
+                  prodandigital
+                </span>
+                <svg
+                  className="w-4 h-4 text-accent transition-transform group-hover:translate-x-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
+                </svg>
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
       <div className="bg-white dark:bg-gray-300 md:h-10 h-20 items-center flex">
         <div className="max-w-[1250px] w-[90%] mx-auto flex flex-col-reverse md:flex-row justify-between items-center gap-2 md:gap-0 py-2 md:py-0">
           <div className="flex items-center space-x-2 text-charade-950">

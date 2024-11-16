@@ -10,6 +10,7 @@ import {
   stripPhonePrefix,
   handlePhoneKeyDown,
 } from "@/lib/utils/phoneUtils";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 export default function ContactForm({ initialUserData }) {
   const t = useTranslations("contact");
@@ -78,6 +79,7 @@ export default function ContactForm({ initialUserData }) {
       phone: stripPhonePrefix(phone).toString(),
       email: formData.get("email"),
       message: formData.get("message"),
+      locale: locale,
     };
 
     try {
@@ -215,24 +217,34 @@ export default function ContactForm({ initialUserData }) {
               </div>
 
               {submitStatus === "success" && (
-                <div className="text-green-600 dark:text-green-400">
-                  {t("message_sent_success")}
+                <div className="mt-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900 rounded-lg p-4">
+                  <p className="text-green-700 dark:text-green-400">
+                    {t("message_sent_success")}
+                  </p>
                 </div>
               )}
 
               {submitStatus === "error" && (
-                <div className="text-red-600 dark:text-red-400">
-                  {t("message_error")}
+                <div className="mt-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 rounded-lg p-4">
+                  <p className="text-red-700 dark:text-red-400">
+                    {t("message_error")}
+                  </p>
                 </div>
               )}
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`bg-gray-500 hover:bg-charade-800 text-white px-4 py-2 rounded-lg transition-colors ${
+                className={`bg-gray-500 hover:bg-charade-800 text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2 ${
                   isSubmitting ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
+                {isSubmitting && (
+                  <AiOutlineLoading3Quarters
+                    className="animate-spin"
+                    size={20}
+                  />
+                )}
                 {isSubmitting ? t("sending") : t("send")}
               </button>
             </form>

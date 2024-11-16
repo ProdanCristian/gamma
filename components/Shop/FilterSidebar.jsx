@@ -176,7 +176,7 @@ const FilterSidebar = ({
               <Label>{t("Color")}</Label>
               <div className="flex flex-wrap gap-2">
                 {colorsData.colors.map((color) => (
-                  <Tooltip.Provider key={color.id}>
+                  <Tooltip.Provider key={color.id} delayDuration={0}>
                     <Tooltip.Root>
                       <Tooltip.Trigger asChild>
                         <button
@@ -193,6 +193,7 @@ const FilterSidebar = ({
                         <Tooltip.Content
                           className="rounded-md bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95"
                           sideOffset={5}
+                          side="top"
                         >
                           {locale === "ru"
                             ? color.Culoare_RU_
