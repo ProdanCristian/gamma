@@ -111,7 +111,7 @@ const MobileNavBar = () => {
         <motion.div
           initial={false}
           className={`
-            md:hidden z-10  flex overflow-hidden justify-center fixed bottom-0 w-full 
+            md:hidden z-50  flex overflow-hidden justify-center fixed bottom-0 w-full 
             bg-charade-900 backdrop-blur-sm rounded-t-3xl transition-all shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-1px_rgba(0,0,0,0.06)]
           `}
           animate={{

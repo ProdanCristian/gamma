@@ -259,17 +259,6 @@ export default function FastOrder() {
           }
         };
 
-        const getLocalizedAddressMessage = (locale: string) => {
-          switch (locale) {
-            case "ru":
-              return "Адрес будет подтвержден";
-            case "ro":
-              return "Adresa va fi confirmată";
-            default:
-              return "Address to be confirmed";
-          }
-        };
-
         const orderConfirmation = {
           products: [
             {
@@ -295,7 +284,12 @@ export default function FastOrder() {
           "orderConfirmation",
           JSON.stringify(orderConfirmation)
         );
-        router.push(`/${params.locale}/checkout/order`);
+
+        if (session?.user) {
+          router.push(`/${params.locale}/checkout/order`);
+        } else {
+          router.push(`/${params.locale}/checkout/lead`);
+        }
       } else {
         throw new Error("Failed to create order");
       }

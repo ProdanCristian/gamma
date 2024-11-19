@@ -78,7 +78,7 @@ const MessageChat = () => {
 
   return (
     <div
-      className="fixed bottom-20 md:bottom-7 right-7 z-50"
+      className="fixed bottom-20 md:bottom-7 right-7 z-40"
       ref={containerRef}
     >
       <AnimatePresence>

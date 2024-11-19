@@ -104,7 +104,7 @@
     "phone_placeholder": "Numărul de telefon",
     "price": "Preț",
     "stock": "Stoc",
-    "get_call_now": "Solicită apel",
+    "get_call_now": "Primește apel",
     "lei": "Lei",
     "quantity": "Cantitate",
     "units": "unități",
@@ -362,7 +362,8 @@
     "quantity": "Cantitate",
     "add_to_cart": "Adaugă în coș",
     "decrease_quantity": "Micșorează cantitatea",
-    "increase_quantity": "Mărește cantitatea"
+    "increase_quantity": "Mărește cantitatea",
+    "low_stock": "Stoc limitat"
   },
   "discounts": {
     "title": "Produse cu reducere",

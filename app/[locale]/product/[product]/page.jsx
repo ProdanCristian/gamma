@@ -18,6 +18,7 @@ import Script from "next/script";
 import { headers } from "next/headers";
 import YouTubeFacade from "@/components/ProductPage/YouTubeFacade";
 import Image from "next/image";
+import DeliveryEstimate from "@/components/ProductPage/DeliveryEstimate";
 
 async function getProduct(productId) {
   try {
@@ -429,6 +430,7 @@ export default async function ProductPage({ params, searchParams }) {
                       </span>
                     </div>
                   )}
+                  <DeliveryEstimate locale={locale} />
                 </li>
 
                 <li className="min-h-[40px]">

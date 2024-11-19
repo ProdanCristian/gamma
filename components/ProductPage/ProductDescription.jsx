@@ -30,6 +30,8 @@ const ProductDescription = ({
   const [currentProduct, setCurrentProduct] = useState(productData);
   const currentScrollPosition = useRef(0);
   const [quantity, setQuantity] = useState(1);
+  const [showStickyButton, setShowStickyButton] = useState(false);
+  const originalButtonRef = useRef(null);
 
   const attributeLabel =
     variantsData[0]?.[locale === "ru" ? "Atribut_RU" : "Atribut_RO"] || "";
@@ -173,208 +175,283 @@ const ProductDescription = ({
   // Get the ShowVariantImages value from the first variant
   const showVariantImages = variantsData[0]?.ShowVariantImages ?? false;
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowStickyButton(!entry.isIntersecting);
+      },
+      {
+        threshold: 0,
+        rootMargin: "0px",
+      }
+    );
+
+    if (originalButtonRef.current) {
+      observer.observe(originalButtonRef.current);
+    }
+
+    return () => {
+      if (originalButtonRef.current) {
+        observer.unobserve(originalButtonRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center">
-        <span className="font-bold text-xl">
-          {hasDiscount
-            ? currentProduct.Pret_Redus
-            : currentProduct.Pret_Standard}{" "}
-          {t("lei")}
-        </span>
-        {hasDiscount && (
-          <>
-            <s className="ml-5 text-gray-500 text-xl">
-              {currentProduct.Pret_Standard} {t("lei")}
-            </s>
-            <div className="flex items-center ml-10">
-              <span className="text-red-500 mr-2 text-xl">
-                {getDiscountPercentage()}%
-              </span>
-              <PiSealPercentFill size={30} className="text-red-500" />
-            </div>
-          </>
-        )}
-      </div>
-
-      {hasAttributes && Object.entries(modelVariantsWithImages).length > 0 && (
-        <div>
-          <label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {attributeLabel}
-          </label>
-          <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
-            {Object.entries(modelVariantsWithImages).map(
-              ([model, variants]) => {
-                const mainImage = showVariantImages
-                  ? getVariantImage(variants)
-                  : null;
-                const imagePath = mainImage
-                  ? `${BASE_URL}/${mainImage.path}`
-                  : null;
-
-                return (
-                  <button
-                    key={model}
-                    onClick={() => {
-                      setSelectedModel(model);
-                      setSelectedColor(null);
-                    }}
-                    className={`relative flex flex-col items-center p-2 rounded-lg border transition-all
-                    ${
-                      selectedModel === model
-                        ? "border-accent bg-green-50 dark:bg-green-50/5"
-                        : "border-gray-200 dark:border-charade-700 hover:border-accent"
-                    }`}
-                  >
-                    {showVariantImages && (
-                      <div className="relative aspect-square w-full rounded-lg overflow-hidden mb-2">
-                        {imagePath && (
-                          <Image
-                            src={imagePath}
-                            alt={variants[0].Nume_Produs_RO}
-                            fill
-                            sizes="(max-width: 768px) 33vw, 25vw"
-                            className="object-cover rounded-lg"
-                            loading="lazy"
-                            priority={false}
-                          />
-                        )}
-                      </div>
-                    )}
-                    <span
-                      className={`text-sm font-medium ${
-                        !showVariantImages ? "py-2" : ""
-                      }`}
-                    >
-                      {model}
-                    </span>
-                  </button>
-                );
-              }
-            )}
-          </div>
-        </div>
-      )}
-
-      {availableColors.length > 0 && (
-        <div>
-          <label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {t("select_color")}
-          </label>
-          <div className="flex flex-wrap gap-4">
-            {availableColors.map((color) => (
-              <div key={color.id} className="flex flex-col items-center gap-2">
-                <button
-                  onClick={() => setSelectedColor(color.id)}
-                  className={`w-8 h-8 rounded-full border transition-all hover:scale-110
-                    ${
-                      selectedColor === color.id
-                        ? "border-accent ring-1 ring-accent"
-                        : "border-gray-300"
-                    }
-                  `}
-                  style={{ backgroundColor: color.code || "#FFFFFF" }}
-                  title={color.name || ""}
-                />
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
-                  {color.name}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="text-base">
-        <span
-          className={
-            currentProduct.Stock > 0 ? "text-green-500" : "text-red-500"
-          }
-        >
-          {currentProduct.Stock > 0 ? t("in_stock") : t("out_of_stock")}
-        </span>
-        {currentProduct.Stock > 0 && (
-          <span className="ml-2 text-gray-500">
-            ({currentProduct.Stock}{" "}
-            {currentProduct.Stock === "1" ? t("unit") : t("units")})
+    <>
+      <div className="space-y-6">
+        <div className="flex items-center">
+          <span className="font-bold text-xl">
+            {hasDiscount
+              ? currentProduct.Pret_Redus
+              : currentProduct.Pret_Standard}{" "}
+            {t("lei")}
           </span>
-        )}
-      </div>
+          {hasDiscount && (
+            <>
+              <s className="ml-5 text-gray-500 text-xl">
+                {currentProduct.Pret_Standard} {t("lei")}
+              </s>
+              <div className="flex items-center ml-10">
+                <span className="text-red-500 mr-2 text-xl">
+                  {getDiscountPercentage()}%
+                </span>
+                <PiSealPercentFill size={30} className="text-red-500" />
+              </div>
+            </>
+          )}
+        </div>
 
-      <div className="flex flex-col sm:flex-row justify-between items-start md:items-center gap-4">
-        {currentProduct.Stock > 0 && (
-          <div className="flex items-center gap-4 sm:w-auto">
-            <label
-              htmlFor="quantity-input"
-              className="text-base font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap"
-            >
-              {t("quantity")}
+        {hasAttributes &&
+          Object.entries(modelVariantsWithImages).length > 0 && (
+            <div>
+              <label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {attributeLabel}
+              </label>
+              <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
+                {Object.entries(modelVariantsWithImages).map(
+                  ([model, variants]) => {
+                    const mainImage = showVariantImages
+                      ? getVariantImage(variants)
+                      : null;
+                    const imagePath = mainImage
+                      ? `${BASE_URL}/${mainImage.path}`
+                      : null;
+
+                    return (
+                      <button
+                        key={model}
+                        onClick={() => {
+                          setSelectedModel(model);
+                          setSelectedColor(null);
+                        }}
+                        className={`relative flex flex-col items-center p-2 rounded-lg border transition-all
+                      ${
+                        selectedModel === model
+                          ? "border-accent bg-green-50 dark:bg-green-50/5"
+                          : "border-gray-200 dark:border-charade-700 hover:border-accent"
+                      }`}
+                      >
+                        {showVariantImages && (
+                          <div className="relative aspect-square w-full rounded-lg overflow-hidden mb-2">
+                            {imagePath && (
+                              <Image
+                                src={imagePath}
+                                alt={variants[0].Nume_Produs_RO}
+                                fill
+                                sizes="(max-width: 768px) 33vw, 25vw"
+                                className="object-cover rounded-lg"
+                                loading="lazy"
+                                priority={false}
+                              />
+                            )}
+                          </div>
+                        )}
+                        <span
+                          className={`text-sm font-medium ${
+                            !showVariantImages ? "py-2" : ""
+                          }`}
+                        >
+                          {model}
+                        </span>
+                      </button>
+                    );
+                  }
+                )}
+              </div>
+            </div>
+          )}
+
+        {availableColors.length > 0 && (
+          <div>
+            <label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t("select_color")}
             </label>
-            <div className="flex items-center">
-              <button
-                onClick={() => handleQuantityChange(quantity - 1)}
-                aria-label={t("decrease_quantity")}
-                className="px-3 py-1 border border-gray-300 rounded-l-lg hover:bg-gray-100 
-                  dark:border-gray-600 dark:hover:bg-gray-700"
-                disabled={quantity <= 1}
-              >
-                -
-              </button>
-              <input
-                id="quantity-input"
-                type="number"
-                min="1"
-                max={currentProduct.Stock}
-                value={quantity}
-                onChange={(e) =>
-                  handleQuantityChange(parseInt(e.target.value) || 1)
-                }
-                className="w-16 text-center border-y border-gray-300 py-1 
-                  dark:border-gray-600 dark:bg-charade-800"
-                aria-label={t("quantity")}
-              />
-              <button
-                onClick={() => handleQuantityChange(quantity + 1)}
-                aria-label={t("increase_quantity")}
-                className="px-3 py-1 border border-gray-300 rounded-r-lg hover:bg-gray-100 
-                  dark:border-gray-600 dark:hover:bg-gray-700"
-                disabled={quantity >= currentProduct.Stock}
-              >
-                +
-              </button>
+            <div className="flex flex-wrap gap-4">
+              {availableColors.map((color) => (
+                <div
+                  key={color.id}
+                  className="flex flex-col items-center gap-2"
+                >
+                  <button
+                    onClick={() => setSelectedColor(color.id)}
+                    className={`w-8 h-8 rounded-full border transition-all hover:scale-110
+                      ${
+                        selectedColor === color.id
+                          ? "border-accent ring-1 ring-accent"
+                          : "border-gray-300"
+                      }
+                    `}
+                    style={{ backgroundColor: color.code || "#FFFFFF" }}
+                    title={color.name || ""}
+                  />
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                    {color.name}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
-        <div className="flex items-center gap-4 w-full sm:w-full">
-          <button
-            disabled={currentProduct.Stock <= 0}
-            onClick={handleOrderNow}
-            aria-label={t("order_now")}
-            className={`dark:bg-accent bg-accent dark:hover:bg-gray-100
-              hover:bg-charade-900 py-[8px] text-charade-950 hover:text-white dark:text-charade-950 text-sm font-semibold px-4 rounded-lg flex
-              items-center justify-center content-center w-full transition-colors duration-200
-              ${
-                currentProduct.Stock <= 0 ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-          >
-            {t("order_now")}
-            <PiCursorClick className="ml-2" size={30} />
-          </button>
-          <button
-            disabled={currentProduct.Stock <= 0}
-            onClick={handleAddToCart}
-            aria-label={t("add_to_cart")}
-            className={`hover:text-[#47e194] transition-colors duration-200
-              ${
-                currentProduct.Stock <= 0 ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-          >
-            <PiShoppingCartSimple size={35} />
-          </button>
+        <div className="text-base">
+          {quantity >= currentProduct.Stock && currentProduct.Stock > 0 ? (
+            <span className="text-red-500">
+              {currentProduct.Stock === "1"
+                ? `1 ${t("unit")} ${t("in_stock")}`
+                : `${currentProduct.Stock} ${t("units")} ${t("in_stock")}`}
+            </span>
+          ) : currentProduct.Stock > 0 ? (
+            <span
+              className={
+                currentProduct.Stock <= 3 ? "text-yellow-500" : "text-green-500"
+              }
+            >
+              {currentProduct.Stock <= 3 ? t("low_stock") : t("in_stock")}
+            </span>
+          ) : (
+            <span className="text-red-500">{t("out_of_stock")}</span>
+          )}
+        </div>
+
+        <div
+          ref={originalButtonRef}
+          className="flex flex-col sm:flex-row justify-between items-start md:items-center gap-4"
+        >
+          {currentProduct.Stock > 0 && (
+            <div className="flex items-center gap-4 sm:w-auto">
+              <label
+                htmlFor="quantity-input"
+                className="text-base font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap"
+              >
+                {t("quantity")}
+              </label>
+              <div className="flex items-center">
+                <button
+                  onClick={() => handleQuantityChange(quantity - 1)}
+                  aria-label={t("decrease_quantity")}
+                  className="px-3 py-1 border border-gray-300 rounded-l-lg hover:bg-gray-100 
+                    dark:border-gray-600 dark:hover:bg-gray-700"
+                  disabled={quantity <= 1}
+                >
+                  -
+                </button>
+                <input
+                  id="quantity-input"
+                  type="number"
+                  min="1"
+                  max={currentProduct.Stock}
+                  value={quantity}
+                  onChange={(e) =>
+                    handleQuantityChange(parseInt(e.target.value) || 1)
+                  }
+                  className="w-16 text-center border-y border-gray-300 py-1 
+                    dark:border-gray-600 dark:bg-charade-800"
+                  aria-label={t("quantity")}
+                />
+                <button
+                  onClick={() => handleQuantityChange(quantity + 1)}
+                  aria-label={t("increase_quantity")}
+                  className="px-3 py-1 border border-gray-300 rounded-r-lg hover:bg-gray-100 
+                    dark:border-gray-600 dark:hover:bg-gray-700"
+                  disabled={quantity >= currentProduct.Stock}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center gap-4 w-full sm:w-full">
+            <button
+              disabled={currentProduct.Stock <= 0}
+              onClick={handleOrderNow}
+              aria-label={t("order_now")}
+              className={` dark:bg-accent bg-accent dark:hover:bg-gray-100 
+                hover:bg-charade-900 py-[8px] text-charade-950 hover:text-white dark:text-charade-950 text-sm font-semibold px-4 rounded-lg flex
+                items-center justify-center content-center w-full transition-colors duration-200
+                ${
+                  currentProduct.Stock <= 0
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+            >
+              {t("order_now")}
+              <PiCursorClick className="ml-2" size={30} />
+            </button>
+            <button
+              disabled={currentProduct.Stock <= 0}
+              onClick={handleAddToCart}
+              aria-label={t("add_to_cart")}
+              className={`hover:text-[#47e194] transition-colors duration-200
+                ${
+                  currentProduct.Stock <= 0
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+            >
+              <PiShoppingCartSimple size={35} />
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Modified Sticky Order Button */}
+      <div
+        className={`fixed md:hidden bottom-[70px] md:bottom-7 left-0 w-full z-40 px-4 md:px-7 transition-all duration-300 pointer-events-none
+          ${
+            showStickyButton
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-10"
+          }`}
+      >
+        <div className="max-w-[80%]">
+          <div className="flex justify-end">
+            <div className="w-full md:w-auto pointer-events-auto">
+              <div className="rounded-lg p-4 md:p-3 flex items-center gap-4">
+                <button
+                  disabled={currentProduct.Stock <= 0}
+                  onClick={handleOrderNow}
+                  aria-label={t("order_now")}
+                  className={`dark:bg-accent bg-accent dark:hover:bg-gray-100 
+                    hover:bg-charade-900 py-2 text-charade-950 hover:text-white dark:text-charade-950 
+                    text-sm font-semibold px-4 rounded-lg flex items-center justify-center content-center 
+                    transition-colors duration-200 w-full md:w-auto
+                    ${
+                      currentProduct.Stock <= 0
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    }`}
+                >
+                  {t("order_now")}
+                  <PiCursorClick className="ml-2" size={24} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 
