@@ -15,6 +15,24 @@ import BottomBarMobile from "@/components/Footer/BottomBarMobile";
 import Cart from "@/components/Cart";
 import FastOrder from "@/components/FastOrder";
 import MessageChat from "@/components/messageChat";
+import Script from "next/script";
+import Pixels from "@/components/Pixels";
+
+async function getPixels() {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const res = await fetch(`${baseUrl}/api/pixels`, {
+      next: { revalidate: 3600 },
+    });
+
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.Pixels;
+  } catch (error) {
+    console.error("Error fetching pixels:", error);
+    return null;
+  }
+}
 
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
@@ -53,6 +71,7 @@ export default async function LocaleLayout({ children, params }) {
   }
 
   const messages = await getMessages();
+  const pixelsData = await getPixels();
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -66,6 +85,7 @@ export default async function LocaleLayout({ children, params }) {
         />
       </head>
       <body className="antialiased">
+        <Pixels pixelData={pixelsData} />
         <NextIntlClientProvider messages={messages} locale={locale}>
           <ThemeProvider
             attribute="class"

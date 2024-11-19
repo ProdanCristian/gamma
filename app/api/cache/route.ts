@@ -11,7 +11,7 @@ export async function DELETE() {
         "MATCH",
         "nextjs:*",
         "COUNT",
-        100
+        10000
       );
       cursor = nextCursor;
 

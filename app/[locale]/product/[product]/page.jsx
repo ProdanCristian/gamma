@@ -19,6 +19,8 @@ import { headers } from "next/headers";
 import YouTubeFacade from "@/components/ProductPage/YouTubeFacade";
 import Image from "next/image";
 import DeliveryEstimate from "@/components/ProductPage/DeliveryEstimate";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 
 async function getProduct(productId) {
   try {
@@ -391,11 +393,25 @@ export default async function ProductPage({ params, searchParams }) {
 
             <div className="lg:w-[50%]">
               <div className="space-y-2">
-                {productData.data.brand_name && (
-                  <div className="mb-2 text-gray-600 dark:text-gray-400 text-lg">
-                    {productData.data.brand_name}
+                <div className="flex items-center justify-between">
+                  {productData.data.brand_name && (
+                    <div className="mb-2 text-gray-600 dark:text-gray-400 text-lg">
+                      {productData.data.brand_name}
+                    </div>
+                  )}
+                  <div>
+                    {locale === "ro" && (
+                      <p className="text-gray-600 dark:text-gray-400 text-lg">
+                        Cod produs: {productData.data.id}
+                      </p>
+                    )}
+                    {locale === "ru" && (
+                      <p className="text-gray-600 dark:text-gray-400 text-lg">
+                        Код продукта: {productData.data.id}
+                      </p>
+                    )}
                   </div>
-                )}
+                </div>
                 <h1 className="dark:text-white text-charade-950 font-semibold text-4xl min-h-[48px]">
                   {locale === "ru"
                     ? productData.data.Nume_Produs_RU
@@ -405,11 +421,27 @@ export default async function ProductPage({ params, searchParams }) {
 
               <ul>
                 <li className="border-t py-8 min-h-[200px] dark:border-charade-700">
-                  <p className="text-gray-600 dark:text-gray-300 font-normal text-base">
+                  <ReactMarkdown
+                    components={{
+                      br: () => <br />,
+                      p: ({ children }) => <p className="">{children}</p>,
+                      ul: ({ children }) => (
+                        <ul className="list-disc pl-6 mb-2">{children}</ul>
+                      ),
+                      li: ({ children }) => (
+                        <li className="mb-2">{children}</li>
+                      ),
+                      u: ({ children }) => (
+                        <span className="underline">{children}</span>
+                      ),
+                    }}
+                    rehypePlugins={[rehypeRaw]}
+                  >
                     {locale === "ru"
                       ? productData.data.Descriere_Produs_RU
                       : productData.data.Descriere_Produs_RO}
-                  </p>
+                  </ReactMarkdown>
+
                   {productData.data.Bestselling && (
                     <div className="flex items-center gap-2 mt-4 text-yellow-300">
                       <AnimatedHeart />

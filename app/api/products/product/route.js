@@ -36,7 +36,9 @@ export async function GET(request) {
       );
     }
 
-    return NextResponse.json({ success: true, data: res.rows[0] });
+    const productData = res.rows[0];
+
+    return NextResponse.json({ success: true, data: productData });
   } catch (error) {
     return NextResponse.json(
       {
