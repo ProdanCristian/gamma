@@ -43,11 +43,45 @@ export default function OrderPage() {
     return null;
   });
 
-  const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
     window.scrollTo(0, 0);
-  }, []);
+
+    if (orderData && session?.user) {
+      const sendPurchaseEvent = async () => {
+        try {
+          await fetch("/api/facebook-event", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              eventName: "Purchase",
+              data: {
+                firstName: session.user.name?.split(" ")[0] || "",
+                lastName:
+                  session.user.name?.split(" ").slice(1).join(" ") || "",
+                email: session.user.email || "",
+                clientUserAgent: navigator.userAgent,
+                currency: "MDL",
+                value: orderData.total,
+                city: orderData.address?.split(",")[0] || "",
+                state: "",
+                zipCode: "2000",
+              },
+              sourceUrl: window.location.href,
+            }),
+          });
+        } catch (error) {
+          console.error("Error sending purchase event:", error);
+        }
+      };
+
+      sendPurchaseEvent();
+    }
+  }, [orderData, session]);
+
+  const [mounted, setMounted] = useState(false);
 
   if (!mounted) return null;
 

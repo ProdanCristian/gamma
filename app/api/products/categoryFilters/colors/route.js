@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { cache } from "@/lib/redis/cache";
 
 export async function GET(request) {
   try {
@@ -13,32 +14,40 @@ export async function GET(request) {
       );
     }
 
-    const query = `
-      WITH category_products AS (
-        SELECT DISTINCT p.id, p."nc_pka4___Culori_id"
-        FROM "nc_pka4__Produse" p
-        JOIN "nc_pka4___SubSubCategorii" ssc ON p."nc_pka4___SubSubCategorii_id" = ssc.id
-        JOIN "nc_pka4___SubCategorii" sc ON ssc."nc_pka4___SubCategorii_id" = sc.id
-        JOIN "nc_pka4___Categorii" c ON sc."nc_pka4___Categorii_id" = c.id
-        WHERE c.id = $1 AND p."nc_pka4___Culori_id" IS NOT NULL
-      )
-      SELECT 
-        c.id,
-        c."Culoare_RO_",
-        c."Culoare_RU_",
-        c."Cod_Culoare"
-      FROM public."nc_pka4___Culori" c
-      INNER JOIN category_products cp ON c.id = cp."nc_pka4___Culori_id"
-      WHERE c."Cod_Culoare" IS NOT NULL
-      GROUP BY c.id, c."Culoare_RO_", c."Culoare_RU_", c."Cod_Culoare"
-      ORDER BY c.id;
-    `;
+    const cacheKey = `category_colors:${categoryId}`;
+    let colors = await cache.get(cacheKey);
 
-    const result = await db.query(query, [categoryId]);
+    if (!colors) {
+      const query = `
+        WITH category_products AS (
+          SELECT DISTINCT p.id, p."nc_pka4___Culori_id"
+          FROM "nc_pka4__Produse" p
+          JOIN "nc_pka4___SubSubCategorii" ssc ON p."nc_pka4___SubSubCategorii_id" = ssc.id
+          JOIN "nc_pka4___SubCategorii" sc ON ssc."nc_pka4___SubCategorii_id" = sc.id
+          JOIN "nc_pka4___Categorii" c ON sc."nc_pka4___Categorii_id" = c.id
+          WHERE c.id = $1 AND p."nc_pka4___Culori_id" IS NOT NULL
+        )
+        SELECT 
+          c.id,
+          c."Culoare_RO_",
+          c."Culoare_RU_",
+          c."Cod_Culoare"
+        FROM public."nc_pka4___Culori" c
+        INNER JOIN category_products cp ON c.id = cp."nc_pka4___Culori_id"
+        WHERE c."Cod_Culoare" IS NOT NULL
+        GROUP BY c.id, c."Culoare_RO_", c."Culoare_RU_", c."Cod_Culoare"
+        ORDER BY c.id;
+      `;
+
+      const result = await db.query(query, [categoryId]);
+      colors = result.rows;
+
+      await cache.set(cacheKey, colors, 3600);
+    }
 
     return NextResponse.json({
       success: true,
-      colors: result.rows,
+      colors,
     });
   } catch (error) {
     console.error("API Error:", error);

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { cache } from "@/lib/redis/cache";
 
 export async function GET(request) {
   try {
@@ -16,17 +17,41 @@ export async function GET(request) {
       );
     }
 
-    const query = `
-      SELECT *
-      FROM public."nc_pka4__Produse"
-      WHERE "nc_pka4___SubSubCategorii_id" = $1
-      ORDER BY RANDOM()
-      LIMIT 8;
-    `;
+    const cacheKey = `similar_products:${id}`;
+    let products = await cache.get(cacheKey);
 
-    const { rows } = await db.query(query, [id]);
+    if (!products) {
+      const { rows } = await db.query(
+        `SELECT *
+        FROM public."nc_pka4__Produse"
+        WHERE "nc_pka4___SubSubCategorii_id" = $1
+        ORDER BY RANDOM()
+        LIMIT 8`,
+        [id]
+      );
 
-    if (rows.length === 0) {
+      products = rows;
+      await cache.set(cacheKey, products, 3600);
+    }
+
+    if (products?.length) {
+      const productIds = products.map((p) => p.id);
+      const { rows: stockData } = await db.query(
+        `SELECT id, "Stock" FROM public."nc_pka4__Produse"
+         WHERE id = ANY($1)`,
+        [productIds]
+      );
+
+      products = products.map((product) => {
+        const currentStock = stockData.find((s) => s.id === product.id);
+        return {
+          ...product,
+          Stock: currentStock?.Stock,
+        };
+      });
+    }
+
+    if (products.length === 0) {
       return NextResponse.json(
         {
           success: false,
@@ -36,7 +61,7 @@ export async function GET(request) {
       );
     }
 
-    return NextResponse.json({ success: true, data: rows });
+    return NextResponse.json({ success: true, data: products });
   } catch (error) {
     return NextResponse.json(
       {

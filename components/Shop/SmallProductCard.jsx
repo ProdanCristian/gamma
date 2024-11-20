@@ -99,6 +99,25 @@ const SmallProductCard = ({ product, loading = false }) => {
     };
 
     addItem(item);
+
+    // Send AddToCart event
+    try {
+      fetch("/api/facebook-event", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          eventName: "AddToCart",
+          data: {
+            clientUserAgent: navigator.userAgent,
+          },
+          sourceUrl: window.location.href,
+        }),
+      });
+    } catch (error) {
+      console.error("Error sending add to cart event:", error);
+    }
   };
 
   const buyNow = (e) => {
@@ -114,6 +133,20 @@ const SmallProductCard = ({ product, loading = false }) => {
       discount: product.Pret_Redus,
       stock: product.Stock,
     });
+
+    try {
+      fetch("/api/facebook-event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventName: "Contact",
+          data: { clientUserAgent: navigator.userAgent },
+          sourceUrl: window.location.href,
+        }),
+      });
+    } catch (error) {
+      console.error("Error sending contact event:", error);
+    }
   };
 
   const toggleWishlist = (e) => {
@@ -134,8 +167,34 @@ const SmallProductCard = ({ product, loading = false }) => {
 
     if (isInWishlist(productData.id)) {
       removeFromWishlist(productData.id);
+      try {
+        fetch("/api/facebook-event", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            eventName: "RemoveFromWishlist",
+            data: { clientUserAgent: navigator.userAgent },
+            sourceUrl: window.location.href,
+          }),
+        });
+      } catch (error) {
+        console.error("Error sending remove from wishlist event:", error);
+      }
     } else {
       addToWishlist(wishlistProduct);
+      try {
+        fetch("/api/facebook-event", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            eventName: "AddToWishlist",
+            data: { clientUserAgent: navigator.userAgent },
+            sourceUrl: window.location.href,
+          }),
+        });
+      } catch (error) {
+        console.error("Error sending add to wishlist event:", error);
+      }
     }
   };
 

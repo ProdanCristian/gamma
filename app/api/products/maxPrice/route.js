@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { cache } from "@/lib/redis/cache";
 
 export async function GET(request) {
   try {
@@ -12,13 +13,25 @@ export async function GET(request) {
     const subCategoryId = url.searchParams.get("subCategoryId");
     const subSubCategoryId = url.searchParams.get("subSubCategoryId");
 
-    // Start with basic conditions
+    const cacheKey = `max_price:${showBestsellers}:${showDiscounted}:${
+      colorId || ""
+    }:${brandId || ""}:${categoryId || ""}:${subCategoryId || ""}:${
+      subSubCategoryId || ""
+    }:${new URLSearchParams(url.searchParams).toString()}`;
+
+    let maxPrice = await cache.get(cacheKey);
+    if (maxPrice !== null) {
+      return NextResponse.json({
+        success: true,
+        maxPrice,
+      });
+    }
+
     let conditions = [];
     const params = [];
 
     conditions.push(`"Nume_Produs_RO" IS NOT NULL`);
 
-    // Add category filter
     if (categoryId) {
       conditions.push(`
         EXISTS (
@@ -33,7 +46,6 @@ export async function GET(request) {
       params.push(categoryId);
     }
 
-    // Add subcategory filter
     if (subCategoryId) {
       conditions.push(`
         EXISTS (
@@ -47,7 +59,6 @@ export async function GET(request) {
       params.push(subCategoryId);
     }
 
-    // Add subsubcategory filter
     if (subSubCategoryId) {
       conditions.push(`"nc_pka4___SubSubCategorii_id" = $${params.length + 1}`);
       params.push(subSubCategoryId);
@@ -64,7 +75,6 @@ export async function GET(request) {
       `);
     }
 
-    // Parse attribute filters from URL
     const attributeFilters = {};
     for (const [key, value] of url.searchParams.entries()) {
       if (key.startsWith("attr_") && value !== "all") {
@@ -73,7 +83,6 @@ export async function GET(request) {
       }
     }
 
-    // Add attribute filters
     Object.entries(attributeFilters).forEach(([attrId, value]) => {
       if (value !== "all") {
         conditions.push(`
@@ -84,19 +93,16 @@ export async function GET(request) {
       }
     });
 
-    // Add color filter
     if (colorId) {
       conditions.push(`"nc_pka4___Culori_id" = $${params.length + 1}`);
       params.push(parseInt(colorId));
     }
 
-    // Add brand filter
     if (brandId) {
       conditions.push(`"nc_pka4___Branduri_id" = $${params.length + 1}`);
       params.push(parseInt(brandId));
     }
 
-    // Combine conditions
     const whereClause =
       conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
@@ -107,7 +113,9 @@ export async function GET(request) {
     `;
 
     const result = await db.query(query, params);
-    const maxPrice = parseInt(result.rows[0].max_price) || 50000;
+    maxPrice = parseInt(result.rows[0].max_price) || 50000;
+
+    await cache.set(cacheKey, maxPrice, 3600);
 
     return NextResponse.json({
       success: true,

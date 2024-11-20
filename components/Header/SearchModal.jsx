@@ -218,6 +218,32 @@ const SearchModal = ({ isOpen, onClose }) => {
     setActiveVideo(videoUrl);
   };
 
+  // Update the search term handler to include event tracking
+  const handleSearchInput = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    // Fire search event when user starts typing
+    if (value.trim()) {
+      try {
+        fetch("/api/facebook-event", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            eventName: "Search",
+            data: {
+              clientUserAgent: navigator.userAgent,
+              searchTerm: value.trim(),
+            },
+            sourceUrl: window.location.href,
+          }),
+        });
+      } catch (error) {
+        console.error("Error sending search event:", error);
+      }
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -237,7 +263,7 @@ const SearchModal = ({ isOpen, onClose }) => {
               type="text"
               placeholder={t("searchPlaceholder")}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchInput}
               className="flex-grow bg-transparent outline-none text-primary dark:text-white text-base md:text-xl placeholder-primary/50 dark:placeholder-white/50"
               autoFocus
             />

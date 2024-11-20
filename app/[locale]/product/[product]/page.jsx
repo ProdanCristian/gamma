@@ -399,16 +399,12 @@ export default async function ProductPage({ params, searchParams }) {
                       {productData.data.brand_name}
                     </div>
                   )}
-                  <div>
+                  <div className="mb-2 text-gray-600 dark:text-gray-400 text-lg">
                     {locale === "ro" && (
-                      <p className="text-gray-600 dark:text-gray-400 text-lg">
-                        Cod produs: {productData.data.id}
-                      </p>
+                      <p>Cod produs: {productData.data.id}</p>
                     )}
                     {locale === "ru" && (
-                      <p className="text-gray-600 dark:text-gray-400 text-lg">
-                        Код продукта: {productData.data.id}
-                      </p>
+                      <p>Код продукта: {productData.data.id}</p>
                     )}
                   </div>
                 </div>

@@ -63,6 +63,28 @@ const CheckoutPage = () => {
     if (mounted) {
       setMounted(true);
       window.scrollTo(0, 0);
+
+      const sendInitiateCheckoutEvent = async () => {
+        try {
+          await fetch("/api/facebook-event", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              eventName: "InitiateCheckout",
+              data: {
+                clientUserAgent: navigator.userAgent,
+              },
+              sourceUrl: window.location.href,
+            }),
+          });
+        } catch (error) {
+          console.error("Error sending initiate checkout event:", error);
+        }
+      };
+
+      sendInitiateCheckoutEvent();
     }
     return () => {
       mounted = false;

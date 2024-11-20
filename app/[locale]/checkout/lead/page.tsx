@@ -42,10 +42,42 @@ export default function LeadOrderPage() {
   });
 
   const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
     setMounted(true);
     window.scrollTo(0, 0);
-  }, []);
+
+    if (orderData) {
+      const sendCompleteRegistrationEvent = async () => {
+        try {
+          const customerData = JSON.parse(
+            localStorage.getItem("customerData") || "{}"
+          );
+
+          await fetch("/api/facebook-event", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              eventName: "CompleteRegistration",
+              data: {
+                firstName: customerData.firstName || "",
+                lastName: customerData.lastName || "",
+                phone: customerData.phone || "",
+                clientUserAgent: navigator.userAgent,
+              },
+              sourceUrl: window.location.href,
+            }),
+          });
+        } catch (error) {
+          console.error("Error sending complete registration event:", error);
+        }
+      };
+
+      sendCompleteRegistrationEvent();
+    }
+  }, [orderData]);
 
   if (!mounted) return null;
 
