@@ -36,7 +36,7 @@ export async function GET(request) {
         LEFT JOIN public."nc_pka4__Atribute" a ON p."nc_pka4__Atribute_id" = a.id
         LEFT JOIN public."nc_pka4___Culori" c ON p."nc_pka4___Culori_id" = c.id
         LEFT JOIN public."nc_pka4___Variante" v ON p."nc_pka4___Variante_id" = v.id
-        WHERE p."nc_pka4___Variante_id" = $1
+        WHERE p."nc_pka4___Variante_id" = $1 AND p."Disponibil" = true
       `;
 
       const queryParams = [id];

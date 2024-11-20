@@ -47,9 +47,40 @@ export default function OrderPage() {
     setMounted(true);
     window.scrollTo(0, 0);
 
-    if (orderData && session?.user) {
+    if (orderData) {
       const sendPurchaseEvent = async () => {
         try {
+          let phoneNumber = "";
+          let firstName = "";
+          let lastName = "";
+
+          if (session?.user) {
+            // For logged-in users, fetch phone from profile
+            try {
+              const response = await fetch("/api/auth/profile");
+              if (response.ok) {
+                const data = await response.json();
+                phoneNumber = data.user.Numar_Telefon || "";
+                firstName =
+                  data.user.Prenume || session.user.name?.split(" ")[0] || "";
+                lastName =
+                  data.user.Nume ||
+                  session.user.name?.split(" ").slice(1).join(" ") ||
+                  "";
+              }
+            } catch (error) {
+              console.error("Error fetching user profile:", error);
+            }
+          } else {
+            // For non-logged-in users, get data from localStorage
+            const customerData = JSON.parse(
+              localStorage.getItem("customerData") || "{}"
+            );
+            phoneNumber = customerData.phone || "";
+            firstName = customerData.firstName || "";
+            lastName = customerData.lastName || "";
+          }
+
           await fetch("/api/facebook-event", {
             method: "POST",
             headers: {
@@ -58,10 +89,10 @@ export default function OrderPage() {
             body: JSON.stringify({
               eventName: "Purchase",
               data: {
-                firstName: session.user.name?.split(" ")[0] || "",
-                lastName:
-                  session.user.name?.split(" ").slice(1).join(" ") || "",
-                email: session.user.email || "",
+                firstName,
+                lastName,
+                phone: phoneNumber,
+                email: session?.user?.email || "",
                 clientUserAgent: navigator.userAgent,
                 currency: "MDL",
                 value: orderData.total,

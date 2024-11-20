@@ -133,20 +133,6 @@ const SmallProductCard = ({ product, loading = false }) => {
       discount: product.Pret_Redus,
       stock: product.Stock,
     });
-
-    try {
-      fetch("/api/facebook-event", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          eventName: "Contact",
-          data: { clientUserAgent: navigator.userAgent },
-          sourceUrl: window.location.href,
-        }),
-      });
-    } catch (error) {
-      console.error("Error sending contact event:", error);
-    }
   };
 
   const toggleWishlist = (e) => {
@@ -227,14 +213,14 @@ const SmallProductCard = ({ product, loading = false }) => {
         href={`/${locale}/product/${productData.slug}_${productData.id}`}
         className="block"
       >
-        <div className="relative h-24 sm:h-32 flex items-center justify-center">
+        <div className="relative h-24 sm:h-32 flex items-center justify-center ">
           {isFiftyPercentOff && (
             <div className="absolute top-[-10px] right-[-10px] bg-red-500 text-white px-1.5 py-0.5 rounded-bl-lg text-[10px] font-bold z-[6] group-hover:z-0">
               {t("fifty_percent_off")}
             </div>
           )}
           {productData.image ? (
-            <div className="relative w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] group-hover:drop-shadow-[0_0_8px_rgba(71,225,148,0.5)] transition-all duration-300">
+            <div className="relative w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] group-hover:drop-shadow-[0_0_8px_rgba(71,225,148,0.5)] transition-all duration-300 content-center justify-center items-center justify-items-center">
               <Image
                 alt={productData.name}
                 src={productData.image}

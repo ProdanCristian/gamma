@@ -47,6 +47,8 @@ export async function GET(request) {
     let conditions = [`c.id = $1`];
     const params = [categoryId];
 
+    conditions.push(`p."Disponibil" = true`);
+
     if (minPrice !== null && minPrice !== undefined) {
       conditions.push(
         `CAST(p."Pret_Standard" AS NUMERIC) >= $${params.length + 1}`
@@ -108,7 +110,8 @@ export async function GET(request) {
         SELECT DISTINCT
           p.id, p."Nume_Produs_RO", p."Nume_Produs_RU", p."Descriere_Produs_RO",
           p."Descriere_Produs_RU", p."Pret_Standard", p."Pret_Redus",
-          p."Imagine_Principala", p."imagini_Secundare", p."Bestselling", p."Stock"
+          p."Imagine_Principala", p."imagini_Secundare", p."Bestselling", p."Stock",
+          p."Disponibil"
         FROM "nc_pka4__Produse" p
         JOIN "nc_pka4___SubSubCategorii" ssc ON p."nc_pka4___SubSubCategorii_id" = ssc.id
         JOIN "nc_pka4___SubCategorii" sc ON ssc."nc_pka4___SubCategorii_id" = sc.id

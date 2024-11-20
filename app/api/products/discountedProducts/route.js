@@ -14,7 +14,8 @@ export async function GET(request) {
     if (!products) {
       const { rows } = await db.query(
         `SELECT * FROM public."nc_pka4__Produse"
-          WHERE "Pret_Standard" > "Pret_Redus"
+          WHERE "Pret_Standard" > "Pret_Redus" 
+          AND "Disponibil" = true
           LIMIT $1`,
         [limit]
       );

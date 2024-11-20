@@ -14,13 +14,13 @@ export async function GET(request) {
     if (!products) {
       const { rows } = await db.query(
         `SELECT * FROM public."nc_pka4__Produse"
-          WHERE "Bestselling" = true
+          WHERE "Bestselling" = true AND "Disponibil" = true
           LIMIT $1`,
         [limit]
       );
 
       products = rows;
-      await cache.set(cacheKey, products, 3600); // Cache for 1 hour
+      await cache.set(cacheKey, products, 3600);
     }
 
     if (products?.length) {

@@ -48,34 +48,62 @@ export default function LeadOrderPage() {
     window.scrollTo(0, 0);
 
     if (orderData) {
-      const sendCompleteRegistrationEvent = async () => {
+      const sendContactEvent = async () => {
         try {
           const customerData = JSON.parse(
             localStorage.getItem("customerData") || "{}"
           );
 
-          await fetch("/api/facebook-event", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              eventName: "CompleteRegistration",
+          if (
+            customerData.firstName &&
+            customerData.lastName &&
+            customerData.phone &&
+            customerData.firstName.trim() !== "" &&
+            customerData.lastName.trim() !== "" &&
+            customerData.phone.toString() !== ""
+          ) {
+            const eventData = {
+              eventName: "Contact",
               data: {
-                firstName: customerData.firstName || "",
-                lastName: customerData.lastName || "",
-                phone: customerData.phone || "",
+                firstName: customerData.firstName.trim(),
+                lastName: customerData.lastName.trim(),
+                phone: customerData.phone.toString(),
                 clientUserAgent: navigator.userAgent,
               },
               sourceUrl: window.location.href,
-            }),
-          });
+            };
+
+            const response = await fetch("/api/facebook-event", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(eventData),
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json();
+              console.error("Server response error:", errorData);
+              throw new Error(
+                `Server responded with ${response.status}: ${JSON.stringify(
+                  errorData
+                )}`
+              );
+            }
+
+            localStorage.removeItem("customerData");
+          } else {
+            console.warn(
+              "Missing or empty required customer data for Contact event",
+              customerData
+            );
+          }
         } catch (error) {
-          console.error("Error sending complete registration event:", error);
+          console.error("Error sending contact event:", error);
         }
       };
 
-      sendCompleteRegistrationEvent();
+      sendContactEvent();
     }
   }, [orderData]);
 

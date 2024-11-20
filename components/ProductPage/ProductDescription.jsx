@@ -147,20 +147,6 @@ const ProductDescription = ({
       stock: currentProduct.Stock,
       quantity: quantity,
     });
-
-    try {
-      fetch("/api/facebook-event", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          eventName: "Contact",
-          data: { clientUserAgent: navigator.userAgent },
-          sourceUrl: window.location.href,
-        }),
-      });
-    } catch (error) {
-      console.error("Error sending contact event:", error);
-    }
   };
 
   const addItem = useCartStore((state) => state.addItem);

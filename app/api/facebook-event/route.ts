@@ -1,16 +1,16 @@
 import { fbEvents } from "@/lib/utils/facebook";
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest } from "next/server";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
-
+export async function POST(req: NextRequest) {
   try {
-    const { eventName, data, sourceUrl } = req.body;
+    const body = await req.json();
+    const { eventName, data, sourceUrl } = body;
+
+    console.log("Received event request:", {
+      eventName,
+      data,
+      sourceUrl,
+    });
 
     switch (eventName) {
       case "Search":
@@ -18,10 +18,35 @@ export default async function handler(
         break;
 
       case "Contact":
-        await fbEvents.contact(data.clientUserAgent, sourceUrl);
+        if (
+          !data.clientUserAgent ||
+          !sourceUrl ||
+          !data.firstName ||
+          !data.lastName ||
+          !data.phone
+        ) {
+          console.error("Contact event validation failed:", {
+            data,
+            sourceUrl,
+          });
+          throw new Error("Missing required parameters for Contact event");
+        }
+        await fbEvents.contact(
+          {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            phone: data.phone,
+            clientUserAgent: data.clientUserAgent,
+          },
+          sourceUrl
+        );
         break;
 
       case "Purchase":
+        if (!data.currency || !data.value) {
+          console.error("Purchase event validation failed:", data);
+          throw new Error("Missing required parameters for Purchase event");
+        }
         await fbEvents.purchase(
           {
             firstName: data.firstName,
@@ -39,18 +64,6 @@ export default async function handler(
         );
         break;
 
-      case "CompleteRegistration":
-        await fbEvents.completeRegistration(
-          {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            phone: data.phone,
-            clientUserAgent: data.clientUserAgent,
-          },
-          sourceUrl
-        );
-        break;
-
       case "InitiateCheckout":
         await fbEvents.initiateCheckout(data.clientUserAgent, sourceUrl);
         break;
@@ -63,24 +76,28 @@ export default async function handler(
         await fbEvents.addToCart(data.clientUserAgent, sourceUrl);
         break;
 
-      case "PageView":
-        await fbEvents.pageView(
-          {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            clientUserAgent: data.clientUserAgent,
-          },
-          sourceUrl
-        );
-        break;
-
       default:
-        return res.status(400).json({ error: "Invalid event name" });
+        return new Response(JSON.stringify({ error: "Invalid event name" }), {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        });
     }
 
-    res.status(200).json({ success: true });
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
     console.error("Facebook event error:", error);
-    res.status(500).json({ error: "Error processing event" });
+    return new Response(
+      JSON.stringify({
+        error: "Error processing event",
+        details: error instanceof Error ? error.message : "Unknown error",
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 }

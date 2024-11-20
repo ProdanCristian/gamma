@@ -18,7 +18,7 @@ export default function ImageCarousel({ sliders }) {
         <CarouselContent>
           {sliders.map((item, index) => (
             <CarouselItem key={index}>
-              <div className="relative w-full h-[200px] md:h-[350px] lg:h-[515px]">
+              <div className="relative w-full max-h-[200px] md:max-h-[350px] lg:max-h-[515px] aspect-square">
                 <Image
                   src={item}
                   fill

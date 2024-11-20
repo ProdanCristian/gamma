@@ -316,6 +316,11 @@ export default async function ProductPage({ params, searchParams }) {
       />
 
       <main className="my-6 min-h-screen max-w-[1250px] w-[90vw] mx-auto">
+        <h1 className="md:hidden block mb4 dark:text-white text-charade-950 font-semibold text-4xl min-h-[48px]">
+          {locale === "ru"
+            ? productData.data.Nume_Produs_RU
+            : productData.data.Nume_Produs_RO}
+        </h1>
         <nav
           aria-label="Breadcrumb"
           className="mb-4"
@@ -393,13 +398,13 @@ export default async function ProductPage({ params, searchParams }) {
 
             <div className="lg:w-[50%]">
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
+                <div className="mb-2 flex items-center justify-between">
                   {productData.data.brand_name && (
-                    <div className="mb-2 text-gray-600 dark:text-gray-400 text-lg">
+                    <div className=" text-gray-600 dark:text-gray-400 text-lg">
                       {productData.data.brand_name}
                     </div>
                   )}
-                  <div className="mb-2 text-gray-600 dark:text-gray-400 text-lg">
+                  <div className=" text-gray-600 dark:text-gray-400 text-lg">
                     {locale === "ro" && (
                       <p>Cod produs: {productData.data.id}</p>
                     )}
@@ -408,7 +413,7 @@ export default async function ProductPage({ params, searchParams }) {
                     )}
                   </div>
                 </div>
-                <h1 className="dark:text-white text-charade-950 font-semibold text-4xl min-h-[48px]">
+                <h1 className="md:flex hidden dark:text-white text-charade-950 font-semibold text-4xl min-h-[48px]">
                   {locale === "ru"
                     ? productData.data.Nume_Produs_RU
                     : productData.data.Nume_Produs_RO}
@@ -416,7 +421,7 @@ export default async function ProductPage({ params, searchParams }) {
               </div>
 
               <ul>
-                <li className="border-t py-8 min-h-[200px] dark:border-charade-700">
+                <li className="border-t mt-4 py-8 min-h-[200px] dark:border-charade-700">
                   <ReactMarkdown
                     components={{
                       br: () => <br />,

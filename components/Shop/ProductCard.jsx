@@ -104,7 +104,6 @@ const ProductCard = ({ product, loading = false }) => {
 
     addItem(item);
 
-    // Send AddToCart event
     try {
       fetch("/api/facebook-event", {
         method: "POST",
@@ -137,20 +136,6 @@ const ProductCard = ({ product, loading = false }) => {
       discount: product.Pret_Redus,
       stock: product.Stock,
     });
-
-    try {
-      fetch("/api/facebook-event", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          eventName: "Contact",
-          data: { clientUserAgent: navigator.userAgent },
-          sourceUrl: window.location.href,
-        }),
-      });
-    } catch (error) {
-      console.error("Error sending contact event:", error);
-    }
   };
 
   const handleNavigation = (e) => {
@@ -257,18 +242,18 @@ const ProductCard = ({ product, loading = false }) => {
             </div>
           )}
           {productData.image ? (
-            <div className="relative w-[160px] h-[160px] group-hover:drop-shadow-[0_0_8px_rgba(71,225,148,0.5)] transition-all duration-300">
+            <div className="relative w-[160px] h-[160px] mx-auto group-hover:drop-shadow-[0_0_8px_rgba(71,225,148,0.5)] transition-all duration-300 content-center items-center justify-items-center justify-center">
               <Image
                 alt={productData.name}
                 src={productData.image}
-                className="max-w-full max-h-[160px] w-auto h-auto object-contain group-hover:opacity-90 transition-opacity duration-200"
+                className="items-center justify-center max-w-full max-h-[160px] w-auto h-auto object-contain group-hover:opacity-90 transition-opacity duration-200"
                 width={160}
                 height={160}
                 loading="lazy"
               />
             </div>
           ) : (
-            <div className="w-20 h-auto" />
+            <div className="w-20 h-auto mx-auto" />
           )}
         </div>
         <PiHeartFill

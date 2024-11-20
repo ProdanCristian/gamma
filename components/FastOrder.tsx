@@ -181,11 +181,21 @@ export default function FastOrder() {
 
     setIsSubmitting(true);
 
+    // Split name into first and last name
+    const nameParts = name.trim().split(/\s+/);
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(" ");
+
+    // Save customer data to localStorage
+    const customerData = {
+      firstName,
+      lastName: lastName || firstName, // If no last name, use first name as last name
+      phone: stripPhonePrefix(phone).toString(), // Ensure phone is stored as string
+    };
+    localStorage.setItem("customerData", JSON.stringify(customerData));
+
     if (session?.user) {
       try {
-        const [firstName, ...restName] = name.trim().split(" ");
-        const lastName = restName.join(" ");
-
         const response = await fetch("/api/auth/update-profile", {
           method: "PUT",
           headers: {
@@ -202,13 +212,6 @@ export default function FastOrder() {
 
         if (!response.ok) {
           console.error("Failed to update profile");
-        } else {
-          setUserProfile((prev) => ({
-            ...prev!,
-            Nume: lastName || firstName,
-            Prenume: lastName ? firstName : "",
-            Numar_Telefon: stripPhonePrefix(phone).toString(),
-          }));
         }
       } catch (error) {
         console.error("Error updating profile:", error);

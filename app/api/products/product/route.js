@@ -26,7 +26,7 @@ export async function GET(request) {
         FROM public."nc_pka4__Produse" p
         LEFT JOIN public."nc_pka4___Branduri" b 
         ON p."nc_pka4___Branduri_id" = b.id
-        WHERE p.id = $1`,
+        WHERE p.id = $1 AND p."Disponibil" = true`,
         [id]
       );
 

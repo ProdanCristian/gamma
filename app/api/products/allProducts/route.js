@@ -40,6 +40,7 @@ export async function GET(request) {
     const params = [];
 
     conditions.push(`"Nume_Produs_RO" IS NOT NULL`);
+    conditions.push(`"Disponibil" = true`);
 
     if (minPrice !== null && minPrice !== undefined) {
       conditions.push(
@@ -104,7 +105,7 @@ export async function GET(request) {
       "Imagine_Principala", "imagini_Secundare", "Bestselling", "Stock",
       "Valoare_Atribut", "Video", "nc_pka4___Branduri_id",
       "nc_pka4___SubSubCategorii_id", "nc_pka4___Variante_id",
-      "nc_pka4__Atribute_id", "nc_pka4___Culori_id"
+      "nc_pka4__Atribute_id", "nc_pka4___Culori_id", "Disponibil"
     `;
 
     const [productsResult, countResult] = await Promise.all([

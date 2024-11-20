@@ -25,6 +25,7 @@ export async function GET(request) {
         `SELECT *
         FROM public."nc_pka4__Produse"
         WHERE "nc_pka4___SubSubCategorii_id" = $1
+        AND "Disponibil" = true
         ORDER BY RANDOM()
         LIMIT 8`,
         [id]

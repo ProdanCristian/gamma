@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -53,11 +54,9 @@ const FilterSidebar = ({
     setSelectedColor(null);
     setSelectedBrand(null);
 
-    // Only clear query parameters while keeping the current path
     const currentPath = window.location.pathname;
     window.history.replaceState({}, "", currentPath);
 
-    // Force a re-fetch of the data
     router.refresh();
   };
 
@@ -81,6 +80,16 @@ const FilterSidebar = ({
     setSelectedBrand(value === "all" ? null : value);
   };
 
+  const handleMinPriceChange = (e) => {
+    const value = parseInt(e.target.value) || 0;
+    setPriceRange([Math.min(value, priceRange[1]), priceRange[1]]);
+  };
+
+  const handleMaxPriceChange = (e) => {
+    const value = parseInt(e.target.value) || 0;
+    setPriceRange([priceRange[0], Math.max(value, priceRange[0])]);
+  };
+
   return (
     <div className="h-full md:h-screen p-6 border-0 lg:border lg:border-gray-200 dark:border-charade-700 lg:rounded-xl flex flex-col w-full lg:w-[280px]">
       <div className="flex items-center justify-center md:justify-between mb-4">
@@ -99,7 +108,6 @@ const FilterSidebar = ({
       </div>
 
       <div className="space-y-6 overflow-y-auto p-2">
-        {/* Discounted Products Filter */}
         {!hideDiscountFilter && (
           <div className="flex items-center space-x-2">
             <Switch
@@ -113,7 +121,6 @@ const FilterSidebar = ({
           </div>
         )}
 
-        {/* Bestsellers Filter */}
         {!hideBestsellerFilter && (
           <div className="flex items-center space-x-2">
             <Switch
@@ -125,7 +132,6 @@ const FilterSidebar = ({
           </div>
         )}
 
-        {/* Price Range Filter */}
         <div className="space-y-2">
           <Label>{t("Price Range")}</Label>
           {isLoading ? (
@@ -147,14 +153,27 @@ const FilterSidebar = ({
                 onValueChange={setPriceRange}
                 className="w-full"
               />
-              <div className="flex justify-between text-sm">
-                <span>{formatPrice(priceRange[0])}</span>
-                <span>{formatPrice(priceRange[1])}</span>
+              <div className="flex justify-between gap-2">
+                <Input
+                  type="number"
+                  value={priceRange[0]}
+                  onChange={handleMinPriceChange}
+                  min={0}
+                  max={priceRange[1]}
+                  className="w-full"
+                />
+                <Input
+                  type="number"
+                  value={priceRange[1]}
+                  onChange={handleMaxPriceChange}
+                  min={priceRange[0]}
+                  max={maxPrice}
+                  className="w-full"
+                />
               </div>
             </>
           )}
         </div>
-        {/* Updated Color Filters */}
         {isLoading ? (
           <div className="space-y-2">
             <Skeleton className="w-16 h-4" />
@@ -209,7 +228,6 @@ const FilterSidebar = ({
           )
         )}
 
-        {/* Updated Brand Filter */}
         {isLoading ? (
           <div className="space-y-2">
             <Skeleton className="w-16 h-4" />
@@ -240,7 +258,6 @@ const FilterSidebar = ({
           )
         )}
 
-        {/* Updated Attribute Filters */}
         {isLoading
           ? Array(3)
               .fill(0)
