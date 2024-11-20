@@ -3,7 +3,7 @@ import db from "@/lib/db";
 import { cache } from "@/lib/redis/cache";
 
 const CACHE_KEY = "marketing:design:data";
-const CACHE_TTL = 3600; // 1 hour
+const CACHE_TTL = 86400; // 1 day
 
 export async function GET() {
   const NEXT_PUBLIC_MEDIA_URL = process.env.NEXT_PUBLIC_MEDIA_URL;

@@ -67,7 +67,7 @@ export async function GET(request) {
       }
 
       products = rows;
-      await cache.set(cacheKey, products, 3600);
+      await cache.set(cacheKey, products, 86400);
     }
 
     if (products?.length) {

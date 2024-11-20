@@ -15,46 +15,63 @@ export async function GET(request) {
   }
 
   try {
-    // Try to get from cache first
     const CACHE_KEY = `subcategories:category:${categoryId}`;
     const cachedData = await cache.get(CACHE_KEY);
     if (cachedData) {
       return NextResponse.json({ success: true, data: cachedData });
     }
 
-    const subcategoriesQuery = `
-      SELECT id, "Nume_SubCategorie_RO", "Nume__SubCategorie_RU", "nc_pka4___Categorii_id", "Images"
-      FROM public."nc_pka4___SubCategorii"
-      WHERE "nc_pka4___Categorii_id" = $1
-      ORDER BY id ASC;
+    const query = `
+      WITH subcategories AS (
+        SELECT 
+          id,
+          "Nume_SubCategorie_RO",
+          "Nume__SubCategorie_RU",
+          "Images"
+        FROM public."nc_pka4___SubCategorii"
+        WHERE "nc_pka4___Categorii_id" = $1
+      ),
+      subsubcategories AS (
+        SELECT 
+          id,
+          "Nume_SubSubCategorie_RO",
+          "Nume_SubSubCategorie_RU",
+          "nc_pka4___SubCategorii_id"
+        FROM public."nc_pka4___SubSubCategorii"
+        WHERE "nc_pka4___SubCategorii_id" IN (SELECT id FROM subcategories)
+      )
+      SELECT 
+        json_build_object(
+          'id', s.id,
+          'subcategory_name_ro', s."Nume_SubCategorie_RO",
+          'subcategory_name_ru', s."Nume__SubCategorie_RU",
+          'images', s."Images",
+          'subSubcategories', COALESCE(
+            json_agg(
+              json_build_object(
+                'id', ss.id,
+                'subsub_name_ro', ss."Nume_SubSubCategorie_RO",
+                'subsub_name_ru', ss."Nume_SubSubCategorie_RU"
+              )
+            ) FILTER (WHERE ss.id IS NOT NULL),
+            '[]'::json
+          )
+        ) as data
+      FROM subcategories s
+      LEFT JOIN subsubcategories ss ON ss."nc_pka4___SubCategorii_id" = s.id
+      GROUP BY s.id, s."Nume_SubCategorie_RO", s."Nume__SubCategorie_RU", s."Images"
+      ORDER BY s.id ASC;
     `;
 
-    const subcategoriesRes = await db.query(subcategoriesQuery, [categoryId]);
-    const subcategories = subcategoriesRes.rows;
+    const result = await db.query(query, [categoryId]);
 
-    const subcategoryIds = subcategories.map((sub) => sub.id);
-
-    const subSubcategoriesQuery = `
-      SELECT id, "Nume_SubSubCategorie_RO", "Nume_SubSubCategorie_RU", "nc_pka4___SubCategorii_id"
-      FROM public."nc_pka4___SubSubCategorii"
-      WHERE "nc_pka4___SubCategorii_id" = ANY($1::int[])
-      ORDER BY id ASC;
-    `;
-
-    const subSubcategoriesRes = await db.query(subSubcategoriesQuery, [
-      subcategoryIds,
-    ]);
-    const subSubcategories = subSubcategoriesRes.rows;
-
-    const formattedData = subcategories.map((subcategory) => {
-      const filteredSubSubcategories = subSubcategories.filter(
-        (subSub) => subSub.nc_pka4___SubCategorii_id === subcategory.id
-      );
-
+    const formattedData = result.rows.map((row) => {
+      const { data } = row;
       let images = [];
-      if (subcategory.Images) {
+
+      if (data.images) {
         try {
-          const parsedImages = JSON.parse(subcategory.Images);
+          const parsedImages = JSON.parse(data.images);
           images = parsedImages.map(
             (img) =>
               `${NEXT_PUBLIC_MEDIA_URL}${img.path.startsWith("/") ? "" : "/"}${
@@ -67,20 +84,12 @@ export async function GET(request) {
       }
 
       return {
-        id: subcategory.id,
-        subcategory_name_ro: subcategory.Nume_SubCategorie_RO,
-        subcategory_name_ru: subcategory.Nume__SubCategorie_RU,
+        ...data,
         images,
-        subSubcategories: filteredSubSubcategories.map((subSub) => ({
-          id: subSub.id,
-          subsub_name_ro: subSub.Nume_SubSubCategorie_RO,
-          subsub_name_ru: subSub.Nume_SubSubCategorie_RU,
-        })),
       };
     });
 
-    // Cache the formatted data for 1 hour
-    await cache.set(CACHE_KEY, formattedData, 3600);
+    await cache.set(CACHE_KEY, formattedData, 86400);
 
     return NextResponse.json({ success: true, data: formattedData });
   } catch (error) {

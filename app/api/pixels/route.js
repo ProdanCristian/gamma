@@ -15,7 +15,7 @@ export async function GET(req) {
       'SELECT "Pixels" FROM "nc_ssxn__Settings" LIMIT 1'
     );
 
-    await cache.set(CACHE_KEY, pixels.rows[0], 3600);
+    await cache.set(CACHE_KEY, pixels.rows[0], 86400);
 
     return NextResponse.json(pixels.rows[0]);
   } catch (error) {

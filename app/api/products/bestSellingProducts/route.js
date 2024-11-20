@@ -6,38 +6,48 @@ export async function GET(request) {
   try {
     const url = new URL(request.url);
     const limit = parseInt(url.searchParams.get("limit") || "12");
-
     const cacheKey = `bestselling_products:${limit}`;
 
-    let products = await cache.get(cacheKey);
+    let cachedData = await cache.get(cacheKey);
+    let products;
 
-    if (!products) {
+    if (cachedData) {
+      products = cachedData;
+    } else {
       const { rows } = await db.query(
-        `SELECT * FROM public."nc_pka4__Produse"
-          WHERE "Bestselling" = true AND "Disponibil" = true
-          LIMIT $1`,
+        `SELECT 
+          id, "Nume_Produs_RO", "Nume_Produs_RU", "Pret_Standard", 
+          "Pret_Redus", "Imagine_Principala", "imagini_Secundare"
+         FROM public."nc_pka4__Produse"
+         WHERE "Bestselling" = true AND "Disponibil" = true
+         ORDER BY id DESC
+         LIMIT $1`,
         [limit]
       );
 
-      products = rows;
-      await cache.set(cacheKey, products, 3600);
+      products = rows.map((product) => ({
+        ...product,
+        Pret_Standard: parseFloat(product.Pret_Standard),
+        Pret_Redus: product.Pret_Redus ? parseFloat(product.Pret_Redus) : null,
+        imagini_Secundare: product.imagini_Secundare
+          ? JSON.parse(product.imagini_Secundare)
+          : [],
+      }));
+
+      await cache.set(cacheKey, products, 86400);
     }
 
-    if (products?.length) {
+    if (products?.length > 0) {
       const productIds = products.map((p) => p.id);
       const { rows: stockData } = await db.query(
-        `SELECT id, "Stock" FROM public."nc_pka4__Produse"
-         WHERE id = ANY($1)`,
+        `SELECT id, "Stock" FROM public."nc_pka4__Produse" WHERE id = ANY($1)`,
         [productIds]
       );
 
-      products = products.map((product) => {
-        const currentStock = stockData.find((s) => s.id === product.id);
-        return {
-          ...product,
-          Stock: currentStock?.Stock,
-        };
-      });
+      products = products.map((product) => ({
+        ...product,
+        Stock: stockData.find((s) => s.id === product.id)?.Stock || 0,
+      }));
     }
 
     return NextResponse.json({
@@ -46,10 +56,7 @@ export async function GET(request) {
     });
   } catch (error) {
     return NextResponse.json(
-      {
-        success: false,
-        error: error.message || "Failed to fetch products",
-      },
+      { success: false, error: error.message || "Failed to fetch products" },
       { status: 500 }
     );
   }

@@ -29,7 +29,9 @@ export class CacheService {
     try {
       const prefixedKeys = keys.map((key) => this.getKey(key));
       const results = await this.getRedis().mget(prefixedKeys);
-      return results.map((result) => (result ? JSON.parse(result) : null));
+      return results.map((result: string | null) =>
+        result ? JSON.parse(result) : null
+      );
     } catch (error) {
       console.error("Cache mget error:", error);
       return keys.map(() => null);

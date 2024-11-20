@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
 import { cache } from "@/lib/redis/cache";
+import { NextResponse } from "next/server";
 
 export async function DELETE() {
   try {
     const redis = cache["getRedis"]();
     const script = `
-      local keys = redis.call('keys', 'nextjs:*')
+      local keys = redis.call('keys', 'cache:*')
       local deletedCount = 0
       for i, key in ipairs(keys) do
         redis.call('del', key)

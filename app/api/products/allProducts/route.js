@@ -23,36 +23,32 @@ export async function GET(request) {
     let cachedData = await cache.get(cacheKey);
     if (cachedData) {
       const productIds = cachedData.products.map((p) => p.id);
-      const { rows: stockData } = await db.query(
-        `SELECT id, "Stock" FROM public."nc_pka4__Produse" WHERE id = ANY($1)`,
-        [productIds]
-      );
 
-      cachedData.products = cachedData.products.map((product) => ({
-        ...product,
-        Stock: stockData.find((s) => s.id === product.id)?.Stock || 0,
-      }));
+      if (productIds.length > 0) {
+        const { rows: stockData } = await db.query(
+          `SELECT id, "Stock" FROM public."nc_pka4__Produse" WHERE id = ANY($1)`,
+          [productIds]
+        );
+
+        cachedData.products = cachedData.products.map((product) => ({
+          ...product,
+          Stock: stockData.find((s) => s.id === product.id)?.Stock || 0,
+        }));
+      }
 
       return NextResponse.json(cachedData);
     }
 
-    let conditions = [];
+    let conditions = [`"Nume_Produs_RO" IS NOT NULL`, `"Disponibil" = true`];
     const params = [];
 
-    conditions.push(`"Nume_Produs_RO" IS NOT NULL`);
-    conditions.push(`"Disponibil" = true`);
-
     if (minPrice !== null && minPrice !== undefined) {
-      conditions.push(
-        `CAST("Pret_Standard" AS NUMERIC) >= $${params.length + 1}`
-      );
+      conditions.push(`"Pret_Standard"::numeric >= $${params.length + 1}`);
       params.push(parseFloat(minPrice));
     }
 
     if (maxPrice !== null && maxPrice !== undefined) {
-      conditions.push(
-        `CAST("Pret_Standard" AS NUMERIC) <= $${params.length + 1}`
-      );
+      conditions.push(`"Pret_Standard"::numeric <= $${params.length + 1}`);
       params.push(parseFloat(maxPrice));
     }
 
@@ -62,7 +58,7 @@ export async function GET(request) {
 
     if (showDiscounted) {
       conditions.push(
-        `"Pret_Redus" IS NOT NULL AND CAST("Pret_Redus" AS NUMERIC) < CAST("Pret_Standard" AS NUMERIC)`
+        `"Pret_Redus" IS NOT NULL AND "Pret_Redus"::numeric < "Pret_Standard"::numeric`
       );
     }
 
@@ -76,23 +72,19 @@ export async function GET(request) {
       params.push(parseInt(brandId));
     }
 
-    const attributeFilters = {};
-    for (const [key, value] of url.searchParams.entries()) {
-      if (key.startsWith("attr_") && value !== "all") {
-        const attrId = key.replace("attr_", "");
-        attributeFilters[attrId] = value;
-      }
-    }
+    const attributeFilters = Object.fromEntries(
+      Array.from(url.searchParams.entries())
+        .filter(([key, value]) => key.startsWith("attr_") && value !== "all")
+        .map(([key, value]) => [key.replace("attr_", ""), value])
+    );
 
     Object.entries(attributeFilters).forEach(([attrId, value]) => {
-      if (value !== "all") {
-        conditions.push(
-          `("nc_pka4__Atribute_id" = $${
-            params.length + 1
-          } AND "Valoare_Atribut" = $${params.length + 2})`
-        );
-        params.push(parseInt(attrId), value);
-      }
+      conditions.push(
+        `("nc_pka4__Atribute_id" = $${
+          params.length + 1
+        } AND "Valoare_Atribut" = $${params.length + 2})`
+      );
+      params.push(parseInt(attrId), value);
     });
 
     const whereClause =
@@ -110,21 +102,14 @@ export async function GET(request) {
 
     const [productsResult, countResult] = await Promise.all([
       db.query(
-        `
-        SELECT ${selectFields}
-        FROM public."nc_pka4__Produse"
-        ${whereClause}
-        ORDER BY id DESC
-        LIMIT $${params.length + 1} OFFSET $${params.length + 2}
-      `,
+        `SELECT ${selectFields}
+         FROM public."nc_pka4__Produse" ${whereClause}
+         ORDER BY id DESC
+         LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
         [...params, limit, offset]
       ),
       db.query(
-        `
-        SELECT COUNT(*) 
-        FROM public."nc_pka4__Produse"
-        ${whereClause}
-      `,
+        `SELECT COUNT(*) FROM public."nc_pka4__Produse" ${whereClause}`,
         params
       ),
     ]);
@@ -153,18 +138,18 @@ export async function GET(request) {
       },
     };
 
-    await cache.set(cacheKey, response, 3600);
+    const productData = {
+      ...response,
+      products: products.map(({ Stock, ...product }) => product),
+    };
+
+    await cache.set(cacheKey, productData, 86400);
 
     return NextResponse.json(response);
   } catch (error) {
     console.error("API Error:", error);
-    console.error("Full error details:", error.stack);
     return NextResponse.json(
-      {
-        success: false,
-        error: error.message || "Failed to fetch products",
-        details: error.stack,
-      },
+      { success: false, error: error.message || "Failed to fetch products" },
       { status: 500 }
     );
   }

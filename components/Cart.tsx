@@ -176,7 +176,7 @@ export default function Cart() {
                     src={item.image}
                     alt={item.name}
                     fill
-                    className="object-cover rounded-md"
+                    className="object-contain rounded-md"
                   />
                 </div>
 

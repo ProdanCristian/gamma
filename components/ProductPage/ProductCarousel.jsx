@@ -45,16 +45,18 @@ export default function ProductCarousel({ images, altText }) {
         <CarouselContent>
           {images.map((image, index) => (
             <CarouselItem key={image.id || index}>
-              <Card className="bg-white dark:bg-charade-950 border-gray-200 dark:border-charade-700 h-full">
-                <CardContent className="flex aspect-square items-center justify-center p-2">
-                  <Image
-                    src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${image.path}`}
-                    alt={`${altText} - ${index + 1}`}
-                    width={600}
-                    height={600}
-                    className="object-contain"
-                    priority={index === 0}
-                  />
+              <Card className="bg-white dark:bg-charade-950 border-gray-200 dark:border-charade-700">
+                <CardContent className="p-0">
+                  <div className="relative aspect-square w-full">
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${image.path}`}
+                      alt={`${altText} - ${index + 1}`}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-contain"
+                      priority={index === 0}
+                    />
+                  </div>
                 </CardContent>
               </Card>
             </CarouselItem>
@@ -64,7 +66,6 @@ export default function ProductCarousel({ images, altText }) {
         <CarouselNext className="absolute top-1/2 right-2 transform -translate-y-1/2" />
       </Carousel>
 
-      {/* Thumbnails */}
       <Carousel
         setApi={setThumbnailApi}
         opts={{
@@ -75,7 +76,7 @@ export default function ProductCarousel({ images, altText }) {
       >
         <CarouselContent className="-ml-4">
           {images.map((image, index) => (
-            <CarouselItem key={image.id || index} className="basis-1/4">
+            <CarouselItem key={image.id || index} className="basis-1/4 pl-4">
               <button
                 onClick={() => handleThumbnailClick(index)}
                 className={cn(
@@ -88,9 +89,9 @@ export default function ProductCarousel({ images, altText }) {
                 <Image
                   src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${image.path}`}
                   alt={`Thumbnail ${index + 1}`}
-                  width={150}
-                  height={150}
-                  className="object-cover"
+                  fill
+                  sizes="(max-width: 768px) 25vw, 10vw"
+                  className="object-contain"
                 />
               </button>
             </CarouselItem>

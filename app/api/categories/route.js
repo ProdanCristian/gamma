@@ -3,7 +3,7 @@ import db from "@/lib/db";
 import { cache } from "@/lib/redis/cache";
 
 const CACHE_KEY = "categories:all";
-const CACHE_TTL = 3600;
+const CACHE_TTL = 86400;
 
 export async function GET() {
   try {

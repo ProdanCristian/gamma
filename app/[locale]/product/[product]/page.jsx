@@ -316,7 +316,7 @@ export default async function ProductPage({ params, searchParams }) {
       />
 
       <main className="my-6 min-h-screen max-w-[1250px] w-[90vw] mx-auto">
-        <h1 className="md:hidden block mb4 dark:text-white text-charade-950 font-semibold text-4xl min-h-[48px]">
+        <h1 className="md:hidden block mb-4 dark:text-white text-charade-950 font-semibold text-4xl min-h-[48px]">
           {locale === "ru"
             ? productData.data.Nume_Produs_RU
             : productData.data.Nume_Produs_RO}
@@ -366,14 +366,16 @@ export default async function ProductPage({ params, searchParams }) {
         <div>
           <div className="flex flex-col lg:flex-row gap-10 justify-between mt-6">
             <article className="lg:w-[40%]">
-              <ProductCarousel
-                images={allImages}
-                altText={
-                  locale === "ru"
-                    ? productData.data.Nume_Produs_RU
-                    : productData.data.Nume_Produs_RO
-                }
-              />
+              <div className="aspect-square">
+                <ProductCarousel
+                  images={allImages}
+                  altText={
+                    locale === "ru"
+                      ? productData.data.Nume_Produs_RU
+                      : productData.data.Nume_Produs_RO
+                  }
+                />
+              </div>
               {videos.length > 0 && (
                 <div className="mt-20 space-y-4 pt-16 border-t border-gray-200 dark:border-charade-700">
                   {videos.map((videoUrl, index) => {

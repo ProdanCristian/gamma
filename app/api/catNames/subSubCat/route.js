@@ -14,8 +14,8 @@ export async function GET(request) {
       );
     }
 
-    // Try to get from cache first
     const CACHE_KEY = `subsubcategory:${id}:names`;
+    const CACHE_TTL = 86400;
     const cachedData = await cache.get(CACHE_KEY);
     if (cachedData) {
       return NextResponse.json({ success: true, data: cachedData });
@@ -41,8 +41,7 @@ export async function GET(request) {
       Nume_SubSubCategorie_RU: result.rows[0].Nume_SubSubCategorie_RU,
     };
 
-    // Cache the result for 1 hour
-    await cache.set(CACHE_KEY, transformedData, 3600);
+    await cache.set(CACHE_KEY, transformedData, CACHE_TTL);
 
     return NextResponse.json({ success: true, data: transformedData });
   } catch (error) {

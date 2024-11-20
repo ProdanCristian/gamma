@@ -14,7 +14,6 @@ export async function GET(request) {
       );
     }
 
-    // Try to get from cache first
     const CACHE_KEY = `subsubcategories:subcategory:${subcategoryId}`;
     const cachedData = await cache.get(CACHE_KEY);
     if (cachedData) {
@@ -35,7 +34,7 @@ export async function GET(request) {
     const result = await db.query(query, [subcategoryId]);
 
     // Cache the result for 1 hour
-    await cache.set(CACHE_KEY, result.rows, 3600);
+    await cache.set(CACHE_KEY, result.rows, 86400);
 
     return NextResponse.json({
       success: true,

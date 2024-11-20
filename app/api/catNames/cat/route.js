@@ -14,8 +14,9 @@ export async function GET(request) {
       );
     }
 
-    // Try to get from cache first
     const CACHE_KEY = `category:${id}:names`;
+    const CACHE_TTL = 86400; // 24 hours
+
     const cachedData = await cache.get(CACHE_KEY);
     if (cachedData) {
       return NextResponse.json({ success: true, data: cachedData });
@@ -36,8 +37,7 @@ export async function GET(request) {
       );
     }
 
-    // Cache the result for 1 hour
-    await cache.set(CACHE_KEY, result.rows[0], 3600);
+    await cache.set(CACHE_KEY, result.rows[0], CACHE_TTL);
 
     return NextResponse.json({ success: true, data: result.rows[0] });
   } catch (error) {
