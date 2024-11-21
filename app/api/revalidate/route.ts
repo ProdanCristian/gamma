@@ -2,12 +2,6 @@ import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const authHeader = request.headers.get("authorization");
-
-  if (authHeader !== `Bearer ${process.env.REVALIDATE_SECRET_TOKEN}`) {
-    return NextResponse.json({ message: "Invalid token" }, { status: 401 });
-  }
-
   try {
     const body = await request.json();
     const { tag } = body;
@@ -21,7 +15,6 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // If no specific tag provided, revalidate all
     const tags = ["marketing", "categories", "products", "pixels"];
     tags.forEach((tag) => revalidateTag(tag));
 
@@ -39,12 +32,6 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get("authorization");
-
-  if (authHeader !== `Bearer ${process.env.REVALIDATE_SECRET_TOKEN}`) {
-    return NextResponse.json({ message: "Invalid token" }, { status: 401 });
-  }
-
   try {
     const tags = ["marketing", "categories", "products", "pixels"];
     tags.forEach((tag) => revalidateTag(tag));
