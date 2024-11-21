@@ -44,16 +44,6 @@ export async function GET(request) {
       await cache.set(cacheKey, product, 3600);
     }
 
-    const { rows: stockData } = await db.query(
-      `SELECT "Stock" FROM public."nc_pka4__Produse"
-       WHERE id = $1`,
-      [id]
-    );
-
-    if (stockData.length > 0) {
-      product.Stock = stockData[0].Stock;
-    }
-
     return NextResponse.json({ success: true, data: product });
   } catch (error) {
     return NextResponse.json(

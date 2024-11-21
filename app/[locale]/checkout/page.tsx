@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useCartStore, DELIVERY_RULES } from "@/lib/store/useCart";
+import { useCartStore, DELIVERY_RULES, CartItem } from "@/lib/store/useCart";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import { CouponSection } from "@/components/Checkout/CouponSection";
 import { UserInfoForm } from "@/components/Checkout/UserInfoForm";
 import { useOrderStore } from "@/lib/store/useOrderStore";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import useSWR from "swr";
 
 interface ExtendedUser {
   id: string;
@@ -28,6 +29,19 @@ interface ExtendedSession {
   user?: ExtendedUser;
 }
 
+interface StockData {
+  [key: number]: number;
+}
+
+const fetcher = async (url: string): Promise<StockData> => {
+  const response = await fetch(url);
+  const data = await response.json();
+  if (!data.success) {
+    throw new Error(data.error);
+  }
+  return data.data as StockData;
+};
+
 const CheckoutPage = () => {
   const { data: session } = useSession() as { data: ExtendedSession | null };
   const router = useRouter();
@@ -36,7 +50,7 @@ const CheckoutPage = () => {
   const params = useParams();
 
   const [mounted, setMounted] = useState(false);
-  const { items, deliveryZone, clearCart } = useCartStore();
+  const { items, deliveryZone, clearCart, removeItem } = useCartStore();
   const [isLoading, setIsLoading] = useState(false);
   const [guestEmail, setGuestEmail] = useState("");
   const [guestPhone, setGuestPhone] = useState("");
@@ -57,6 +71,31 @@ const CheckoutPage = () => {
   );
 
   const setOrderData = useOrderStore((state) => state.setOrderData);
+
+  const queryString = items.map((item) => `ids=${item.id}`).join("&");
+
+  const { data: stockData, isLoading: isCheckingStock } = useSWR<StockData>(
+    items.length > 0 ? `/api/products/stock?${queryString}` : null,
+    fetcher,
+    {
+      revalidateOnFocus: true,
+      refreshInterval: 0,
+      shouldRetryOnError: false,
+    }
+  );
+
+  const outOfStockItems = React.useMemo(() => {
+    if (!stockData) return [];
+
+    return Object.entries(stockData).reduce<number[]>((acc, [idStr, stock]) => {
+      const id = parseInt(idStr, 10);
+      const item = items.find((item) => item.id === id);
+      if (item && stock < item.quantity) {
+        acc.push(id);
+      }
+      return acc;
+    }, []);
+  }, [items, stockData]);
 
   useEffect(() => {
     let mounted = true;
@@ -189,7 +228,6 @@ const CheckoutPage = () => {
       return false;
     }
 
-    // Validate phone format (must be +373 followed by 8 digits)
     if (!guestPhone.trim() || guestPhone.length < 13) {
       toast({
         title: t("checkout.error"),
@@ -235,9 +273,33 @@ const CheckoutPage = () => {
   };
 
   const handlePlaceOrder = async () => {
-    // Add validation check before proceeding
     if (!validateFields()) {
       return;
+    }
+
+    // Check if any items are out of stock
+    if (stockData) {
+      const outOfStockItems = Object.entries(stockData).reduce<number[]>(
+        (acc, [idStr, stock]) => {
+          const id = parseInt(idStr, 10);
+          const item = items.find((item) => item.id === id);
+          if (item && stock < item.quantity) {
+            acc.push(id);
+          }
+          return acc;
+        },
+        []
+      );
+
+      if (outOfStockItems.length > 0) {
+        outOfStockItems.forEach((itemId) => {
+          const item = items.find((i) => i.id === itemId);
+          if (item) {
+            removeItem(item.id);
+          }
+        });
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -374,6 +436,10 @@ const CheckoutPage = () => {
     return <LoginForm onClose={() => setShowLoginForm(false)} />;
   };
 
+  const handleRemoveOutOfStock = (item: CartItem) => {
+    removeItem(item.id);
+  };
+
   if (!mounted) {
     return null;
   }
@@ -396,42 +462,64 @@ const CheckoutPage = () => {
             <h2 className="text-xl font-semibold mb-4">
               {t("checkout.order_summary")}
             </h2>
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className="flex gap-4 border-b dark:border-charade-700 py-4"
-              >
-                <div className="relative w-20 h-20">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="object-cover rounded-md"
-                  />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-medium text-sm">{item.name}</h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {t("checkout.quantity")}: {item.quantity}
-                  </p>
-                  <div className="mt-2">
-                    {item.discountPrice ? (
-                      <div className="flex items-center gap-2">
+            {items.map((item) => {
+              const isOutOfStock =
+                stockData &&
+                stockData[item.id] !== undefined &&
+                stockData[item.id] < item.quantity;
+
+              return (
+                <div
+                  key={item.id}
+                  className="flex gap-4 border-b dark:border-charade-700 py-4"
+                >
+                  <div className="relative w-20 h-20">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="object-cover rounded-md"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-medium text-sm">{item.name}</h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {t("checkout.quantity")}: {item.quantity}
+                    </p>
+                    {isOutOfStock && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-sm text-red-500">
+                          {t("checkout.out_of_stock")}
+                        </p>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleRemoveOutOfStock(item)}
+                          className="text-xs py-1 h-7"
+                        >
+                          {t("checkout.remove_item")}
+                        </Button>
+                      </div>
+                    )}
+                    <div className="mt-2">
+                      {item.discountPrice ? (
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">
+                            {item.discountPrice} {t("checkout.currency")}
+                          </span>
+                          <span className="text-sm text-gray-500 line-through">
+                            {item.price} {t("checkout.currency")}
+                          </span>
+                        </div>
+                      ) : (
                         <span className="font-medium">
-                          {item.discountPrice} {t("checkout.currency")}
-                        </span>
-                        <span className="text-sm text-gray-500 line-through">
                           {item.price} {t("checkout.currency")}
                         </span>
-                      </div>
-                    ) : (
-                      <span className="font-medium">
-                        {item.price} {t("checkout.currency")}
-                      </span>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             <div className="mt-4 space-y-3">
               {couponDiscountAmount > 0 && (
@@ -583,10 +671,13 @@ const CheckoutPage = () => {
             onClick={handlePlaceOrder}
             disabled={
               isLoading ||
+              isCheckingStock ||
+              outOfStockItems.length > 0 ||
               (session ? !userAddress : !guestAddress) ||
               !guestName ||
               !guestEmail ||
-              !guestPhone
+              !guestPhone ||
+              stockData === undefined
             }
             className="w-full bg-accent hover:bg-charade-900 hover:text-white text-charade-900 
               dark:hover:bg-gray-100 dark:hover:text-charade-900 h-10 text-sm font-semibold
@@ -597,6 +688,11 @@ const CheckoutPage = () => {
               <>
                 <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin" />
                 {t("checkout.processing")}
+              </>
+            ) : isCheckingStock ? (
+              <>
+                <AiOutlineLoading3Quarters className="h-4 w-4 animate-spin" />
+                {t("checkout.checking_stock")}
               </>
             ) : (
               t("checkout.place_order")

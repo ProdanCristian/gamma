@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+export const revalidate = false;
 import React from "react";
 import { notFound } from "next/navigation";
 import AnimatedHeart from "@/components/ProductPage/AnimatedHeart";
@@ -13,11 +13,8 @@ import ProductCarousel from "@/components/ProductPage/ProductCarousel";
 import ProductDescription from "@/components/ProductPage/ProductDescription";
 import ProductCard from "@/components/Shop/ProductCard";
 import Link from "next/link";
-import { Metadata } from "next";
 import Script from "next/script";
-import { headers } from "next/headers";
 import YouTubeFacade from "@/components/ProductPage/YouTubeFacade";
-import Image from "next/image";
 import DeliveryEstimate from "@/components/ProductPage/DeliveryEstimate";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
@@ -25,7 +22,10 @@ import rehypeRaw from "rehype-raw";
 async function getProduct(productId) {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-    const res = await fetch(`${baseUrl}/api/products/product?id=${productId}`);
+    const res = await fetch(`${baseUrl}/api/products/product?id=${productId}`, {
+      next: { tags: ["products"] },
+      cache: "force-cache",
+    });
 
     if (!res.ok) {
       return null;
@@ -42,7 +42,11 @@ async function getProductVariants(variantId) {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     const res = await fetch(
-      `${baseUrl}/api/products/productVariants?id=${variantId}`
+      `${baseUrl}/api/products/productVariants?id=${variantId}`,
+      {
+        next: { tags: ["products"] },
+        cache: "force-cache",
+      }
     );
 
     if (!res.ok) {
@@ -60,7 +64,11 @@ async function getSimilarProducts(subSubCategoryId) {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     const res = await fetch(
-      `${baseUrl}/api/products/similarProducts?id=${subSubCategoryId}`
+      `${baseUrl}/api/products/similarProducts?id=${subSubCategoryId}`,
+      {
+        next: { tags: ["products"] },
+        cache: "force-cache",
+      }
     );
 
     if (!res.ok) {
@@ -117,7 +125,7 @@ export async function generateMetadata({ params, searchParams }) {
       : productData.data.Descriere_Produs_RO;
 
   return {
-    title: `${productName} | ${productData.data.brand_name || "Shop"}`,
+    title: `${productName} | ${productData.data.brand_name || "Gamma"}`,
     description: description,
     keywords: `${productName}, ${productData.data.brand_name}, ${
       locale === "ru" ? "купить онлайн" : "cumpără online"

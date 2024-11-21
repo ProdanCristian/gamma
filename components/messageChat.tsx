@@ -134,6 +134,7 @@ const MessageChat = () => {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsOpen(!isOpen)}
+          aria-label={isOpen ? "Close chat" : "Open chat"}
           className="p-3 rounded-full bg-accent text-white shadow-lg hover:bg-accent/90 transition-all duration-300"
         >
           <AnimatePresence mode="wait">

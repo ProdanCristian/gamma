@@ -70,7 +70,7 @@ export const AddressTab = ({
       return;
     }
 
-    if (addressData) {
+    if (!isAddressLoading && addressData) {
       if (addressData.exists && addressData.address) {
         setAddress(addressData.address);
         onAddressChange?.(addressData.address);
@@ -79,7 +79,7 @@ export const AddressTab = ({
         setShowAddressForm(true);
       }
     }
-  }, [addressData, onAddressChange, guestMode]);
+  }, [addressData, onAddressChange, guestMode, isAddressLoading]);
 
   const getDistricts = () => {
     return Array.from(validator.data.districtsMap.entries()).map(
@@ -312,7 +312,10 @@ export const AddressTab = ({
         setAddress(data.address);
         onAddressChange?.(data.address);
         setShowAddressForm(false);
-        mutate("/api/address");
+
+        if (data.address !== addressData?.address) {
+          mutate("/api/address");
+        }
 
         toast({
           title: t("address.success"),
@@ -440,7 +443,14 @@ export const AddressTab = ({
 
   return (
     <div className="border-gray-200 dark:border-gray-700 dark:bg-charade-900 rounded-lg bg-white">
-      {address && !showAddressForm ? (
+      {isAddressLoading ? (
+        <div className="p-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-gray-200 dark:bg-charade-700 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 dark:bg-charade-700 rounded w-1/2"></div>
+          </div>
+        </div>
+      ) : address && !showAddressForm ? (
         <div className="space-y-4">
           <div className="p-4 bg-gray-100 dark:bg-[#4A4B59] rounded-lg ">
             <p className="text-gray-700 dark:text-gray-300 mb-4">{address}</p>
@@ -455,7 +465,7 @@ export const AddressTab = ({
             </Button>
           </div>
         </div>
-      ) : (
+      ) : showAddressForm ? (
         <form
           onSubmit={handleAddressSubmit}
           onChange={(e) => {
@@ -768,7 +778,7 @@ export const AddressTab = ({
             </div>
           )}
         </form>
-      )}
+      ) : null}
 
       {error && (
         <div className="text-red-500 mt-4">

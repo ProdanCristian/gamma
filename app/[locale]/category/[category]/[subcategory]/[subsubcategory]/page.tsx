@@ -20,13 +20,25 @@ async function getSubSubCategoryData(
   const [subsubcategoryNames, subcategoryNames, categoryNames] =
     await Promise.all([
       fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/catNames/subSubCat?id=${subsubcategoryId}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/catNames/subSubCat?id=${subsubcategoryId}`,
+        {
+          next: { tags: ["categories"] },
+          cache: "force-cache",
+        }
       ).then((res) => res.json()),
       fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/catNames/subCat?id=${subcategoryId}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/catNames/subCat?id=${subcategoryId}`,
+        {
+          next: { tags: ["categories"] },
+          cache: "force-cache",
+        }
       ).then((res) => res.json()),
       fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/catNames/cat?id=${categoryId}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/catNames/cat?id=${categoryId}`,
+        {
+          next: { tags: ["categories"] },
+          cache: "force-cache",
+        }
       ).then((res) => res.json()),
     ]);
 

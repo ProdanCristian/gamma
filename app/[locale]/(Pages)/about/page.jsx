@@ -1,12 +1,13 @@
 import Image from "next/image";
-import { useLocale } from "next-intl";
-import { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
 
-export async function generateMetadata({ params }) {
-  const resolvedParams = await params;
-  const locale = resolvedParams.locale;
+export function generateStaticParams() {
+  return [{ locale: "ru" }, { locale: "ro" }];
+}
+
+export function generateMetadata({ params }) {
+  const locale = params.locale;
 
   const title = locale === "ru" ? "О Gamma | Gamma" : "Despre Gamma | Gamma";
   const description =
@@ -42,9 +43,8 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default async function About({ params }) {
-  const resolvedParams = await params;
-  const locale = resolvedParams.locale;
+export default function About({ params }) {
+  const locale = params.locale;
 
   const structuredData = {
     "@context": "https://schema.org",

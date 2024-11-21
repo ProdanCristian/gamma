@@ -1,4 +1,5 @@
-export const dynamic = "force-dynamic";
+export const revalidate = false;
+
 import ImageCarousel from "@/components/ImageCarousel";
 import TopCategories from "@/components/TopCategories";
 import DiscountedProducts from "@/components/Shop/DiscoutedProducts";
@@ -9,7 +10,10 @@ import { getTranslations } from "next-intl/server";
 async function getSliders() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-    const res = await fetch(`${baseUrl}/api/marketingDesign`);
+    const res = await fetch(`${baseUrl}/api/marketingDesign`, {
+      next: { tags: ["marketing"] },
+      cache: "force-cache",
+    });
 
     if (!res.ok) {
       return null;
@@ -26,7 +30,10 @@ async function getSliders() {
 async function getTopCategories() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-    const response = await fetch(`${baseUrl}/api/topCategories`);
+    const response = await fetch(`${baseUrl}/api/topCategories`, {
+      next: { tags: ["categories"] },
+      cache: "force-cache",
+    });
     const data = await response.json();
     return data.success ? data.categories : [];
   } catch (error) {

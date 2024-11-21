@@ -11,8 +11,11 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useFastOrderStore } from "@/lib/store/useFastOrderStore";
 import { useCartStore } from "@/lib/store/useCart";
+import useSWR from "swr";
 
 const BASE_URL = process.env.NEXT_PUBLIC_MEDIA_URL;
+
+const fetcher = (url) => fetch(url).then((res) => res.json());
 
 const ProductDescription = ({
   productData,
@@ -126,7 +129,7 @@ const ProductDescription = ({
   };
 
   const handleQuantityChange = (value) => {
-    const newQuantity = Math.max(1, Math.min(value, currentProduct.Stock));
+    const newQuantity = Math.max(1, Math.min(value, currentStock));
     setQuantity(newQuantity);
   };
 
@@ -171,7 +174,6 @@ const ProductDescription = ({
 
     addItem(item);
 
-    // Send AddToCart event
     try {
       fetch("/api/facebook-event", {
         method: "POST",
@@ -215,6 +217,18 @@ const ProductDescription = ({
       }
     };
   }, []);
+
+  const { data: stockData } = useSWR(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/stock/productpage/?id=${currentProduct.id}`,
+    fetcher,
+    {
+      revalidateOnFocus: true,
+      refreshInterval: 0,
+      fallbackData: { success: true, data: { Stock: currentProduct.Stock } },
+    }
+  );
+
+  const currentStock = stockData?.success ? stockData.data.Stock : 0;
 
   return (
     <>
@@ -334,19 +348,19 @@ const ProductDescription = ({
         )}
 
         <div className="text-base">
-          {quantity >= currentProduct.Stock && currentProduct.Stock > 0 ? (
+          {quantity >= currentStock && currentStock > 0 ? (
             <span className="text-red-500">
-              {currentProduct.Stock === "1"
+              {currentStock === 1
                 ? `1 ${t("unit")} ${t("in_stock")}`
-                : `${currentProduct.Stock} ${t("units")} ${t("in_stock")}`}
+                : `${currentStock} ${t("units")} ${t("in_stock")}`}
             </span>
-          ) : currentProduct.Stock > 0 ? (
+          ) : currentStock > 0 ? (
             <span
               className={
-                currentProduct.Stock <= 3 ? "text-yellow-500" : "text-green-500"
+                currentStock <= 3 ? "text-yellow-500" : "text-green-500"
               }
             >
-              {currentProduct.Stock <= 3 ? t("low_stock") : t("in_stock")}
+              {currentStock <= 3 ? t("low_stock") : t("in_stock")}
             </span>
           ) : (
             <span className="text-red-500">{t("out_of_stock")}</span>
@@ -357,7 +371,7 @@ const ProductDescription = ({
           ref={originalButtonRef}
           className="flex flex-col sm:flex-row justify-between items-start md:items-center gap-4"
         >
-          {currentProduct.Stock > 0 && (
+          {currentStock > 0 && (
             <div className="flex items-center gap-4 sm:w-auto">
               <label
                 htmlFor="quantity-input"
@@ -379,7 +393,7 @@ const ProductDescription = ({
                   id="quantity-input"
                   type="number"
                   min="1"
-                  max={currentProduct.Stock}
+                  max={currentStock}
                   value={quantity}
                   onChange={(e) =>
                     handleQuantityChange(parseInt(e.target.value) || 1)
@@ -393,7 +407,7 @@ const ProductDescription = ({
                   aria-label={t("increase_quantity")}
                   className="px-3 py-1 border border-gray-300 rounded-r-lg hover:bg-gray-100 
                     dark:border-gray-600 dark:hover:bg-gray-700"
-                  disabled={quantity >= currentProduct.Stock}
+                  disabled={quantity >= currentStock}
                 >
                   +
                 </button>
@@ -403,31 +417,23 @@ const ProductDescription = ({
 
           <div className="flex items-center gap-4 w-full sm:w-full">
             <button
-              disabled={currentProduct.Stock <= 0}
+              disabled={currentStock <= 0}
               onClick={handleOrderNow}
               aria-label={t("order_now")}
               className={` dark:bg-accent bg-accent dark:hover:bg-gray-100 
                 hover:bg-charade-900 py-[8px] text-charade-950 hover:text-white dark:text-charade-950 text-sm font-semibold px-4 rounded-lg flex
                 items-center justify-center content-center w-full transition-colors duration-200
-                ${
-                  currentProduct.Stock <= 0
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }`}
+                ${currentStock <= 0 ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               {t("order_now")}
               <PiCursorClick className="ml-2" size={30} />
             </button>
             <button
-              disabled={currentProduct.Stock <= 0}
+              disabled={currentStock <= 0}
               onClick={handleAddToCart}
               aria-label={t("add_to_cart")}
               className={`hover:text-[#47e194] transition-colors duration-200
-                ${
-                  currentProduct.Stock <= 0
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }`}
+                ${currentStock <= 0 ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               <PiShoppingCartSimple size={35} />
             </button>
@@ -449,7 +455,7 @@ const ProductDescription = ({
             <div className="w-full md:w-auto pointer-events-auto">
               <div className="rounded-lg p-4 md:p-3 flex items-center gap-4">
                 <button
-                  disabled={currentProduct.Stock <= 0}
+                  disabled={currentStock <= 0}
                   onClick={handleOrderNow}
                   aria-label={t("order_now")}
                   className={`dark:bg-accent bg-accent dark:hover:bg-gray-100 
@@ -457,9 +463,7 @@ const ProductDescription = ({
                     text-sm font-semibold px-4 rounded-lg flex items-center justify-center content-center 
                     transition-colors duration-200 w-full md:w-auto
                     ${
-                      currentProduct.Stock <= 0
-                        ? "opacity-50 cursor-not-allowed"
-                        : ""
+                      currentStock <= 0 ? "opacity-50 cursor-not-allowed" : ""
                     }`}
                 >
                   {t("order_now")}

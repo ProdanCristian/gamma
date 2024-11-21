@@ -8,6 +8,7 @@ import {
 } from "@/lib/utils/phoneUtils";
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
+import useSWR from "swr";
 
 interface UserProfile {
   Nume: string;
@@ -25,6 +26,15 @@ interface UserInfoFormProps {
   setGuestPhone: (value: string) => void;
 }
 
+const fetcher = async (url: string) => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error("Failed to fetch user profile");
+  }
+  const data = await response.json();
+  return data.user;
+};
+
 export const UserInfoForm = ({
   guestName,
   setGuestName,
@@ -36,33 +46,26 @@ export const UserInfoForm = ({
   const t = useTranslations();
   const { data: session } = useSession();
 
-  // Fetch user profile when component mounts if user is logged in
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (session?.user?.email) {
-        try {
-          const response = await fetch("/api/auth/profile");
-          if (response.ok) {
-            const data = await response.json();
-            const userProfile: UserProfile = data.user;
-
-            // Set the form values with user data
-            setGuestName(`${userProfile.Nume} ${userProfile.Prenume}`.trim());
+  const { data: userProfile } = useSWR<UserProfile>(
+    session?.user?.email ? "/api/auth/profile" : null,
+    fetcher,
+    {
+      revalidateOnFocus: true,
+      refreshInterval: 0,
+      shouldRetryOnError: false,
+      onSuccess: (data) => {
+        if (data) {
+          setGuestName(`${data.Nume} ${data.Prenume}`.trim());
+          if (session?.user?.email) {
             setGuestEmail(session.user.email);
-            if (userProfile.Numar_Telefon) {
-              setGuestPhone(formatPhoneNumber(userProfile.Numar_Telefon));
-            }
           }
-        } catch (error) {
-          console.error("Error fetching user profile:", error);
+          if (data.Numar_Telefon) {
+            setGuestPhone(formatPhoneNumber(data.Numar_Telefon));
+          }
         }
-      }
-    };
-
-    if (session?.user) {
-      fetchUserProfile();
+      },
     }
-  }, [session, setGuestName, setGuestEmail, setGuestPhone]);
+  );
 
   // Set default phone prefix if empty
   useEffect(() => {
@@ -88,7 +91,7 @@ export const UserInfoForm = ({
             type="text"
             value={guestName}
             onChange={(e) => setGuestName(e.target.value)}
-            className="w-full p-2 rounded-lg dark:bg-[#4a4b59]  bg-gray-100"
+            className="w-full p-2 rounded-lg dark:bg-[#4a4b59] bg-gray-100"
             placeholder={t("checkout.first_name_placeholder")}
             required
           />
@@ -99,7 +102,7 @@ export const UserInfoForm = ({
             type="email"
             value={guestEmail}
             onChange={(e) => setGuestEmail(e.target.value)}
-            className="w-full p-2 rounded-lg dark:bg-[#4a4b59]  bg-gray-100"
+            className="w-full p-2 rounded-lg dark:bg-[#4a4b59] bg-gray-100"
             placeholder={t("checkout.email_placeholder")}
             required
           />
@@ -118,7 +121,6 @@ export const UserInfoForm = ({
           placeholder="+373 XXXXXXXX"
           required
         />
-        <p className="text-xs text-gray-500">{t("checkout.phone_format")}</p>
       </div>
     </div>
   );

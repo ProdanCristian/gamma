@@ -7,7 +7,6 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import useSWR from "swr";
 import SmallProductCard from "@/components/Shop/SmallProductCard";
 import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -29,12 +28,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
 import Link from "next/link";
 import { useStableQuery } from "@/hooks/useAbortableSWR";
-
-const swrConfig = {
-  revalidateOnFocus: false,
-  revalidateOnReconnect: false,
-  dedupingInterval: 1000,
-};
 
 const fetcher = (url) => fetch(url).then((res) => res.json());
 

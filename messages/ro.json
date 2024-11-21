@@ -494,7 +494,13 @@
     "email_sent_success": "Email trimis cu succes",
     "email_send_error": "Eroare la trimiterea email-ului",
     "order_error": "Eroare la plasarea comenzii",
-    "invalid_phone_format": "Format număr de telefon invalid. Folosiți formatul: +373 XXXXXXXX"
+    "invalid_phone_format": "Format număr de telefon invalid. Folosiți formatul: +373 XXXXXXXX",
+    "out_of_stock": "Stoc epuizat",
+    "items_out_of_stock": "Unele produse nu mai sunt în stoc",
+    "checking_stock": "Verificare stoc...",
+    "item_removed": "Produs eliminat",
+    "removed_from_cart": "a fost eliminat din coș",
+    "remove_item": "Elimină"
   },
   "orders": {
     "order_confirmation": "Confirmare comandă",

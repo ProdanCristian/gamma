@@ -23,17 +23,24 @@ const formatCategoryName = (slug: string): string => {
 async function getCategoryData(categoryId: string) {
   const [categoryNames, subcategories] = await Promise.all([
     fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/catNames/cat?id=${categoryId}`
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/catNames/cat?id=${categoryId}`,
+      {
+        next: { tags: ["categories"] },
+        cache: "force-cache",
+      }
     ).then((res) => res.json()),
     fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/subCategories?categoryId=${categoryId}`
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/subCategories?categoryId=${categoryId}`,
+      {
+        next: { tags: ["categories"] },
+        cache: "force-cache",
+      }
     ).then((res) => res.json()),
   ]);
 
   return { categoryNames, subcategories };
 }
 
-// Add generateMetadata
 export async function generateMetadata({ params }: any): Promise<Metadata> {
   const resolvedParams = await params;
   const category = resolvedParams?.category;

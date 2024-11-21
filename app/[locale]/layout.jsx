@@ -1,3 +1,4 @@
+export const revalidate = false;
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -15,16 +16,15 @@ import BottomBarMobile from "@/components/Footer/BottomBarMobile";
 import Cart from "@/components/Cart";
 import FastOrder from "@/components/FastOrder";
 import MessageChat from "@/components/messageChat";
-import Script from "next/script";
 import Pixels from "@/components/Pixels";
 
 async function getPixels() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
     const res = await fetch(`${baseUrl}/api/pixels`, {
-      next: { revalidate: 3600 },
+      next: { tags: ["pixels"] },
+      cache: "force-cache",
     });
-
     if (!res.ok) return null;
     const data = await res.json();
     return data.Pixels;
@@ -32,6 +32,10 @@ async function getPixels() {
     console.error("Error fetching pixels:", error);
     return null;
   }
+}
+
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
 }
 
 export async function generateMetadata({ params }) {

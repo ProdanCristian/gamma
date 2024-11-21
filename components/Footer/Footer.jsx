@@ -298,7 +298,8 @@ export default function Footer() {
       </div>
       <div>
         <div className="bg-charade-900 py-2">
-          <div className="max-w-[1250px] w-[90%] mx-auto">
+          <div className="max-w-[1250px] w-[90%] mx-auto flex items-center justify-center gap-2">
+            <p className="text-sm text-gray-200  mr-2">v1.0</p>
             <p className="text-sm text-gray-400 text-center flex items-center justify-center gap-2">
               <span>{t("developed_by")}</span>
               <a
