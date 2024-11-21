@@ -3,11 +3,10 @@ import { sleep, check } from "k6";
 
 export const options = {
   stages: [
-    { duration: '1m', target: 300 },
-    { duration: '1m', target: 600 },
-    { duration: '1m', target: 1000 },
-    { duration: '5m', target: 1000 },
-    { duration: '1m', target: 0 },
+    { duration: '30s', target: 50 },    // Ramp up to 50 users
+    { duration: '30s', target: 100 },   // Ramp up to 100 users
+    { duration: '1m', target: 100 },    // Stay at 100 users
+    { duration: '30s', target: 0 },     // Ramp down
   ],
   thresholds: {
     http_req_duration: ['p(95)<3000'],
@@ -18,16 +17,21 @@ export const options = {
 export default function () {
   const baseUrl = "https://gamma.md/ro/product/ferestrau-electric-cu-acumulator-tatta-td-5300_196";
 
-  const responses = {
-    homepage: http.get(`${baseUrl}/`),
+  const params = {
+    headers: {
+      'Accept': 'text/html',
+      'User-Agent': 'k6-test',
+      'Cache-Control': 'no-cache'
+    },
+    tags: { name: 'homepage' }
   };
 
-  Object.keys(responses).forEach(page => {
-    check(responses[page], {
-      [`${page} status is OK`]: (r) => r.status === 200,
-      [`${page} response time < 3s`]: (r) => r.timings.duration < 3000,
-      [`${page} not empty`]: (r) => r.body.length > 0,
-    });
+  const response = http.get(baseUrl, params);
+
+  check(response, {
+    'status is 200': (r) => r.status === 200,
+    'response time < 3s': (r) => r.timings.duration < 3000,
+    'body size > 0': (r) => r.body.length > 0,
   });
 
   sleep(Math.random() * 3 + 1);

@@ -12,18 +12,21 @@ export class CacheService {
   }
 
   private getRedis() {
-    return RedisConnectionPool.getConnection();
-  }
+  const redis = RedisConnectionPool.getConnection();
+  redis.setMaxListeners(20); 
+  return redis;
+}
 
-  async get<T>(key: string): Promise<T | null> {
-    try {
-      const data = await this.getRedis().get(this.getKey(key));
-      return data ? JSON.parse(data) : null;
-    } catch (error) {
-      console.error("Cache get error:", error);
-      return null;
-    }
+async get<T>(key: string): Promise<T | null> {
+  const redis = this.getRedis();
+  try {
+    const data = await redis.get(this.getKey(key));
+    return data ? JSON.parse(data) : null;
+  } catch (error) {
+    console.error("Cache get error:", error);
+    return null;
   }
+}
 
   async mget<T>(keys: string[]): Promise<(T | null)[]> {
     try {
