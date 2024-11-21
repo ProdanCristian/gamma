@@ -16,7 +16,7 @@ export const options = {
 };
 
 export default function () {
-  const baseUrl = "https://gamma.md";
+  const baseUrl = "https://gamma.md/ro/product/ferestrau-electric-cu-acumulator-tatta-td-5300_196";
 
   const responses = {
     homepage: http.get(`${baseUrl}/`),
