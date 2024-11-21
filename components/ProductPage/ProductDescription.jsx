@@ -219,7 +219,7 @@ const ProductDescription = ({
   }, []);
 
   const { data: stockData } = useSWR(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/stock/productpage/?id=${currentProduct.id}`,
+    `/api/products/stock/productpage?id=${currentProduct.id}`,
     fetcher,
     {
       revalidateOnFocus: true,
