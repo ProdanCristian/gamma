@@ -42,7 +42,6 @@ export function useStableQuery(
     try {
       const response = await fetch(url, {
         signal: abortControllerRef.current.signal,
-        cache: "no-store",
       });
 
       if (!response.ok) {

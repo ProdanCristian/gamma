@@ -7,19 +7,8 @@ const i18nMiddleware = createMiddleware(routing);
 
 const middleware = async (request) => {
   const pathname = request.nextUrl.pathname;
-  
-  // Add cache headers for static routes
-  if (pathname === '/' || pathname === '/ro' || pathname === '/ru') {
-    const response = i18nMiddleware(request);
-    response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
-    // Remove unnecessary cookie setting for static routes
-    response.headers.delete('Set-Cookie');
-    response.headers.delete('x-middleware-set-cookie');
-    return response;
-  }
 
-  // Only check auth for dashboard routes
-  if (pathname.includes('/dashboard')) {
+  if (pathname.includes("/dashboard")) {
     const session = await getToken({
       req: request,
       secret: process.env.NEXTAUTH_SECRET,
@@ -42,19 +31,13 @@ const middleware = async (request) => {
 
 export default middleware;
 
-// Optimize matcher to be more specific
 export const config = {
   matcher: [
-    // Protected routes
-    '/dashboard',
-    '/(ro|ru)/dashboard',
-    
-    // Static routes
-    '/',
-    '/ro',
-    '/ru',
-    
-    // Dynamic routes that need i18n
-    '/(ro|ru)/((?!api|_next/static|_next/image|favicon.ico).*)'
-  ]
+    "/dashboard",
+    "/(ro|ru)/dashboard",
+    "/",
+    "/ro",
+    "/ru",
+    "/(ro|ru)/((?!api|_next/static|_next/image|favicon.ico).*)",
+  ],
 };

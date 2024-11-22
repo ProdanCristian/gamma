@@ -6,12 +6,6 @@ const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["pg"],
-  experimental: {
-    serverActions: {
-      bodySizeLimit: '2mb'
-    },
-    optimizeServerReact: true,
-  },
   images: {
     remotePatterns: [
       {
@@ -35,32 +29,6 @@ const nextConfig: NextConfig = {
         hostname: "img.youtube.com",
       },
     ],
-  },
-  async headers() {
-    return [
-      {
-        source: '/:locale',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, stale-while-revalidate=86400',
-          },
-          {
-            key: 'Connection',
-            value: "keep-alive",
-          },
-        ],
-      },
-      {
-        source: '/api/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, stale-while-revalidate=86400',
-          },
-        ],
-      },
-    ];
   },
 };
 
