@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function DELETE() {
   try {
-    const redis = cache["getRedis"]();
+    const redis = await cache["getRedis"]();
     const script = `
       local keys = redis.call('keys', 'cache:*')
       local deletedCount = 0
@@ -14,7 +14,7 @@ export async function DELETE() {
       return deletedCount
     `;
 
-    const deletedKeys = await redis.eval(script, 0);
+    const deletedKeys = await (redis as any).eval(script, 0);
 
     return NextResponse.json({
       success: true,

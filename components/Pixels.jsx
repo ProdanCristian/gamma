@@ -2,36 +2,96 @@
 
 import { useEffect } from "react";
 
+// Prevent Facebook Pixel debug WebSocket connection on localhost
+if (typeof window !== 'undefined') {
+  // Mock WebSocket for localhost debugging
+  const OriginalWebSocket = window.WebSocket;
+  window.WebSocket = function(url, ...args) {
+    if (url.includes('localhost:12387')) {
+      return {
+        close: () => {},
+        send: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {}
+      };
+    }
+    return new OriginalWebSocket(url, ...args);
+  };
+
+  // Suppress console errors for WebSocket
+  const originalConsoleError = console.error;
+  console.error = (...args) => {
+    const errorMessage = args[0]?.toString() || '';
+    if (errorMessage.includes('WebSocket') || errorMessage.includes('ws://localhost')) {
+      return;
+    }
+    originalConsoleError.apply(console, args);
+  };
+}
+
 export default function Pixels({ pixelData }) {
   useEffect(() => {
-    if (pixelData) {
-      // Create a temporary container to parse the HTML
+    if (!pixelData) return;
+
+    const appendToHead = () => {
+      // Create a temporary container for parsing
       const parser = new DOMParser();
       const doc = parser.parseFromString(pixelData, "text/html");
 
-      // Wait for head to be ready
-      const appendToHead = () => {
-        // Get all scripts and insert them
-        const scripts = doc.getElementsByTagName("script");
-        Array.from(scripts).forEach((scriptElement) => {
-          const script = document.createElement("script");
-          script.innerHTML = scriptElement.innerHTML;
-          script.defer = true; // Add defer attribute
-          script.async = true; // Add async attribute
-          document.head.appendChild(script); // Append at the end of head
+      // Function to safely append scripts
+      const appendScript = (scriptElement) => {
+        const script = document.createElement("script");
+        
+        // Copy all attributes
+        Array.from(scriptElement.attributes).forEach(attr => {
+          script.setAttribute(attr.name, attr.value);
         });
 
-        // Get all noscripts and insert them
-        const noscripts = doc.getElementsByTagName("noscript");
-        Array.from(noscripts).forEach((noscriptElement) => {
-          const noscript = document.createElement("noscript");
-          noscript.innerHTML = noscriptElement.innerHTML;
-          document.head.appendChild(noscript); // Append at the end of head
-        });
+        // Handle src scripts vs inline scripts
+        if (scriptElement.src) {
+          script.src = scriptElement.src;
+        } else {
+          script.innerHTML = scriptElement.innerHTML;
+        }
+
+        script.async = true;
+        script.defer = true;
+
+        // Error handling
+        script.onerror = (error) => {
+          if (!error?.message?.includes('WebSocket') && 
+              !error?.message?.includes('ws://localhost')) {
+            console.warn('Script loading error:', error);
+          }
+        };
+
+        // Append to head
+        document.head.appendChild(script);
       };
 
-      // Execute after a small delay to ensure head is ready
-      setTimeout(appendToHead, 0);
+      // Handle all script tags
+      const scripts = doc.getElementsByTagName("script");
+      Array.from(scripts).forEach(appendScript);
+
+      // Handle all noscript tags
+      const noscripts = doc.getElementsByTagName("noscript");
+      Array.from(noscripts).forEach((noscriptElement) => {
+        const noscript = document.createElement("noscript");
+        // Copy all attributes
+        Array.from(noscriptElement.attributes).forEach(attr => {
+          noscript.setAttribute(attr.name, attr.value);
+        });
+        noscript.innerHTML = noscriptElement.innerHTML;
+        document.body.appendChild(noscript);
+      });
+    };
+
+    // Initialize when document is ready
+    if (document.readyState === 'complete') {
+      appendToHead();
+    } else {
+      window.addEventListener('load', appendToHead);
+      return () => window.removeEventListener('load', appendToHead);
     }
   }, [pixelData]);
 

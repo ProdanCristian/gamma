@@ -5,13 +5,14 @@ export function generateStaticParams() {
   return [{ locale: "ru" }, { locale: "ro" }];
 }
 
-export function generateMetadata({ params }) {
-  const headersList = headers();
+export async function generateMetadata({ params }) {
+  const headersList = await headers();
   const domain = headersList.get("host") || process.env.NEXT_PUBLIC_BASE_URL;
   const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
   const baseUrl = `${protocol}://${domain}`;
 
-  const locale = params.locale;
+  const resolvedParams = await params;
+  const { locale } = resolvedParams;
 
   const title = locale === "ru" ? "Контакты | Gamma" : "Contacte | Gamma";
   const description =

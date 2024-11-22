@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "loadtest": "k6 run scripts/loadtest.js",
+    "loadtest:ci": "k6 run --out json=test-results.json scripts/loadtest.js"
   },
   "dependencies": {
     "@meilisearch/instant-meilisearch": "^0.22.0",

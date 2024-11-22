@@ -11,27 +11,26 @@ export class CacheService {
     return `${this.prefix}${key}`;
   }
 
-  private getRedis() {
-  const redis = RedisConnectionPool.getConnection();
-  redis.setMaxListeners(20); 
-  return redis;
-}
-
-async get<T>(key: string): Promise<T | null> {
-  const redis = this.getRedis();
-  try {
-    const data = await redis.get(this.getKey(key));
-    return data ? JSON.parse(data) : null;
-  } catch (error) {
-    console.error("Cache get error:", error);
-    return null;
+  private async getRedis() {
+    return await RedisConnectionPool.getConnection();
   }
-}
+
+  async get<T>(key: string): Promise<T | null> {
+    try {
+      const redis = await this.getRedis();
+      const data = await redis.get(this.getKey(key));
+      return data ? JSON.parse(data) : null;
+    } catch (error) {
+      console.error("Cache get error:", error);
+      return null;
+    }
+  }
 
   async mget<T>(keys: string[]): Promise<(T | null)[]> {
     try {
+      const redis = await this.getRedis();
       const prefixedKeys = keys.map((key) => this.getKey(key));
-      const results = await this.getRedis().mget(prefixedKeys);
+      const results = await redis.mget(prefixedKeys);
       return results.map((result: string | null) =>
         result ? JSON.parse(result) : null
       );
@@ -44,7 +43,7 @@ async get<T>(key: string): Promise<T | null> {
   async set(key: string, data: any, ttl?: number): Promise<void> {
     try {
       const serializedData = JSON.stringify(data);
-      const redis = this.getRedis();
+      const redis = await this.getRedis();
       if (ttl) {
         await redis.set(this.getKey(key), serializedData, "EX", ttl);
       } else {
@@ -55,21 +54,17 @@ async get<T>(key: string): Promise<T | null> {
     }
   }
 
-  async mset(
-    items: { key: string; value: any; ttl?: number }[]
-  ): Promise<void> {
+  async mset(keyValuePairs: { key: string; value: any; ttl?: number }[]): Promise<void> {
     try {
-      const redis = this.getRedis();
+      const redis = await this.getRedis();
       const pipeline = redis.pipeline();
-
-      items.forEach(({ key, value, ttl }) => {
-        const prefixedKey = this.getKey(key);
+      
+      keyValuePairs.forEach(({ key, value, ttl }) => {
         const serializedData = JSON.stringify(value);
-
         if (ttl) {
-          pipeline.set(prefixedKey, serializedData, "EX", ttl);
+          pipeline.set(this.getKey(key), serializedData, "EX", ttl);
         } else {
-          pipeline.set(prefixedKey, serializedData);
+          pipeline.set(this.getKey(key), serializedData);
         }
       });
 
@@ -79,19 +74,10 @@ async get<T>(key: string): Promise<T | null> {
     }
   }
 
-  async exists(key: string): Promise<boolean> {
-    try {
-      const exists = await this.getRedis().exists(this.getKey(key));
-      return exists === 1;
-    } catch (error) {
-      console.error("Cache exists error:", error);
-      return false;
-    }
-  }
-
   async delete(key: string): Promise<void> {
     try {
-      await this.getRedis().del(this.getKey(key));
+      const redis = await this.getRedis();
+      await redis.del(this.getKey(key));
     } catch (error) {
       console.error("Cache delete error:", error);
     }
@@ -99,7 +85,7 @@ async get<T>(key: string): Promise<T | null> {
 
   async clearPrefix(customPrefix?: string): Promise<void> {
     try {
-      const redis = this.getRedis();
+      const redis = await this.getRedis();
       const scanPrefix = customPrefix
         ? `cache:${customPrefix}*`
         : `${this.prefix}*`;
@@ -121,6 +107,17 @@ async get<T>(key: string): Promise<T | null> {
       } while (cursor !== "0");
     } catch (error) {
       console.error("Cache clearPrefix error:", error);
+    }
+  }
+
+  async exists(key: string): Promise<boolean> {
+    try {
+      const redis = await this.getRedis();
+      const exists = await redis.exists(this.getKey(key));
+      return exists === 1;
+    } catch (error) {
+      console.error("Cache exists error:", error);
+      return false;
     }
   }
 }

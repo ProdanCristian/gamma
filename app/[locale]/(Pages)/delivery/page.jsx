@@ -2,12 +2,13 @@ import Script from "next/script";
 import Link from "next/link";
 import Image from "next/image";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
   return [{ locale: "ru" }, { locale: "ro" }];
 }
 
-export function generateMetadata({ params }) {
-  const locale = params.locale;
+export async function generateMetadata({ params }) {
+  const resolvedParams = await params;
+  const { locale } = resolvedParams;
 
   const title = locale === "ru" ? "Доставка | Gamma" : "Livrare | Gamma";
   const description =
@@ -43,8 +44,9 @@ export function generateMetadata({ params }) {
   };
 }
 
-export default function Delivery({ params }) {
-  const locale = params.locale;
+export default async function Delivery({ params }) {
+  const resolvedParams = await params;
+  const { locale } = resolvedParams;
 
   const structuredData = {
     "@context": "https://schema.org",
