@@ -224,7 +224,6 @@ const ProductDescription = ({
     {
       revalidateOnFocus: true,
       refreshInterval: 0,
-      fallbackData: { success: true, data: { Stock: currentProduct.Stock } },
     }
   );
 
@@ -350,7 +349,7 @@ const ProductDescription = ({
         <div className="text-base">
           {quantity >= currentStock && currentStock > 0 ? (
             <span className="text-red-500">
-              {currentStock === 1
+              {currentStock === "1"
                 ? `1 ${t("unit")} ${t("in_stock")}`
                 : `${currentStock} ${t("units")} ${t("in_stock")}`}
             </span>

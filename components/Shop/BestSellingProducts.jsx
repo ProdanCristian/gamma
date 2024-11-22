@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,29 +22,26 @@ const fetcher = async (url) => {
   return response.json();
 };
 
-const TopProductsCarousel = ({ marketingData }) => {
+const TopProductsCarousel = ({ marketingData, products }) => {
   const t = useTranslations("home");
   const locale = useLocale();
-  const [loading, setLoading] = useState(true);
-  const [products, setProducts] = useState([]);
 
-  const { data: productsData, error } = useSWR(
-    "/api/products/bestSellingProducts?limit=12",
-    fetcher
+  const productIds = products.map((product) => product.id);
+  const queryString = productIds.map((id) => `ids=${id}`).join("&");
+
+  const { data: stockData } = useSWR(
+    `/api/products/stock?${queryString}`,
+    fetcher,
+    {
+      refreshInterval: 0,
+      revalidateOnFocus: true,
+    }
   );
 
-  useEffect(() => {
-    if (productsData?.success && productsData.products) {
-      setProducts(productsData.products);
-      setLoading(false);
-    }
-  }, [productsData]);
-
-  if (error) {
-    console.error("Failed to fetch products:", error);
-  }
-
-  const displayProducts = loading ? Array(12).fill({}) : products;
+  const productsWithStock = products.map((product) => ({
+    ...product,
+    Stock: stockData?.data?.[product.id] ?? product.Stock,
+  }));
 
   const computedBanner2Url =
     locale === "ro"
@@ -91,12 +87,12 @@ const TopProductsCarousel = ({ marketingData }) => {
               <CarouselNext className="absolute right-0 -top-7" />
             </div>
             <CarouselContent className="-ml-2 md:-ml-3 lg:-ml-4 w-[80%] md:w-full">
-              {displayProducts.map((product, index) => (
+              {productsWithStock.map((product, index) => (
                 <CarouselItem
                   key={index}
                   className="pl-2 md:pl-3 lg:pl-4 md:basis-1/2 lg:basis-1/2 xl:basis-1/3"
                 >
-                  <ProductCard product={product} loading={loading} />
+                  <ProductCard product={product} />
                 </CarouselItem>
               ))}
             </CarouselContent>

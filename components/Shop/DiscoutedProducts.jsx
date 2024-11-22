@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import Image from "next/image";
-import useSWR from "swr";
 import Link from "next/link";
+import useSWR from "swr";
 import {
   Carousel,
   CarouselContent,
@@ -23,32 +22,29 @@ const fetcher = async (url) => {
   return response.json();
 };
 
-const DiscountCarousel = ({ marketingData }) => {
+const DiscountCarousel = ({ marketingData, products }) => {
   const t = useTranslations("home");
   const locale = useLocale();
-  const [loading, setLoading] = useState(true);
-  const [products, setProducts] = useState([]);
 
-  const { data: productsData, error } = useSWR(
-    "/api/products/discountedProducts?limit=20",
-    fetcher
+  const productIds = products.map((product) => product.id);
+  const queryString = productIds.map((id) => `ids=${id}`).join("&");
+
+  const { data: stockData } = useSWR(
+    `/api/products/stock?${queryString}`,
+    fetcher,
+    {
+      refreshInterval: 0,
+      revalidateOnFocus: true,
+    }
   );
 
-  useEffect(() => {
-    if (productsData?.success && productsData.products) {
-      setProducts(productsData.products);
-      setLoading(false);
-    }
-  }, [productsData]);
+  const productsWithStock = products.map((product) => ({
+    ...product,
+    Stock: stockData?.data?.[product.id] ?? product.Stock,
+  }));
 
-  if (error) {
-    console.error("Failed to fetch products:", error);
-  }
-
-  const displayProducts = loading ? Array(20).fill({}) : products;
-
-  const firstRow = displayProducts.slice(0, displayProducts.length / 2);
-  const secondRow = displayProducts.slice(displayProducts.length / 2);
+  const firstRow = productsWithStock.slice(0, productsWithStock.length / 2);
+  const secondRow = productsWithStock.slice(productsWithStock.length / 2);
 
   const computedBanner1Url =
     locale === "ro"
@@ -95,9 +91,9 @@ const DiscountCarousel = ({ marketingData }) => {
                 className="md:basis-1/2 lg:basis-1/3 xl:basis-1/5"
               >
                 <div className="space-y-4">
-                  <ProductCard product={product} loading={loading} />
+                  <ProductCard product={product} />
                   {secondRow[index] && (
-                    <ProductCard product={secondRow[index]} loading={loading} />
+                    <ProductCard product={secondRow[index]} />
                   )}
                 </div>
               </CarouselItem>

@@ -42,12 +42,54 @@ async function getTopCategories() {
   }
 }
 
+async function getDiscountedProducts() {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    const response = await fetch(
+      `${baseUrl}/api/products/discountedProducts?limit=20`,
+      {
+        cache: "force-cache",
+      }
+    );
+    const data = await response.json();
+    return data.success ? data.products : [];
+  } catch (error) {
+    console.error("Error fetching discounted products:", error);
+    return [];
+  }
+}
+
+async function getBestSellingProducts() {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    const response = await fetch(
+      `${baseUrl}/api/products/bestSellingProducts?limit=12`,
+      {
+        cache: "force-cache",
+      }
+    );
+    const data = await response.json();
+    return data.success ? data.products : [];
+  } catch (error) {
+    console.error("Error fetching best selling products:", error);
+    return [];
+  }
+}
+
 export default async function Page({ params }) {
   const t = await getTranslations("home");
-  const [{ locale }, marketingData, topCategories] = await Promise.all([
+  const [
+    { locale },
+    marketingData,
+    topCategories,
+    discountedProducts,
+    bestSellingProducts,
+  ] = await Promise.all([
     params,
     getSliders(),
     getTopCategories(),
+    getDiscountedProducts(),
+    getBestSellingProducts(),
   ]);
 
   const sliders =
@@ -75,8 +117,14 @@ export default async function Page({ params }) {
         </div>
       </div>
       <TopCategories categories={topCategories} />
-      <DiscountedProducts marketingData={marketingData} />
-      <BestSellingProducts marketingData={marketingData} />
+      <DiscountedProducts
+        marketingData={marketingData}
+        products={discountedProducts}
+      />
+      <BestSellingProducts
+        marketingData={marketingData}
+        products={bestSellingProducts}
+      />
       <div className="max-w-[1250px] w-[90vw] mx-auto mt-10">
         <div className="w-full h-[125px] lg:h-[250px] relative">
           {banner3 && (
