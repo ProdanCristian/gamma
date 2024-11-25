@@ -417,7 +417,10 @@
     "status": {
       "pending": "Ожидает подтверждения",
       "confirmed": "Подтвержден",
-      "cancelled": "Отменен"
+      "cancelled": "Отменен",
+      "shipped": "Отправлен",
+      "delivered": "Доставлен",
+      "returned": "Возвращен"
     },
     "no_order_data": "Детали заказа не найдены",
     "product_price": "Цена товара",

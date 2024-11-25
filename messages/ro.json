@@ -417,9 +417,12 @@
     "error": "Eroare",
     "failed_to_load": "Nu s-au putut încărca comenzile",
     "status": {
-      "pending": "De Confirmat",
-      "confirmed": "Confirmat",
-      "cancelled": "Anulată"
+      "pending": "Solicitare Primită",
+      "confirmed": "Comanda Confirmată",
+      "cancelled": "Anulată",
+      "shipped": "Transmis la Curier",
+      "delivered": "Comanda finalizată",
+      "returned": "Retur"
     },
     "no_order_data": "Nu s-au găsit detalii despre comandă",
     "product_price": "Preț produs",

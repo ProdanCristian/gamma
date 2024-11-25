@@ -27,8 +27,11 @@ const OrdersTab = () => {
 
   const translateStatus = (status) => {
     const statusTranslations = {
-      "De Confirmat": t("Order.status.pending"),
-      Confirmat: t("Order.status.confirmed"),
+      "Solicitare Primita": t("Order.status.pending"),
+      "Comanda Confirmata": t("Order.status.confirmed"),
+      "Transmis la Curier": t("Order.status.shipped"),
+      "Comanda finalizata": t("Order.status.delivered"),
+      Retur: t("Order.status.returned"),
       Anulata: t("Order.status.cancelled"),
     };
     return statusTranslations[status] || status;
@@ -36,10 +39,16 @@ const OrdersTab = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "De Confirmat":
+      case "Solicitare Primita":
         return "bg-blue-600";
-      case "Confirmat":
+      case "Comanda Confirmata":
         return "bg-green-600";
+      case "Transmis la Curier":
+        return "bg-yellow-600";
+      case "Comanda finalizata":
+        return "bg-emerald-600";
+      case "Retur":
+        return "bg-orange-600";
       case "Anulata":
         return "bg-red-600";
       default:
