@@ -9,13 +9,14 @@ export async function GET(request) {
     if (!ids.length) {
       return NextResponse.json(
         { success: false, error: "Product IDs are required" },
-        { 
+        {
           status: 400,
           headers: {
-            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0'
-          }
+            "Cache-Control":
+              "no-store, no-cache, must-revalidate, proxy-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
         }
       );
     }
@@ -30,27 +31,32 @@ export async function GET(request) {
       return acc;
     }, {});
 
-    return NextResponse.json({
-      success: true,
-      data: stockData,
-    }, {
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
+    return NextResponse.json(
+      {
+        success: true,
+        data: stockData,
+      },
+      {
+        headers: {
+          "Cache-Control":
+            "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
       }
-    });
+    );
   } catch (error) {
     console.error("API Error:", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch stock" },
-      { 
+      {
         status: 500,
         headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
-        }
+          "Cache-Control":
+            "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
       }
     );
   }
@@ -59,7 +65,7 @@ export async function GET(request) {
 export async function PUT(request) {
   try {
     const { searchParams } = request.nextUrl;
-    const productId = searchParams.get('productId');
+    const productId = searchParams.get("productId");
     const body = await request.json();
     const { quantity } = body;
 
@@ -98,16 +104,20 @@ export async function PUT(request) {
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      data: { newStock }
-    }, {
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
+    return NextResponse.json(
+      {
+        success: true,
+        data: { newStock },
+      },
+      {
+        headers: {
+          "Cache-Control":
+            "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
       }
-    });
+    );
   } catch (error) {
     console.error("API Error:", error);
     return NextResponse.json(

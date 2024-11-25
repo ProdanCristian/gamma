@@ -248,6 +248,23 @@ export default function FastOrder() {
       });
 
       if (response.ok) {
+        const stockResponse = await fetch(
+          `/api/products/stock?productId=${product.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              quantity: quantity,
+            }),
+          }
+        );
+
+        if (!stockResponse.ok) {
+          console.error("Failed to update stock");
+        }
+
         const data = await response.json();
         setOpen(false);
 
@@ -293,6 +310,31 @@ export default function FastOrder() {
         } else {
           router.push(`/${params.locale}/checkout/lead`);
         }
+
+        await fetch("/api/amoCrm/addLead", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            email: session?.user?.email,
+            phone: stripPhonePrefix(phone).toString(),
+            products: [
+              {
+                id: product.id,
+                name: product.name,
+                quantity: quantity,
+                price: product.price,
+                discountPrice: product.discount,
+              },
+            ],
+            orderIds: [data.orderId],
+            total: total + deliveryCost,
+            address: data.address,
+            deliveryCost: deliveryCost,
+          }),
+        });
       } else {
         throw new Error("Failed to create order");
       }

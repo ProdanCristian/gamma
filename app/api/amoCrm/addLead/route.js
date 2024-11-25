@@ -47,11 +47,27 @@ export async function POST(request) {
     const date = new Date();
     const formattedDate = formatDateForAmo(date);
     const body = await request.json();
-    const { name, email, phone } = body;
+    const { name, email, phone, products, orderIds, address, deliveryCost } =
+      body;
+
+    // Format products information for details
+    const productsInfo = products
+      .map(
+        (product) =>
+          `[] ${product.name} (Cantitate: ${product.quantity} | ${
+            product.discountPrice || product.price
+          } lei) | COD PRODUS: ${product.id}`
+      )
+      .join("\n\n");
+
+    // Format lead name with product names and IDs
+    const leadName = products
+      .map((product) => `${product.name} #${product.id}`)
+      .join("\n");
 
     // Create contact first with email and phone
     const contactData = {
-      name: name || "Unknown",
+      name: name,
       custom_fields_values: [
         {
           field_code: "EMAIL",
@@ -82,10 +98,10 @@ export async function POST(request) {
     }
 
     const leadData = {
-      name: `${body.productName || "Product"} #${body.orderId || "12345"}`,
+      name: leadName,
       pipeline_id: 8625966,
       status_id: 69959062,
-      price: body.price || 1500,
+      price: body.total,
       _embedded: {
         contacts: [
           {
@@ -98,15 +114,7 @@ export async function POST(request) {
           field_id: 1123895,
           values: [
             {
-              value: body.productName || "Product 1",
-            },
-          ],
-        },
-        {
-          field_id: 1123897,
-          values: [
-            {
-              value: parseInt(body.orderId) || 12345,
+              value: productsInfo,
             },
           ],
         },
@@ -114,23 +122,31 @@ export async function POST(request) {
           field_id: 1410509,
           values: [
             {
-              value: body.address || "Test Street 123, Chisinau",
+              value: address || "No address provided",
             },
           ],
         },
         {
-          field_id: 1544979,
+          field_id: 1606519,
           values: [
             {
-              value: body.conversionName || name || "Unknown",
+              value: "Ramburs",
             },
           ],
         },
         {
-          field_id: 1544983,
+          field_id: 1606937,
           values: [
             {
-              value: body.productUrl || "https://gamma.md/product/test-product",
+              value: orderIds.join(", "),
+            },
+          ],
+        },
+        {
+          field_id: 1606939,
+          values: [
+            {
+              value: deliveryCost === 0 ? "Gratis" : `${deliveryCost} lei`,
             },
           ],
         },

@@ -95,7 +95,7 @@ export async function POST(request) {
             numePrenume,
             numarTelefon,
             product.id,
-            "De Confirmat",
+            "Solicitare Primita",
             product.quantity,
             isFreeDelivery ? "Gratis" : deliveryPrice.toString(),
             cartTotal.toFixed(2),

@@ -366,6 +366,32 @@ const CheckoutPage = () => {
         throw new Error(t("checkout.order_failed"));
       }
 
+      // Update stock for all products
+      const stockUpdatePromises = items.map((item) =>
+        fetch(`/api/products/stock?productId=${item.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            quantity: item.quantity,
+          }),
+        })
+      );
+
+      try {
+        const stockResponses = await Promise.all(stockUpdatePromises);
+        const failedUpdates = stockResponses.filter((response) => !response.ok);
+
+        if (failedUpdates.length > 0) {
+          console.error(
+            `Failed to update stock for ${failedUpdates.length} products`
+          );
+        }
+      } catch (error) {
+        console.error("Error updating stock:", error);
+      }
+
       const data = await response.json();
 
       const orderConfirmationData = {
@@ -419,6 +445,34 @@ const CheckoutPage = () => {
 
       // Navigate to order page
       router.push(`/${params.locale}/checkout/order`);
+
+      // In handlePlaceOrder after successful order creation:
+      try {
+        await fetch("/api/amoCrm/addLead", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: guestName,
+            email: guestEmail,
+            phone: formattedPhone,
+            products: items.map((item) => ({
+              id: item.id,
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price,
+              discountPrice: item.discountPrice,
+            })),
+            orderIds: data.orderIds,
+            total: total,
+            address: session ? userAddress : guestAddress,
+            deliveryCost: deliveryCost,
+          }),
+        });
+      } catch (error) {
+        console.error("Error creating amoCRM lead:", error);
+      }
     } catch (error) {
       toast({
         title: t("checkout.error"),

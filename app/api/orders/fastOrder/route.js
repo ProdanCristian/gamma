@@ -80,7 +80,7 @@ export async function POST(request) {
           numePrenume,
           parseInt(numarTelefon),
           productId,
-          "De Confirmat",
+          "Solicitare Primita",
           quantity,
           isFreeDelivery
             ? "Gratis"
