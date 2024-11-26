@@ -1,16 +1,48 @@
+import { NextResponse } from 'next/server';
+import db from '@/lib/db';
+
 export async function POST(req) {
   try {
-    const data = await req.json();
-    const leads = data?.leads;
+    const rawText = await req.text();
+    console.log('Raw webhook data:', rawText);
+    
+    // Parse URL-encoded data
+    const params = new URLSearchParams(rawText);
+    const data = {};
+    
+    // Convert URL-encoded data to nested object structure
+    for (const [key, value] of params.entries()) {
+      const keys = key.replace(/\]/g, '').split('[');
+      let current = data;
+      
+      for (let i = 0; i < keys.length - 1; i++) {
+        const k = keys[i];
+        if (!(k in current)) {
+          current[k] = /^\d+$/.test(keys[i + 1]) ? [] : {};
+        }
+        current = current[k];
+      }
+      
+      const lastKey = keys[keys.length - 1];
+      if (Array.isArray(current)) {
+        current[parseInt(lastKey)] = value;
+      } else {
+        current[lastKey] = value;
+      }
+    }
 
-    if (!leads || !Array.isArray(leads?.status)) {
+    console.log('Parsed data:', JSON.stringify(data, null, 2));
+
+    const leads = data?.leads?.status;
+    
+    if (!leads || !Array.isArray(leads)) {
       return NextResponse.json(
         { success: false, message: "Invalid webhook data format" },
         { status: 400 }
       );
     }
 
-    for (const lead of leads.status) {
+    for (const lead of leads) {
       const statusId = lead.status_id;
       const orderNumbers = lead.custom_fields.find(
         (field) => field.name === "Numarul comenzii"
@@ -77,7 +109,7 @@ export async function POST(req) {
               newStatus = "Transmis la Curier";
               break;
             case "71841690":
-              newStatus = "Comanda finalizata";
+              newStatus = "Comanda Finalizata";
               break;
             default:
               continue;

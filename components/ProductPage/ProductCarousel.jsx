@@ -45,9 +45,9 @@ export default function ProductCarousel({ images, altText }) {
         <CarouselContent>
           {images.map((image, index) => (
             <CarouselItem key={image.id || index}>
-              <Card className="bg-white dark:bg-charade-950 border-gray-200 dark:border-charade-700">
+              <Card className="bg-white dark:bg-charade-950 border-gray-200 dark:border-charade-700 overflow-hidden">
                 <CardContent className="p-0">
-                  <div className="relative aspect-square w-full">
+                  <div className="relative aspect-square w-full overflow-hidden">
                     <Image
                       src={`${process.env.NEXT_PUBLIC_MEDIA_URL}/${image.path}`}
                       alt={`${altText} - ${index + 1}`}

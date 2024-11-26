@@ -30,7 +30,7 @@ const OrdersTab = () => {
       "Solicitare Primita": t("Order.status.pending"),
       "Comanda Confirmata": t("Order.status.confirmed"),
       "Transmis la Curier": t("Order.status.shipped"),
-      "Comanda finalizata": t("Order.status.delivered"),
+      "Comanda Finalizata": t("Order.status.delivered"),
       Retur: t("Order.status.returned"),
       Anulata: t("Order.status.cancelled"),
     };
@@ -45,7 +45,7 @@ const OrdersTab = () => {
         return "bg-green-600";
       case "Transmis la Curier":
         return "bg-yellow-600";
-      case "Comanda finalizata":
+      case "Comanda Finalizata":
         return "bg-emerald-600";
       case "Retur":
         return "bg-orange-600";

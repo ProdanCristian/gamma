@@ -26,7 +26,16 @@ const middleware = async (request) => {
     }
   }
 
-  return i18nMiddleware(request);
+  const response = await i18nMiddleware(request);
+  
+  if (!pathname.includes("/dashboard")) {
+    response.headers.set(
+      "Cache-Control",
+      "public, max-age=3600, s-maxage=3600, stale-while-revalidate=59"
+    );
+  }
+
+  return response;
 };
 
 export default middleware;
