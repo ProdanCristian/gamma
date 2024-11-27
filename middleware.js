@@ -29,10 +29,7 @@ const middleware = async (request) => {
   const response = await i18nMiddleware(request);
 
   if (!pathname.includes("/dashboard")) {
-    response.headers.set(
-      "Cache-Control",
-      "public, s-maxage=3600, stale-while-revalidate=59"
-    );
+    response.headers.set("Cache-Control", "public, s-maxage=360000");
   }
 
   return response;
