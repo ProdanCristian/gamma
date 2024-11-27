@@ -5,6 +5,12 @@ const createNextIntlPlugin = require("next-intl/plugin");
 const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
+  generateBuildId: async () => {
+    return Date.now().toString();
+  },
+  env: {
+    NEXT_PUBLIC_BUILD_ID: Date.now().toString(),
+  },
   serverExternalPackages: ["pg"],
   images: {
     remotePatterns: [

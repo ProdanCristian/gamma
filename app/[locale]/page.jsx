@@ -1,11 +1,5 @@
 export const revalidate = false;
 
-export const metadata = {
-  headers: {
-    "Cache-Control": "public, s-maxage=infinite, stale-while-revalidate=86400",
-  },
-};
-
 import ImageCarousel from "@/components/ImageCarousel";
 import TopCategories from "@/components/TopCategories";
 import DiscountedProducts from "@/components/Shop/DiscoutedProducts";
