@@ -80,7 +80,6 @@ export async function POST(req) {
         let shouldUpdateStock = false;
         let quantityDifference = 0;
 
-        // Check if product is marked for cancellation
         if (
           products[i] &&
           (products[i].startsWith("X ") ||
@@ -88,19 +87,34 @@ export async function POST(req) {
             /^\[[\s]*[xX][\s]*\]/.test(products[i]))
         ) {
           newStatus = "Anulata";
-          shouldUpdateStock = true;
-          quantityDifference = currentOrderData.Cantitate;
+          const orderQuantity = parseInt(currentOrderData.Cantitate) || 0;
+          await db.query(
+            `UPDATE "nc_pka4__Produse" 
+               SET "Stock" = "Stock" + $1 
+               WHERE "id" = $2`,
+            [orderQuantity, currentOrderData.nc_pka4__Produse_id]
+          );
         } else {
           switch (statusId) {
             case "143":
               newStatus = "Anulata";
-              shouldUpdateStock = true;
-              quantityDifference = currentOrderData.Cantitate;
+              const cancelledQuantity = parseInt(currentOrderData.Cantitate) || 0;
+              await db.query(
+                `UPDATE "nc_pka4__Produse" 
+                   SET "Stock" = "Stock" + $1 
+                   WHERE "id" = $2`,
+                [cancelledQuantity, currentOrderData.nc_pka4__Produse_id]
+              );
               break;
             case "71841698":
               newStatus = "Retur";
-              shouldUpdateStock = true;
-              quantityDifference = currentOrderData.Cantitate;
+              const returnedQuantity = parseInt(currentOrderData.Cantitate) || 0;
+              await db.query(
+                `UPDATE "nc_pka4__Produse" 
+                   SET "Stock" = "Stock" + $1 
+                   WHERE "id" = $2`,
+                [returnedQuantity, currentOrderData.nc_pka4__Produse_id]
+              );
               break;
             case "69959066":
               newStatus = "Comanda Confirmata";
@@ -116,17 +130,27 @@ export async function POST(req) {
           }
         }
 
-        // Check if quantity has changed
+        // Handle quantity changes from amoCRM
         if (
           newQuantity !== null &&
           newQuantity !== currentOrderData.Cantitate
         ) {
           quantityDifference = currentOrderData.Cantitate - newQuantity;
+          
+          // Update order quantity
           await db.query(
             `UPDATE "nc_pka4___Comenzi" 
                SET "Cantitate" = $1 
                WHERE "id" = $2`,
             [newQuantity, orderId]
+          );
+
+          // Update product stock for quantity difference
+          await db.query(
+            `UPDATE "nc_pka4__Produse" 
+               SET "Stock" = "Stock" + $1 
+               WHERE "id" = $2`,
+            [quantityDifference, currentOrderData.nc_pka4__Produse_id]
           );
         }
 
@@ -137,16 +161,6 @@ export async function POST(req) {
              WHERE "id" = $2`,
           [newStatus, orderId]
         );
-
-        // Update product stock if needed
-        if (shouldUpdateStock || quantityDifference !== 0) {
-          await db.query(
-            `UPDATE "nc_pka4__Produse" 
-               SET "Stock" = "Stock" + $1 
-               WHERE "id" = $2`,
-            [quantityDifference, currentOrderData.nc_pka4__Produse_id]
-          );
-        }
       }
     }
 

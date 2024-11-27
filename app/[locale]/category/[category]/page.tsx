@@ -1,3 +1,4 @@
+export const revalidate = false;
 import { getTranslations, getLocale } from "next-intl/server";
 import CategoryProducts from "./categoryproducts";
 import {

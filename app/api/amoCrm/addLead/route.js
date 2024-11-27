@@ -122,7 +122,7 @@ export async function POST(request) {
           field_id: 1410509,
           values: [
             {
-              value: address || "No address provided",
+              value: address || "",
             },
           ],
         },

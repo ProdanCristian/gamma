@@ -1,46 +1,27 @@
-import http from "k6/http";
-import { check, sleep } from "k6";
-import { Rate, Trend } from "k6/metrics";
-
-const errorRate = new Rate("errors");
-const timeToFirstByte = new Trend("time_to_first_byte");
+import http from 'k6/http';
+import { sleep, check } from 'k6';
 
 export const options = {
+  // Ramp up virtual users
   stages: [
-    { duration: "2m", target: 500 },
-    { duration: "3m", target: 500 },
-    { duration: "2m", target: 1000 },
-    { duration: "2m", target: 0 },
+    { duration: '1m', target: 200 },    // Slowly ramp up to 10 users
+    { duration: '3m', target: 500 },     // Stay at 50 users for a minute
+    { duration: '30s', target: 0 }      // Ramp down to 0 users
   ],
+  // Thresholds for performance
   thresholds: {
-    http_req_duration: ["p(95)<1000"],
-    "http_req_duration{staticAsset:yes}": ["p(95)<200"],
-    errors: ["rate<0.01"],
-    time_to_first_byte: ["p(95)<100"],
-  },
+    'http_req_duration': ['p(95)<500'],  // 95% of requests under 500ms`
+    'http_req_failed': ['rate<0.01']     // Less than 1% request failure
+  }
 };
 
-const BASE_URL = "https://gamma.md";
-const SLEEP_DURATION = { min: 1, max: 3 };
-
-export default function () {
-  const response = http.get(
-    `${BASE_URL}/ro/product/cs-h8c-r200-1k3kfl4ga-ip-pt-4g-3mpx-4mm_193`,
-    {
-      tags: { page: "product", staticAsset: "yes" },
-    }
-  );
-
-  check(response, {
-    "status is 200": (r) => r.status === 200,
-    "response time < 500ms": (r) => r.timings.duration < 500,
+export default function() {
+  const res = http.get('http://193.160.119.179:3000');  // Replace with your app's URL
+  
+  check(res, {
+    'status is 200': (r) => r.status === 200,
+    'transaction time OK': (r) => r.timings.duration < 500
   });
-
-  timeToFirstByte.add(response.timings.waiting);
-  errorRate.add(response.status !== 200);
-
-  sleep(
-    SLEEP_DURATION.min +
-      Math.random() * (SLEEP_DURATION.max - SLEEP_DURATION.min)
-  );
+  
+  sleep(1);  // Think time between requests
 }
