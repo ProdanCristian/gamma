@@ -22,71 +22,84 @@ export default function PWAInstallPrompt() {
   const [canInstall, setCanInstall] = useState(false);
 
   useEffect(() => {
-    const detectDeviceType = () => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      const prompt = e as any;
+      setDeferredPrompt(prompt);
+      setCanInstall(true);
+      console.log("Deferred prompt captured", prompt);
+    };
+
+    const checkPWAInstallAvailability = () => {
       const userAgent = window.navigator.userAgent.toLowerCase();
-      if (/iphone|ipad|ipod/.test(userAgent)) {
+      const isIOS = /iphone|ipad|ipod/.test(userAgent);
+      const isAndroid = /android/.test(userAgent);
+      const isMobile = isIOS || isAndroid;
+
+      console.log("Device detection:", { isIOS, isAndroid, isMobile });
+
+      if (isIOS) {
         setDeviceType("ios");
-      } else if (/android/.test(userAgent)) {
+        setCanInstall(true);
+      } else if (isAndroid) {
         setDeviceType("android");
       } else {
         setDeviceType("desktop");
       }
+
+      const isPWASupported = 'serviceWorker' in navigator && 
+                              'beforeinstallprompt' in window;
+      
+      console.log("PWA Support:", isPWASupported);
+      
+      setCanInstall(isPWASupported || isMobile);
     };
 
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-      setCanInstall(true);
-    };
-
-    const checkPWAInstallAvailability = () => {
-      if ("serviceWorker" in navigator && "beforeinstallprompt" in window) {
-        setCanInstall(true);
-      }
-    };
-
-    detectDeviceType();
     checkPWAInstallAvailability();
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
     return () => {
-      window.removeEventListener(
-        "beforeinstallprompt",
-        handleBeforeInstallPrompt
-      );
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
     };
   }, []);
 
   const handleInstallClick = async () => {
+    console.log("Install clicked", { 
+      deviceType, 
+      deferredPrompt, 
+      canInstall 
+    });
+
     if (deviceType === "ios") {
+      alert("For iOS, please use browser's 'Add to Home Screen' option");
       setShowPrompt(false);
       return;
     }
 
-    if (!deferredPrompt && deviceType === "desktop") {
-      if (window.navigator.userAgent.includes("Chrome")) {
-        window.open("chrome://flags/#install-pwa", "_blank");
+    if (!deferredPrompt) {
+      console.error("No deferred prompt available");
+      alert("PWA installation is not supported on this device");
+      setShowPrompt(false);
+      return;
+    }
+
+    try {
+      const { outcome } = await deferredPrompt.prompt();
+      console.log("Installation outcome:", outcome);
+
+      if (outcome === "accepted") {
+        setDeferredPrompt(null);
+        setCanInstall(false);
       } else {
-        alert(t("other_browser_instructions"));
+        console.log("Installation was dismissed");
       }
       setShowPrompt(false);
-      return;
+    } catch (error) {
+      console.error("PWA installation failed:", error);
+      alert("Failed to install the app. Please try again.");
+      setShowPrompt(false);
     }
-
-    if (deferredPrompt) {
-      try {
-        const { outcome } = await deferredPrompt.prompt();
-        if (outcome === "accepted") {
-          setDeferredPrompt(null);
-          setCanInstall(false);
-        }
-      } catch (error) {
-        console.error("PWA installation failed:", error);
-        alert(t("install_error"));
-      }
-    }
-    setShowPrompt(false);
   };
 
   return (
