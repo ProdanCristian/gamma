@@ -142,14 +142,14 @@ export default function PWAInstallPrompt() {
             className="flex w-full bg-charade-950 p-2 rounded-xl border-2 border-gray-500 items-center justify-center gap-2 cursor-pointer"
             onClick={() => setShowPrompt(true)}
           >
-            <PiLaptopThin className="h-7 w-7" />
+            <PiLaptopThin className="h-7 w-7 text-white" />
             <h3 className="text-white">{t("install_desktop_app")}</h3>
           </div>
         </div>
       )}
 
       <Dialog open={showPrompt} onOpenChange={setShowPrompt}>
-        <DialogContent>
+        <DialogContent className="dark:bg-charade-950 border border-charade-900">
           <DialogHeader>
             <DialogTitle>{t("install_dialog_title")}</DialogTitle>
             <DialogDescription>
