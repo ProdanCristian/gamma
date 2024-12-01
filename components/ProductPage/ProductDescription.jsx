@@ -199,7 +199,14 @@ const ProductDescription = ({
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setShowStickyButton(!entry.isIntersecting);
+        if (!entry.isIntersecting) {
+          const bottomReached =
+            window.innerHeight + window.scrollY >=
+            document.documentElement.offsetHeight - 10;
+          setShowStickyButton(!bottomReached);
+        } else {
+          setShowStickyButton(false);
+        }
       },
       {
         threshold: 0,
@@ -207,14 +214,27 @@ const ProductDescription = ({
       }
     );
 
+    const handleScroll = () => {
+      const bottomReached =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.offsetHeight - 10;
+
+      if (bottomReached) {
+        setShowStickyButton(false);
+      }
+    };
+
     if (originalButtonRef.current) {
       observer.observe(originalButtonRef.current);
     }
+
+    window.addEventListener("scroll", handleScroll);
 
     return () => {
       if (originalButtonRef.current) {
         observer.unobserve(originalButtonRef.current);
       }
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 

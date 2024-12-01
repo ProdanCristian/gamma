@@ -89,9 +89,9 @@ const BestsellersPage = () => {
     parseInt(searchParams.get("minPrice") || "0"),
     parseInt(searchParams.get("maxPrice") || "50000"),
   ]);
-  // Always true for bestsellers page
+
   const showBestsellers = true;
-  const setShowBestsellers = () => {}; // Empty function since we don't need to change it
+  const setShowBestsellers = () => {};
   const [showDiscounted, setShowDiscounted] = useState(
     searchParams.get("discounted") === "true"
   );
@@ -124,12 +124,10 @@ const BestsellersPage = () => {
     }).format(price);
   };
 
-  // Add refs for tracking initial renders
   const isInitialMount = useRef(true);
   const isInitialUrlUpdate = useRef(true);
   const isInitialPageReset = useRef(true);
 
-  // Memoize the URLs
   const maxPriceUrl = useMemo(() => {
     return `/api/products/maxPrice?bestsellers=true&discounted=${showDiscounted}${Object.entries(
       selectedAttributes
@@ -159,7 +157,6 @@ const BestsellersPage = () => {
     selectedAttributes,
   ]);
 
-  // Memoize query keys
   const queryKeys = useMemo(
     () => ({
       products: apiUrl,
@@ -342,6 +339,15 @@ const BestsellersPage = () => {
                 className="hover:text-gray-900 dark:hover:text-gray-200"
               >
                 {locale === "ru" ? "Главная" : "Acasă"}
+              </Link>
+            </li>
+            <li>/</li>
+            <li>
+              <Link
+                href={`/${locale}/shop`}
+                className="hover:text-gray-900 dark:hover:text-gray-200"
+              >
+                {locale === "ru" ? "Магазин" : "Magazin"}
               </Link>
             </li>
             <li>/</li>

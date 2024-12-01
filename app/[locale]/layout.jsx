@@ -6,6 +6,7 @@ import { routing } from "@/i18n/routing";
 import { ThemeProvider } from "@/components/Providers/ThemeProvider";
 import HeaderDesktop from "@/components/Header/HeaderDesktop";
 import HeaderMobile from "@/components/Header/HeaderMobile";
+import BackButton from "@/components/BackButton";
 import "./globals.css";
 import SubHeader from "@/components/Header/SubHeader";
 import AuthProvider from "@/components/Providers/SessionProvider";
@@ -87,6 +88,7 @@ export default async function LocaleLayout({ children, params }) {
           sizes="180x180"
           href="/favicon/apple-touch-icon.png"
         />
+        <link rel="manifest" href="/favicon/site.webmanifest" />
       </head>
       <body className="antialiased">
         <Pixels pixelData={pixelsData} />
@@ -101,6 +103,7 @@ export default async function LocaleLayout({ children, params }) {
               <HeaderDesktop />
               <HeaderMobile />
               <SubHeader />
+              <BackButton />
               <div className="pt-[77px] md:pt-0">{children}</div>
               <BeforeFooter />
               <Footer />

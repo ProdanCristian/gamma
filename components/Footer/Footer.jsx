@@ -15,6 +15,7 @@ import {
 } from "react-icons/pi";
 import MenuFooter from "./MenuFooter";
 import { useToast } from "@/hooks/use-toast";
+import PWAInstallPrompt from "../PWAInstallPrompt";
 
 const fetcher = (url) =>
   fetch(url).then((res) => {
@@ -141,8 +142,31 @@ export default function Footer() {
         </div>
 
         <div className="max-w-[1250px] w-[90%] mx-auto justify-between my-10 flex flex-col md:flex-row">
-          <div className="flex flex-col gap-4 justify-center items-center md:items-start md:w-1/3">
-            <Link href="/" locale={false} aria-label={t("home_link")}>
+          <Link
+            href="/"
+            locale={false}
+            aria-label={t("home_link")}
+            className="md:hidden self-center"
+          >
+            <div className="h-12 w-[150px]">
+              {blackLogo && lightLogo && (
+                <img
+                  src={currentTheme === "dark" ? lightLogo : blackLogo}
+                  alt={t("logo_alt")}
+                  className="h-full w-full"
+                  loading="lazy"
+                  aria-hidden="true"
+                />
+              )}
+            </div>
+          </Link>
+          <div className="flex flex-col gap-4 self-center md:w-1/3 w-[70%]">
+            <Link
+              href="/"
+              locale={false}
+              aria-label={t("home_link")}
+              className="hidden md:block"
+            >
               <div className="h-12 w-[150px]">
                 {blackLogo && lightLogo && (
                   <img
@@ -191,15 +215,13 @@ export default function Footer() {
 
             <a
               href="https://www.google.com/maps/search/?api=1&query=Strada+Sfîntul+Gheorghe+6,+Chișinău,+Moldova"
-              className="flex justify-center md:justify-start items-center md:items-start gap-2 w-auto"
+              className="flex gap-2 "
               aria-label={t("address_link")}
             >
               <div className="flex bg-accent p-2 rounded-full w-[40px] h-[40px] items-center justify-center">
                 <PiMapPin className="text-white" size={30} aria-hidden="true" />
               </div>
-              <p className="text-gray-500 justify-center w-[50%]">
-                {t("street")}
-              </p>
+              <p className="text-gray-500 justify-center ">{t("street")}</p>
             </a>
           </div>
 
@@ -262,44 +284,13 @@ export default function Footer() {
                 }}
               />
             </div>
-            <h2 className="text-xl font-bold mb-4 text-charade-950 dark:text-white">
-              {t("mobile_app")}
-            </h2>
-            <div
-              className="flex w-full bg-charade-950 p-2 rounded-xl border-2 border-gray-500 items-center justify-center gap-2 mb-2"
-              role="link"
-              aria-label={t("download_for_iphone")}
-            >
-              <img
-                src="/Apple.svg"
-                alt="App Store"
-                className="h-7"
-                loading="lazy"
-                aria-hidden="true"
-              />
-              <h3 className="text-white">{t("download_for_iphone")}</h3>
-            </div>
-            <div
-              className="flex w-full bg-charade-950 p-2 rounded-xl border-2 border-gray-500 items-center justify-center gap-2"
-              role="link"
-              aria-label={t("download_for_android")}
-            >
-              <img
-                src="/Playstore.svg"
-                alt="Play Store"
-                className="h-7"
-                loading="lazy"
-                aria-hidden="true"
-              />
-              <h3 className="text-white">{t("download_for_android")}</h3>
-            </div>
+            <PWAInstallPrompt />
           </div>
         </div>
       </div>
       <div>
         <div className="bg-charade-900 py-2">
           <div className="max-w-[1250px] w-[90%] mx-auto flex items-center justify-center gap-2">
-            <p className="text-sm text-gray-200  mr-2">v1.0</p>
             <p className="text-sm text-gray-400 text-center flex items-center justify-center gap-2">
               <span>{t("developed_by")}</span>
               <a

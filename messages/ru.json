@@ -231,7 +231,7 @@
     "reset_password": "Сброс пароля"
   },
   "profile": {
-    "updating": "Обновление про��иля...",
+    "updating": "Обновление проиля...",
     "profile_information": "Информация профиля",
     "first_name": "Имя",
     "last_name": "Фамилия",
@@ -329,7 +329,15 @@
     "instagram_link": "Следите за нами в Instagram",
     "app_store_link": "Скачать приложение для iPhone",
     "play_store_link": "Скачать приложение для Android",
-    "developed_by": "Приложение разработано"
+    "developed_by": "Приложение разработано",
+    "install_app": "Установить приложение",
+    "install_ios_app": "Установить для iPhone",
+    "install_android_app": "Установить для Android",
+    "install_desktop_app": "Установить для компьютера",
+    "install_dialog_title": "Установить приложение Gamma",
+    "install_dialog_description": "Установите наше приложение на ваше устройство для лучшего опыта использования",
+    "not_now": "Не сейчас",
+    "install": "Установить"
   },
   "home": {
     "discounted_products_title": "Неоспоримые скидки",
@@ -443,7 +451,7 @@
     "total": "Итого",
     "free": "Бесплатно",
     "total_discount": "Общая скидка",
-    "empty_cart": "Ваша корзи��а пуста",
+    "empty_cart": "Ваша корзиа пуста",
     "processing": "Обработка...",
     "place_order": "Разместить заказ",
     "error": "Ошибка",
