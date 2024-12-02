@@ -1,25 +1,16 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Button } from "./ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "./ui/dialog";
-import { PiLaptopThin } from "react-icons/pi";
 import { useTranslations, useLocale } from "next-intl";
+import { PiLaptopThin } from "react-icons/pi";
 
 export default function PWAInstallPrompt() {
   const t = useTranslations("footer");
   const locale = useLocale();
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [showPrompt, setShowPrompt] = useState(false);
+  const [canInstall, setCanInstall] = useState(false);
   const [deviceType, setDeviceType] = useState<"ios" | "android" | "desktop">(
     "desktop"
   );
-  const [canInstall, setCanInstall] = useState(false);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -47,11 +38,11 @@ export default function PWAInstallPrompt() {
         setDeviceType("desktop");
       }
 
-      const isPWASupported = 'serviceWorker' in navigator && 
-                              'beforeinstallprompt' in window;
-      
+      const isPWASupported =
+        "serviceWorker" in navigator && "beforeinstallprompt" in window;
+
       console.log("PWA Support:", isPWASupported);
-      
+
       setCanInstall(isPWASupported || isMobile);
     };
 
@@ -60,27 +51,34 @@ export default function PWAInstallPrompt() {
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
     return () => {
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt
+      );
     };
   }, []);
 
   const handleInstallClick = async () => {
-    console.log("Install clicked", { 
-      deviceType, 
-      deferredPrompt, 
-      canInstall 
-    });
-
     if (deviceType === "ios") {
-      alert("For iOS, please use browser's 'Add to Home Screen' option");
-      setShowPrompt(false);
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: document.title,
+            url: window.location.href,
+          });
+        } catch (error) {
+          console.error("Sharing failed:", error);
+          alert(t("ios_install_manual"));
+        }
+      } else {
+        alert(t("ios_install_manual"));
+      }
       return;
     }
 
     if (!deferredPrompt) {
       console.error("No deferred prompt available");
       alert("PWA installation is not supported on this device");
-      setShowPrompt(false);
       return;
     }
 
@@ -91,14 +89,10 @@ export default function PWAInstallPrompt() {
       if (outcome === "accepted") {
         setDeferredPrompt(null);
         setCanInstall(false);
-      } else {
-        console.log("Installation was dismissed");
       }
-      setShowPrompt(false);
     } catch (error) {
       console.error("PWA installation failed:", error);
       alert("Failed to install the app. Please try again.");
-      setShowPrompt(false);
     }
   };
 
@@ -111,7 +105,7 @@ export default function PWAInstallPrompt() {
           </h2>
           <div
             className="flex w-full bg-charade-950 p-2 rounded-xl border-2 border-gray-500 items-center justify-center gap-2 mb-2 cursor-pointer"
-            onClick={() => setShowPrompt(true)}
+            onClick={handleInstallClick}
           >
             <img
               src="/Apple.svg"
@@ -132,7 +126,7 @@ export default function PWAInstallPrompt() {
           </h2>
           <div
             className="flex w-full bg-charade-950 p-2 rounded-xl border-2 border-gray-500 items-center justify-center gap-2 cursor-pointer"
-            onClick={() => setShowPrompt(true)}
+            onClick={handleInstallClick}
           >
             <img
               src="/Playstore.svg"
@@ -153,30 +147,13 @@ export default function PWAInstallPrompt() {
           </h2>
           <div
             className="flex w-full bg-charade-950 p-2 rounded-xl border-2 border-gray-500 items-center justify-center gap-2 cursor-pointer"
-            onClick={() => setShowPrompt(true)}
+            onClick={handleInstallClick}
           >
             <PiLaptopThin className="h-7 w-7 text-white" />
             <h3 className="text-white">{t("install_desktop_app")}</h3>
           </div>
         </div>
       )}
-
-      <Dialog open={showPrompt} onOpenChange={setShowPrompt}>
-        <DialogContent className="dark:bg-charade-950 border border-charade-900">
-          <DialogHeader>
-            <DialogTitle>{t("install_dialog_title")}</DialogTitle>
-            <DialogDescription>
-              {t("install_dialog_description")}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-end gap-4 mt-4">
-            <Button variant="outline" onClick={() => setShowPrompt(false)}>
-              {t("not_now")}
-            </Button>
-            <Button onClick={handleInstallClick}>{t("install")}</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }

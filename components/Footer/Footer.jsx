@@ -185,7 +185,7 @@ export default function Footer() {
 
             <a
               href="tel:022897007"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 flex-col  md:flex-row"
               aria-label={t("phone_contact")}
             >
               <div className="flex relative bg-accent p-2 rounded-full w-[40px] h-[40px] items-center justify-center">
@@ -200,7 +200,7 @@ export default function Footer() {
 
             <a
               href="mailto:info@gamma.md"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 flex-col md:flex-row"
               aria-label={t("email_contact")}
             >
               <div className="flex bg-accent p-2 rounded-full w-[40px] h-[40px] items-center justify-center">
@@ -215,13 +215,13 @@ export default function Footer() {
 
             <a
               href="https://www.google.com/maps/search/?api=1&query=Strada+Sfîntul+Gheorghe+6,+Chișinău,+Moldova"
-              className="flex gap-2 "
+              className="flex items-center gap-2 flex-col md:flex-row"
               aria-label={t("address_link")}
             >
               <div className="flex bg-accent p-2 rounded-full w-[40px] h-[40px] items-center justify-center">
                 <PiMapPin className="text-white" size={30} aria-hidden="true" />
               </div>
-              <p className="text-gray-500 justify-center ">{t("street")}</p>
+              <p className="text-gray-500 text-center">{t("street")}</p>
             </a>
           </div>
 
