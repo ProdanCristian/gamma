@@ -82,7 +82,34 @@ export default async function LocaleLayout({ children, params }) {
     <html lang={locale} suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" id="theme-color" content="#ffffff" />
         <link rel="icon" href="/favicon/favicon.ico" sizes="any" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              function updateThemeColor() {
+                const themeColorMeta = document.querySelector('#theme-color');
+                const isDark = document.documentElement.classList.contains('dark');
+                themeColorMeta.setAttribute('content', isDark ? '#262833' : '#ffffff');
+              }
+              
+              const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                  if (mutation.attributeName === 'class') {
+                    updateThemeColor();
+                  }
+                });
+              });
+              
+              observer.observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ['class']
+              });
+              
+              updateThemeColor();
+            `,
+          }}
+        />
         <link
           rel="apple-touch-icon"
           sizes="180x180"

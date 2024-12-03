@@ -62,7 +62,7 @@ const IphoneInstall = () => {
                   {t("get_10_off_cupon")}
                 </h2>
                 <Image
-                  src="/iphones.png"
+                  src="/Iphones.png"
                   alt="app-store"
                   width={160}
                   height={160}
