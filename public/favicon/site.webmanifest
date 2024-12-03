@@ -30,12 +30,18 @@
     }
   ],
   "display": "standalone",
-  "orientation": "any",
+  "orientation": "portrait",
   "categories": ["shopping"],
   "screenshots": [
     {
-      "src": "screenshots/mobile.png",
-      "sizes": "390x844",
+      "src": "screenshots/Screenshot 1.png",
+      "sizes": "277x600",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "screenshots/Screenshot 2.png",
+      "sizes": "277x600",
       "type": "image/png",
       "form_factor": "narrow"
     }
