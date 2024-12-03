@@ -116,58 +116,11 @@ export default async function LocaleLayout({ children, params }) {
           href="/favicon/apple-touch-icon.png"
         />
         <link rel="manifest" href="/favicon/site.webmanifest" />
-        <link
-          rel="apple-touch-startup-image"
-          href="/splashscreens/4__iPhone_SE__iPod_touch_5th_generation_and_later_portrait.png"
-          media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
-        />
-        <link
-          rel="apple-touch-startup-image"
-          href="/splashscreens/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_portrait.png"
-          media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
-        />
-        <link
-          rel="apple-touch-startup-image"
-          href="/splashscreens/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_portrait.png"
-          media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)"
-        />
-        <link
-          rel="apple-touch-startup-image"
-          href="/splashscreens/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_portrait.png"
-          media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
-        />
-        <link
-          rel="apple-touch-startup-image"
-          href="/splashscreens/iPhone_11__iPhone_XR_portrait.png"
-          media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)"
-        />
-        <link
-          rel="apple-touch-startup-image"
-          href="/splashscreens/iPhone_11_Pro_Max__iPhone_XS_Max_portrait.png"
-          media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)"
-        />
-        <link
-          rel="apple-touch-startup-image"
-          href="/splashscreens/10.2__iPad_portrait.png"
-          media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)"
-        />
-        <link
-          rel="apple-touch-startup-image"
-          href="/splashscreens/10.5__iPad_Air_portrait.png"
-          media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)"
-        />
-        <link
-          rel="apple-touch-startup-image"
-          href="/splashscreens/10.9__iPad_Air_portrait.png"
-          media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)"
-        />
-        <link
-          rel="apple-touch-startup-image"
-          href="/splashscreens/12.9__iPad_Pro_portrait.png"
-          media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)"
-        />
       </head>
       <body className="antialiased">
+        <div className="splash-screen">
+          <img src="/logo.png" alt="Logo" />
+        </div>
         <Pixels pixelData={pixelsData} />
         <NextIntlClientProvider messages={messages} locale={locale}>
           <ThemeProvider
