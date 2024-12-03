@@ -84,7 +84,8 @@ export default async function LocaleLayout({ children, params }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" id="theme-color" content="#ffffff" />
         <link rel="icon" href="/favicon/favicon.ico" sizes="any" />
-        
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         {/* iOS PWA Splash Screens */}
         <link rel="apple-touch-startup-image" href="/splashscreens/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_portrait.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)" />
         <link rel="apple-touch-startup-image" href="/splashscreens/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_portrait.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" />
@@ -101,6 +102,7 @@ export default async function LocaleLayout({ children, params }) {
         <link rel="apple-touch-startup-image" href="/splashscreens/8.3__iPad_Mini_portrait.png" media="(device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2)" />
         <link rel="apple-touch-startup-image" href="/splashscreens/iPhone_16_Pro_Max_portrait.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" />
         <link rel="apple-touch-startup-image" href="/splashscreens/iPhone_16__iPhone_15_Pro__iPhone_15__iPhone_14_Pro_portrait.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" />
+
         
         <script
           dangerouslySetInnerHTML={{
@@ -136,9 +138,6 @@ export default async function LocaleLayout({ children, params }) {
         <link rel="manifest" href="/favicon/site.webmanifest" />
       </head>
       <body className="antialiased">
-        <div className="splash-screen">
-          <img src="/logo.png" alt="Logo" />
-        </div>
         <Pixels pixelData={pixelsData} />
         <NextIntlClientProvider messages={messages} locale={locale}>
           <ThemeProvider

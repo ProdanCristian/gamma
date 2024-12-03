@@ -299,7 +299,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="hover:text-accent transition-colors font-bold text-lg flex items-center gap-1 group"
               >
-                <span className="bg-gradient-to-b from-accent to-accent-light bg-clip-text text-transparent">
+                <span className="text-accent">
                   prodandigital
                 </span>
                 <svg

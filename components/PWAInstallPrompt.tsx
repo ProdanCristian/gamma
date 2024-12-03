@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { PiLaptopThin } from "react-icons/pi";
 import IphoneInstall from "./IphoneInstall";
+import Cookies from "js-cookie";
 
 export default function PWAInstallPrompt() {
   const t = useTranslations("footer");
@@ -13,14 +14,25 @@ export default function PWAInstallPrompt() {
     "desktop"
   );
   const [showIphoneInstall, setShowIphoneInstall] = useState(false);
+  const [hasShownPrompt, setHasShownPrompt] = useState(false);
 
   useEffect(() => {
+    const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
+    if (isInstalled) {
+      setCanInstall(false);
+      return;
+    }
+
+    const hasShownIOSPrompt = Cookies.get('hasShownIOSPrompt');
+    if (hasShownIOSPrompt) {
+      setHasShownPrompt(true);
+    }
+
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       const prompt = e as any;
       setDeferredPrompt(prompt);
       setCanInstall(true);
-      console.log("Deferred prompt captured", prompt);
     };
 
     const checkPWAInstallAvailability = () => {
@@ -29,11 +41,17 @@ export default function PWAInstallPrompt() {
       const isAndroid = /android/.test(userAgent);
       const isMobile = isIOS || isAndroid;
 
-      console.log("Device detection:", { isIOS, isAndroid, isMobile });
-
       if (isIOS) {
         setDeviceType("ios");
         setCanInstall(true);
+        
+        if (!hasShownIOSPrompt) {
+          setTimeout(() => {
+            setShowIphoneInstall(true);
+            setHasShownPrompt(true);
+            Cookies.set('hasShownIOSPrompt', 'true', { expires: 365 });
+          }, 3500);
+        }
       } else if (isAndroid) {
         setDeviceType("android");
       } else {
@@ -42,14 +60,10 @@ export default function PWAInstallPrompt() {
 
       const isPWASupported =
         "serviceWorker" in navigator && "beforeinstallprompt" in window;
-
-      console.log("PWA Support:", isPWASupported);
-
-      setCanInstall(isPWASupported || isMobile);
+      setCanInstall((isPWASupported || isMobile) && !isInstalled);
     };
 
     checkPWAInstallAvailability();
-
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
     return () => {

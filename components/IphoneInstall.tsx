@@ -15,6 +15,10 @@ const IphoneInstall = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
+      window.scrollTo({ 
+        top: 0,
+        behavior: 'smooth'
+      });
     }, 300);
 
     return () => clearTimeout(timer);
