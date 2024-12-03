@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { PiLaptopThin } from "react-icons/pi";
+import IphoneInstall from "./IphoneInstall";
 
 export default function PWAInstallPrompt() {
   const t = useTranslations("footer");
@@ -11,6 +12,7 @@ export default function PWAInstallPrompt() {
   const [deviceType, setDeviceType] = useState<"ios" | "android" | "desktop">(
     "desktop"
   );
+  const [showIphoneInstall, setShowIphoneInstall] = useState(false);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -60,19 +62,10 @@ export default function PWAInstallPrompt() {
 
   const handleInstallClick = async () => {
     if (deviceType === "ios") {
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: document.title,
-            url: window.location.href,
-          });
-        } catch (error) {
-          console.error("Sharing failed:", error);
-          alert(t("ios_install_manual"));
-        }
-      } else {
-        alert(t("ios_install_manual"));
-      }
+      setShowIphoneInstall(false);
+      setTimeout(() => {
+        setShowIphoneInstall(true);
+      }, 100);
       return;
     }
 
@@ -98,6 +91,8 @@ export default function PWAInstallPrompt() {
 
   return (
     <>
+      {showIphoneInstall && <IphoneInstall />}
+
       {canInstall && deviceType === "ios" && (
         <div>
           <h2 className="text-xl font-bold mb-4 text-charade-950 dark:text-white">
