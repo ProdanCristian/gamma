@@ -1,17 +1,17 @@
-import { Metadata } from 'next';
-import { getLocale } from 'next-intl/server';
+import { Metadata } from "next";
+import { getLocale } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
 
   return {
-    title: locale === "ru" ? "Скидки | Gamma" : "Reduceri | Gamma",
+    title: locale === "ru" ? "Скидки" : "Reduceri",
     description:
       locale === "ru"
         ? "Найдите лучшие предложения и скидки на нашу продукцию. Экономьте на покупках в Gamma."
         : "Găsiți cele mai bune oferte și reduceri la produsele noastre. Economisiți la cumpărături la Gamma.",
     openGraph: {
-      title: locale === "ru" ? "Скидки | Gamma" : "Reduceri | Gamma",
+      title: locale === "ru" ? "Скидки" : "Reduceri",
       description:
         locale === "ru"
           ? "Найдите лучшие предложения и скидки на нашу продукцию"
@@ -36,4 +36,4 @@ export default function DiscountsLayout({
   children: React.ReactNode;
 }) {
   return children;
-} 
+}

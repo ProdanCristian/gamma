@@ -11,7 +11,7 @@ export async function generateMetadata(props) {
   const resolvedParams = await params;
   const { locale } = resolvedParams;
 
-  const title = locale === "ru" ? "О Gamma | Gamma" : "Despre Gamma | Gamma";
+  const title = locale === "ru" ? "О Gamma" : "Despre Gamma";
   const description =
     locale === "ru"
       ? "Узнайте больше о Gamma - вашем надежном партнере в онлайн-шопинге в Молдове. Качественные товары, отличный сервис и быстрая доставка."

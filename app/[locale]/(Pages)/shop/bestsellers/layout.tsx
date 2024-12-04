@@ -5,13 +5,13 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
 
   return {
-    title: locale === "ru" ? "Бестселлеры | Gamma" : "Bestsellers | Gamma",
+    title: locale === "ru" ? "Хиты продаж" : "Produse Populare",
     description:
       locale === "ru"
         ? "Откройте для себя наши самые популярные товары. Бестселлеры, которые выбирают покупатели."
         : "Descoperă cele mai populare produse ale noastre. Bestsellers alese de cumpărători.",
     openGraph: {
-      title: locale === "ru" ? "Бестселлеры | Gamma" : "Bestsellers | Gamma",
+      title: locale === "ru" ? "Хиты продаж" : "Produse Populare",
       description:
         locale === "ru"
           ? "Откройте для себя наши самые популярные товары"

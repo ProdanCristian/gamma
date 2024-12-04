@@ -10,7 +10,7 @@ export async function generateMetadata({ params }) {
   const resolvedParams = await params;
   const { locale } = resolvedParams;
 
-  const title = locale === "ru" ? "Доставка | Gamma" : "Livrare | Gamma";
+  const title = locale === "ru" ? "Доставка" : "Livrare";
   const description =
     locale === "ru"
       ? "Информация о доставке. Быстрая и надежная доставка по всей Молдове"

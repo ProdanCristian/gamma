@@ -14,7 +14,7 @@ export async function generateMetadata({ params }) {
   const resolvedParams = await params;
   const { locale } = resolvedParams;
 
-  const title = locale === "ru" ? "Контакты | Gamma" : "Contacte | Gamma";
+  const title = locale === "ru" ? "Контакты" : "Contacte";
   const description =
     locale === "ru"
       ? "Свяжитесь с нами. Мы всегда готовы помочь вам с любыми вопросами"

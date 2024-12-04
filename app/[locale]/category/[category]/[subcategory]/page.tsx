@@ -94,7 +94,7 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   const fullPath = `/category/${categorySlug}/${subcategorySlug}`;
 
   return {
-    title: `${getSubcategoryTitle()} | Gamma`,
+    title: `${getSubcategoryTitle()}`,
     description:
       locale === "ru"
         ? `Широкий выбор ${getSubcategoryTitle().toLowerCase()}`

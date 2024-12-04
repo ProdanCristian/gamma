@@ -1,17 +1,17 @@
-import { Metadata } from 'next';
-import { getLocale } from 'next-intl/server';
+import { Metadata } from "next";
+import { getLocale } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
 
   return {
-    title: locale === "ru" ? "Магазин | Gamma" : "Magazin | Gamma",
+    title: locale === "ru" ? "Магазин" : "Magazin",
     description:
       locale === "ru"
         ? "Исследуйте наш широкий ассортимент продукции. Найдите идеальные товары для вас."
         : "Explorează gama noastră largă de produse. Găsește produsele perfecte pentru tine.",
     openGraph: {
-      title: locale === "ru" ? "Магазин | Gamma" : "Magazin | Gamma",
+      title: locale === "ru" ? "Магазин" : "Magazin",
       description:
         locale === "ru"
           ? "Исследуйте наш широкий ассортимент продукции"
@@ -36,4 +36,4 @@ export default function ShopLayout({
   children: React.ReactNode;
 }) {
   return children;
-} 
+}

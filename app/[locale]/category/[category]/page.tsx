@@ -75,7 +75,7 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   };
 
   return {
-    title: `${getCategoryTitle()} | Gamma`,
+    title: `${getCategoryTitle()}`,
     description:
       locale === "ru"
         ? `Исследуйте нашу коллекцию ${getCategoryTitle().toLowerCase()}`

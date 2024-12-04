@@ -4,6 +4,8 @@ import { useTranslations, useLocale } from "next-intl";
 import { PiLaptopThin } from "react-icons/pi";
 import IphoneInstall from "./IphoneInstall";
 import Cookies from "js-cookie";
+import DesktopInstall from "./DesktopInstall";
+import AndroidInstall from "./AndroidInstall";
 
 export default function PWAInstallPrompt() {
   const t = useTranslations("footer");
@@ -14,20 +16,33 @@ export default function PWAInstallPrompt() {
     "desktop"
   );
   const [showIphoneInstall, setShowIphoneInstall] = useState(false);
-  const [hasShownPrompt, setHasShownPrompt] = useState(false);
+  const [showDesktopInstall, setShowDesktopInstall] = useState(false);
+  const [showAndroidInstall, setShowAndroidInstall] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
 
+  // Check if app is installed
   useEffect(() => {
-    const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
-    if (isInstalled) {
-      setCanInstall(false);
-      return;
-    }
+    const checkIfInstalled = () => {
+      const isStandalone = window.matchMedia(
+        "(display-mode: standalone)"
+      ).matches;
+      setIsInstalled(isStandalone);
+    };
 
-    const hasShownIOSPrompt = Cookies.get('hasShownIOSPrompt');
-    if (hasShownIOSPrompt) {
-      setHasShownPrompt(true);
-    }
+    checkIfInstalled();
+    window
+      .matchMedia("(display-mode: standalone)")
+      .addListener(checkIfInstalled);
 
+    return () => {
+      window
+        .matchMedia("(display-mode: standalone)")
+        .removeListener(checkIfInstalled);
+    };
+  }, []);
+
+  // Handle installation prompt
+  useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       const prompt = e as any;
@@ -35,35 +50,6 @@ export default function PWAInstallPrompt() {
       setCanInstall(true);
     };
 
-    const checkPWAInstallAvailability = () => {
-      const userAgent = window.navigator.userAgent.toLowerCase();
-      const isIOS = /iphone|ipad|ipod/.test(userAgent);
-      const isAndroid = /android/.test(userAgent);
-      const isMobile = isIOS || isAndroid;
-
-      if (isIOS) {
-        setDeviceType("ios");
-        setCanInstall(true);
-        
-        if (!hasShownIOSPrompt) {
-          setTimeout(() => {
-            setShowIphoneInstall(true);
-            setHasShownPrompt(true);
-            Cookies.set('hasShownIOSPrompt', 'true', { expires: 365 });
-          }, 3500);
-        }
-      } else if (isAndroid) {
-        setDeviceType("android");
-      } else {
-        setDeviceType("desktop");
-      }
-
-      const isPWASupported =
-        "serviceWorker" in navigator && "beforeinstallprompt" in window;
-      setCanInstall((isPWASupported || isMobile) && !isInstalled);
-    };
-
-    checkPWAInstallAvailability();
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
     return () => {
@@ -73,6 +59,47 @@ export default function PWAInstallPrompt() {
       );
     };
   }, []);
+
+  // Device detection and prompt display
+  useEffect(() => {
+    if (isInstalled) {
+      return;
+    }
+
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(userAgent);
+    const isAndroid = /android/.test(userAgent);
+
+    const hasShownIOSPrompt = Cookies.get("hasShownIOSPrompt");
+    const hasShownAndroidPrompt = Cookies.get("hasShownAndroidPrompt");
+    const hasShownDesktopPrompt = Cookies.get("hasShownDesktopPrompt");
+
+    if (isIOS) {
+      setDeviceType("ios");
+      if (!hasShownIOSPrompt) {
+        setTimeout(() => {
+          setShowIphoneInstall(true);
+          Cookies.set("hasShownIOSPrompt", "true", { expires: 365 });
+        }, 3500);
+      }
+    } else if (isAndroid) {
+      setDeviceType("android");
+      if (!hasShownAndroidPrompt) {
+        setTimeout(() => {
+          setShowAndroidInstall(true);
+          Cookies.set("hasShownAndroidPrompt", "true", { expires: 365 });
+        }, 4000);
+      }
+    } else {
+      setDeviceType("desktop");
+      if (!hasShownDesktopPrompt && deferredPrompt) {
+        setTimeout(() => {
+          setShowDesktopInstall(true);
+          Cookies.set("hasShownDesktopPrompt", "true", { expires: 365 });
+        }, 4000);
+      }
+    }
+  }, [isInstalled, deferredPrompt]);
 
   const handleInstallClick = async () => {
     if (deviceType === "ios") {
@@ -84,8 +111,7 @@ export default function PWAInstallPrompt() {
     }
 
     if (!deferredPrompt) {
-      console.error("No deferred prompt available");
-      alert("PWA installation is not supported on this device");
+      console.log("No installation prompt available");
       return;
     }
 
@@ -96,16 +122,28 @@ export default function PWAInstallPrompt() {
       if (outcome === "accepted") {
         setDeferredPrompt(null);
         setCanInstall(false);
+        setShowDesktopInstall(false);
+        setIsInstalled(true);
+        Cookies.set("appInstalled", "true", { expires: 365 });
       }
     } catch (error) {
-      console.error("PWA installation failed:", error);
-      alert("Failed to install the app. Please try again.");
+      console.error("Installation failed:", error);
     }
   };
 
+  if (isInstalled) {
+    return null;
+  }
+
   return (
     <>
-      {showIphoneInstall && <IphoneInstall />}
+      {showIphoneInstall && deviceType === "ios" && <IphoneInstall />}
+      {showAndroidInstall && deviceType === "android" && (
+        <AndroidInstall onInstallClick={handleInstallClick} />
+      )}
+      {showDesktopInstall && deviceType === "desktop" && deferredPrompt && (
+        <DesktopInstall onInstallClick={handleInstallClick} />
+      )}
 
       {canInstall && deviceType === "ios" && (
         <div>
