@@ -1,4 +1,8 @@
 {
+  "offline": {
+    "title": "Sunteți offline",
+    "description": "Vă rugăm să verificați conexiunea la internet pentru a accesa aplicația"
+  },
   "for": "și primiți un",
   "notification_with_order_status": "și notificări cu statusul comenzii dumneavoastră",
   "Tap_the_Share_button": "Apăsați pe butonul Share",

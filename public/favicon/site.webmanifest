@@ -32,6 +32,8 @@
   "display": "standalone",
   "orientation": "portrait",
   "categories": ["shopping"],
+  "prefer_related_applications": false,
+  "offline_enabled": true,
   "screenshots": [
     {
       "src": "screenshots/Screenshot 1.png",
