@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { IoShareOutline } from "react-icons/io5";
 import { IoAddOutline } from "react-icons/io5";
 import { PiArrowFatLinesDown } from "react-icons/pi";
@@ -11,18 +11,6 @@ import { motion, AnimatePresence } from "framer-motion";
 const IphoneInstall = () => {
   const [isVisible, setIsVisible] = useState(true);
   const t = useTranslations();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleSwipeEnd = (event: any, info: any) => {
     const SWIPE_THRESHOLD = 100;
@@ -37,7 +25,7 @@ const IphoneInstall = () => {
         <motion.div
           className="fixed inset-x-0 bottom-0 w-full z-[1000]"
           initial={false}
-          animate={{ height: "500px" }}
+          animate={{ height: "600px" }}
           exit={{ height: 0 }}
           transition={{ type: "spring", damping: 20 }}
         >

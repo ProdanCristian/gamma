@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { PiArrowFatLinesDown } from "react-icons/pi";
+import React, { useState, } from "react";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -14,17 +13,6 @@ const AndroidInstall = ({ onInstallClick }: AndroidInstallProps) => {
   const [isVisible, setIsVisible] = useState(true);
   const t = useTranslations();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleSwipeEnd = (event: any, info: any) => {
     const SWIPE_THRESHOLD = 100;
@@ -39,7 +27,7 @@ const AndroidInstall = ({ onInstallClick }: AndroidInstallProps) => {
         <motion.div
           className="fixed inset-x-0 bottom-0 w-full z-[1000]"
           initial={false}
-          animate={{ height: "500px" }}
+          animate={{ height: "520px" }}
           exit={{ height: 0 }}
           transition={{ type: "spring", damping: 20 }}
         >
@@ -68,7 +56,7 @@ const AndroidInstall = ({ onInstallClick }: AndroidInstallProps) => {
                   {t("get_10_off_cupon")}
                 </h2>
                 <Image
-                  src="/Android-install.png"
+                  src="/Androids.png"
                   alt="android-install"
                   width={160}
                   height={160}

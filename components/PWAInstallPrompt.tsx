@@ -70,26 +70,18 @@ export default function PWAInstallPrompt() {
     const isIOS = /iphone|ipad|ipod/.test(userAgent);
     const isAndroid = /android/.test(userAgent);
 
-    const hasShownIOSPrompt = Cookies.get("hasShownIOSPrompt");
-    const hasShownAndroidPrompt = Cookies.get("hasShownAndroidPrompt");
     const hasShownDesktopPrompt = Cookies.get("hasShownDesktopPrompt");
 
     if (isIOS) {
       setDeviceType("ios");
-      if (!hasShownIOSPrompt) {
-        setTimeout(() => {
-          setShowIphoneInstall(true);
-          Cookies.set("hasShownIOSPrompt", "true", { expires: 365 });
-        }, 3500);
-      }
+      setTimeout(() => {
+        setShowIphoneInstall(true);
+      }, 3500);
     } else if (isAndroid) {
       setDeviceType("android");
-      if (!hasShownAndroidPrompt) {
-        setTimeout(() => {
-          setShowAndroidInstall(true);
-          Cookies.set("hasShownAndroidPrompt", "true", { expires: 365 });
-        }, 4000);
-      }
+      setTimeout(() => {
+        setShowAndroidInstall(true);
+      }, 4000);
     } else {
       setDeviceType("desktop");
       if (!hasShownDesktopPrompt && deferredPrompt) {
