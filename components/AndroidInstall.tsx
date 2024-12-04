@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, } from "react";
+import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -12,7 +12,6 @@ interface AndroidInstallProps {
 const AndroidInstall = ({ onInstallClick }: AndroidInstallProps) => {
   const [isVisible, setIsVisible] = useState(true);
   const t = useTranslations();
-
 
   const handleSwipeEnd = (event: any, info: any) => {
     const SWIPE_THRESHOLD = 100;
@@ -27,7 +26,7 @@ const AndroidInstall = ({ onInstallClick }: AndroidInstallProps) => {
         <motion.div
           className="fixed inset-x-0 bottom-0 w-full z-[1000]"
           initial={false}
-          animate={{ height: "520px" }}
+          animate={{ height: "450px" }}
           exit={{ height: 0 }}
           transition={{ type: "spring", damping: 20 }}
         >
