@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
-// Type declaration for iOS Safari navigator
+
 interface SafariNavigator extends Navigator {
   standalone?: boolean;
 }
@@ -14,44 +14,22 @@ export default function NotificationHandler() {
   const [showPrompt, setShowPrompt] = useState(() => {
     if (typeof window !== "undefined") {
       const storedPromptState = localStorage.getItem("notificationPromptState");
-      console.log("Stored prompt state:", storedPromptState);
       if (storedPromptState !== null) {
         return JSON.parse(storedPromptState);
       }
-      const defaultPermission = Notification.permission === "default";
-      console.log("Default notification permission:", defaultPermission);
-      return defaultPermission;
+      return window.matchMedia("(display-mode: standalone)").matches;
     }
     return false;
   });
   const [isPWA, setIsPWA] = useState(false);
 
-  // Check if app is running as PWA
   useEffect(() => {
     const checkIfPWA = () => {
-      // Check all possible PWA indicators
-      const isStandalone = window.matchMedia(
-        "(display-mode: standalone)"
-      ).matches;
-      const isIOSPWA =
-        (window.navigator as SafariNavigator).standalone ?? false;
-      const isFullScreen = window.matchMedia(
-        "(display-mode: fullscreen)"
-      ).matches;
-      const isMinimalUI = window.matchMedia(
-        "(display-mode: minimal-ui)"
-      ).matches;
+      const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
+      const isIOSPWA = (window.navigator as SafariNavigator).standalone ?? false;
 
-      const isPWAValue = Boolean(
-        isStandalone || isIOSPWA || isFullScreen || isMinimalUI
-      );
-      console.log("PWA indicators:", {
-        isStandalone,
-        isIOSPWA,
-        isFullScreen,
-        isMinimalUI,
-        isPWAValue,
-      });
+      const isPWAValue = Boolean(isStandalone || isIOSPWA);
+      console.log("PWA status:", { isStandalone, isIOSPWA, isPWAValue });
       return isPWAValue;
     };
 
@@ -60,31 +38,21 @@ export default function NotificationHandler() {
       setIsPWA(newPWAState);
     };
 
-    // Initial check
     updatePWAState();
 
-    // Listen to all possible display mode changes
-    const modes = ["standalone", "fullscreen", "minimal-ui"];
-    const mediaQueryLists = modes.map((mode) =>
-      window.matchMedia(`(display-mode: ${mode})`)
-    );
-
-    const handleChange = () => updatePWAState();
-
-    mediaQueryLists.forEach((mql) => {
-      mql.addEventListener("change", handleChange);
-    });
+    const mql = window.matchMedia("(display-mode: standalone)");
+    mql.addEventListener("change", updatePWAState);
 
     return () => {
-      mediaQueryLists.forEach((mql) => {
-        mql.removeEventListener("change", handleChange);
-      });
+      mql.removeEventListener("change", updatePWAState);
     };
   }, []);
 
   const registerPushSubscription = async () => {
+    if (!isPWA) return;
+
     try {
-      console.log("Getting service worker registration...");
+      console.log("Registering push in PWA mode...");
       const registration = await navigator.serviceWorker.ready;
       console.log("Service worker is ready");
 
@@ -142,9 +110,9 @@ export default function NotificationHandler() {
 
         const registration = await navigator.serviceWorker.register("/sw.js");
 
-        if (Notification.permission === "default") {
+        if (Notification.permission === "default" && isPWA) {
           setShowPrompt(true);
-        } else if (Notification.permission === "granted") {
+        } else if (Notification.permission === "granted" && isPWA) {
           await registerPushSubscription();
         }
       } catch (error) {

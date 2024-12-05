@@ -8,7 +8,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 
-const IphoneInstall = () => {
+const IphoneInstall = ({ onClose }: { onClose?: () => void }) => {
   const [isVisible, setIsVisible] = useState(true);
   const t = useTranslations();
 
@@ -16,6 +16,7 @@ const IphoneInstall = () => {
     const SWIPE_THRESHOLD = 100;
     if (info.velocity.y > 0 && info.offset.y > SWIPE_THRESHOLD) {
       setIsVisible(false);
+      onClose?.();
     }
   };
 
