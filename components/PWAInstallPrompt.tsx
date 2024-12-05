@@ -18,6 +18,17 @@ export default function PWAInstallPrompt() {
   const [showDesktopInstall, setShowDesktopInstall] = useState(false);
   const [showAndroidInstall, setShowAndroidInstall] = useState(false);
   const [isPWA, setIsPWA] = useState(false);
+  const [hasVisited, setHasVisited] = useState(false);
+
+  useEffect(() => {
+    const hasVisitedBefore = Cookies.get("hasVisitedBefore");
+    if (!hasVisitedBefore) {
+      Cookies.set("hasVisitedBefore", "true", { expires: 365 });
+      setHasVisited(false);
+    } else {
+      setHasVisited(true);
+    }
+  }, []);
 
   // Check if app is running as PWA
   useEffect(() => {
@@ -59,21 +70,17 @@ export default function PWAInstallPrompt() {
 
   // Device detection and prompt display
   useEffect(() => {
+    if (hasVisited) return;
+
     const userAgent = window.navigator.userAgent.toLowerCase();
     const isIOS = /iphone|ipad|ipod/.test(userAgent);
     const isAndroid = /android/.test(userAgent);
 
-    const hasShownIphonePrompt = Cookies.get("hasShownIphonePrompt");
-    const hasShownDesktopPrompt = Cookies.get("hasShownDesktopPrompt");
-
     if (isIOS) {
       setDeviceType("ios");
-      if (!hasShownIphonePrompt && !isPWA) {
-        setTimeout(() => {
-          setShowIphoneInstall(true);
-          Cookies.set("hasShownIphonePrompt", "true", { expires: 365 });
-        }, 3500);
-      }
+      setTimeout(() => {
+        setShowIphoneInstall(true);
+      }, 3500);
     } else if (isAndroid) {
       setDeviceType("android");
       setTimeout(() => {
@@ -81,14 +88,13 @@ export default function PWAInstallPrompt() {
       }, 4000);
     } else {
       setDeviceType("desktop");
-      if (!hasShownDesktopPrompt && deferredPrompt) {
+      if (deferredPrompt) {
         setTimeout(() => {
           setShowDesktopInstall(true);
-          Cookies.set("hasShownDesktopPrompt", "true", { expires: 365 });
         }, 4000);
       }
     }
-  }, [isPWA, deferredPrompt]);
+  }, [isPWA, deferredPrompt, hasVisited]);
 
   const handleInstallClick = async () => {
     if (deviceType === "ios") {
@@ -123,12 +129,16 @@ export default function PWAInstallPrompt() {
 
   return (
     <>
-      {showIphoneInstall && deviceType === "ios" && <IphoneInstall />}
-      {showAndroidInstall && deviceType === "android" && (
-        <AndroidInstall onInstallClick={handleInstallClick} />
-      )}
-      {showDesktopInstall && deviceType === "desktop" && deferredPrompt && (
-        <DesktopInstall onInstallClick={handleInstallClick} />
+      {!hasVisited && (
+        <>
+          {showIphoneInstall && deviceType === "ios" && <IphoneInstall />}
+          {showAndroidInstall && deviceType === "android" && (
+            <AndroidInstall onInstallClick={handleInstallClick} />
+          )}
+          {showDesktopInstall && deviceType === "desktop" && deferredPrompt && (
+            <DesktopInstall onInstallClick={handleInstallClick} />
+          )}
+        </>
       )}
 
       {deviceType === "ios" && (

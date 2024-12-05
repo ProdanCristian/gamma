@@ -13,7 +13,14 @@ export default function NotificationHandler() {
 
   const [showPrompt, setShowPrompt] = useState(() => {
     if (typeof window !== "undefined") {
-      return Notification.permission === "default";
+      const storedPromptState = localStorage.getItem("notificationPromptState");
+      console.log("Stored prompt state:", storedPromptState);
+      if (storedPromptState !== null) {
+        return JSON.parse(storedPromptState);
+      }
+      const defaultPermission = Notification.permission === "default";
+      console.log("Default notification permission:", defaultPermission);
+      return defaultPermission;
     }
     return false;
   });
@@ -22,23 +29,57 @@ export default function NotificationHandler() {
   // Check if app is running as PWA
   useEffect(() => {
     const checkIfPWA = () => {
+      // Check all possible PWA indicators
       const isStandalone = window.matchMedia(
         "(display-mode: standalone)"
       ).matches;
       const isIOSPWA =
         (window.navigator as SafariNavigator).standalone ?? false;
+      const isFullScreen = window.matchMedia(
+        "(display-mode: fullscreen)"
+      ).matches;
+      const isMinimalUI = window.matchMedia(
+        "(display-mode: minimal-ui)"
+      ).matches;
 
-      return Boolean(isStandalone || isIOSPWA);
+      const isPWAValue = Boolean(
+        isStandalone || isIOSPWA || isFullScreen || isMinimalUI
+      );
+      console.log("PWA indicators:", {
+        isStandalone,
+        isIOSPWA,
+        isFullScreen,
+        isMinimalUI,
+        isPWAValue,
+      });
+      return isPWAValue;
     };
 
-    setIsPWA(checkIfPWA());
+    const updatePWAState = () => {
+      const newPWAState = checkIfPWA();
+      setIsPWA(newPWAState);
+    };
 
-    // Listen for changes in display mode
-    const mediaQuery = window.matchMedia("(display-mode: standalone)");
-    const handleChange = (e: MediaQueryListEvent) => setIsPWA(e.matches);
-    mediaQuery.addEventListener("change", handleChange);
+    // Initial check
+    updatePWAState();
 
-    return () => mediaQuery.removeEventListener("change", handleChange);
+    // Listen to all possible display mode changes
+    const modes = ["standalone", "fullscreen", "minimal-ui"];
+    const mediaQueryLists = modes.map((mode) =>
+      window.matchMedia(`(display-mode: ${mode})`)
+    );
+
+    const handleChange = () => updatePWAState();
+
+    mediaQueryLists.forEach((mql) => {
+      mql.addEventListener("change", handleChange);
+    });
+
+    return () => {
+      mediaQueryLists.forEach((mql) => {
+        mql.removeEventListener("change", handleChange);
+      });
+    };
   }, []);
 
   const registerPushSubscription = async () => {
@@ -84,6 +125,7 @@ export default function NotificationHandler() {
       console.log("Notification permission status:", permission);
 
       setShowPrompt(false);
+      localStorage.setItem("notificationPromptState", "false");
 
       if (permission === "granted") {
         await registerPushSubscription();
@@ -115,14 +157,16 @@ export default function NotificationHandler() {
     }
   }, [isPWA]);
 
-  // Only show if it's a PWA and notification prompt should be shown
+  // Add console log before return condition
+  console.log("Current states - isPWA:", isPWA, "showPrompt:", showPrompt);
+
   if (!isPWA || !showPrompt) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-accent p-6 text-charade-950 shadow-lg z-50">
       <div className="max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div>
+          <div className="text-center md:text-left">
             <h3 className="text-xl font-semibold mb-2">
               {t("notifications.title")}
             </h3>
