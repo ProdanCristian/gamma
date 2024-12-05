@@ -539,5 +539,10 @@
     "coupon": "Cupon aplicat",
     "hello": "Bună",
     "currency": "lei"
+  },
+  "notifications": {
+    "title": "Activați notificările",
+    "description": "Fiți la curent cu statusul livrării comenzilor, oferte noi și promoții exclusive",
+    "enable": "Activați notificările"
   }
 }

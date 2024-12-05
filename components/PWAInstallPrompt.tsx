@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { PiLaptopThin } from "react-icons/pi";
 import IphoneInstall from "./IphoneInstall";
 import Cookies from "js-cookie";
@@ -9,7 +9,6 @@ import AndroidInstall from "./AndroidInstall";
 
 export default function PWAInstallPrompt() {
   const t = useTranslations("footer");
-  const locale = useLocale();
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [canInstall, setCanInstall] = useState(false);
   const [deviceType, setDeviceType] = useState<"ios" | "android" | "desktop">(
@@ -18,27 +17,25 @@ export default function PWAInstallPrompt() {
   const [showIphoneInstall, setShowIphoneInstall] = useState(false);
   const [showDesktopInstall, setShowDesktopInstall] = useState(false);
   const [showAndroidInstall, setShowAndroidInstall] = useState(false);
-  const [isInstalled, setIsInstalled] = useState(false);
+  const [isPWA, setIsPWA] = useState(false);
 
-  // Check if app is installed
+  // Check if app is running as PWA
   useEffect(() => {
-    const checkIfInstalled = () => {
+    const checkIfPWA = () => {
       const isStandalone = window.matchMedia(
         "(display-mode: standalone)"
       ).matches;
-      setIsInstalled(isStandalone);
+      const isIOSPWA = (window.navigator as any).standalone;
+      return Boolean(isStandalone || isIOSPWA);
     };
 
-    checkIfInstalled();
-    window
-      .matchMedia("(display-mode: standalone)")
-      .addListener(checkIfInstalled);
+    setIsPWA(checkIfPWA());
 
-    return () => {
-      window
-        .matchMedia("(display-mode: standalone)")
-        .removeListener(checkIfInstalled);
-    };
+    const mediaQuery = window.matchMedia("(display-mode: standalone)");
+    const handleChange = (e: MediaQueryListEvent) => setIsPWA(e.matches);
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
   // Handle installation prompt
@@ -62,21 +59,21 @@ export default function PWAInstallPrompt() {
 
   // Device detection and prompt display
   useEffect(() => {
-    if (isInstalled) {
-      return;
-    }
-
     const userAgent = window.navigator.userAgent.toLowerCase();
     const isIOS = /iphone|ipad|ipod/.test(userAgent);
     const isAndroid = /android/.test(userAgent);
 
+    const hasShownIphonePrompt = Cookies.get("hasShownIphonePrompt");
     const hasShownDesktopPrompt = Cookies.get("hasShownDesktopPrompt");
 
     if (isIOS) {
       setDeviceType("ios");
-      setTimeout(() => {
-        setShowIphoneInstall(true);
-      }, 3500);
+      if (!hasShownIphonePrompt && !isPWA) {
+        setTimeout(() => {
+          setShowIphoneInstall(true);
+          Cookies.set("hasShownIphonePrompt", "true", { expires: 365 });
+        }, 3500);
+      }
     } else if (isAndroid) {
       setDeviceType("android");
       setTimeout(() => {
@@ -91,14 +88,11 @@ export default function PWAInstallPrompt() {
         }, 4000);
       }
     }
-  }, [isInstalled, deferredPrompt]);
+  }, [isPWA, deferredPrompt]);
 
   const handleInstallClick = async () => {
     if (deviceType === "ios") {
-      setShowIphoneInstall(false);
-      setTimeout(() => {
-        setShowIphoneInstall(true);
-      }, 100);
+      setShowIphoneInstall(true);
       return;
     }
 
@@ -115,7 +109,6 @@ export default function PWAInstallPrompt() {
         setDeferredPrompt(null);
         setCanInstall(false);
         setShowDesktopInstall(false);
-        setIsInstalled(true);
         Cookies.set("appInstalled", "true", { expires: 365 });
       }
     } catch (error) {
@@ -123,7 +116,8 @@ export default function PWAInstallPrompt() {
     }
   };
 
-  if (isInstalled) {
+  // Only hide install buttons in PWA mode
+  if (isPWA) {
     return null;
   }
 
@@ -137,7 +131,7 @@ export default function PWAInstallPrompt() {
         <DesktopInstall onInstallClick={handleInstallClick} />
       )}
 
-      {canInstall && deviceType === "ios" && (
+      {deviceType === "ios" && (
         <div>
           <h2 className="text-xl font-bold mb-4 text-charade-950 dark:text-white">
             {t("install_app")}
@@ -158,7 +152,7 @@ export default function PWAInstallPrompt() {
         </div>
       )}
 
-      {canInstall && deviceType === "android" && (
+      {deviceType === "android" && (
         <div>
           <h2 className="text-xl font-bold mb-4 text-charade-950 dark:text-white">
             {t("install_app")}
@@ -179,7 +173,7 @@ export default function PWAInstallPrompt() {
         </div>
       )}
 
-      {canInstall && deviceType === "desktop" && (
+      {deviceType === "desktop" && deferredPrompt && (
         <div>
           <h2 className="text-xl font-bold mb-4 text-charade-950 dark:text-white">
             {t("install_app")}

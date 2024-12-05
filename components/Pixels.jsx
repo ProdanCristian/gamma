@@ -3,16 +3,16 @@
 import { useEffect } from "react";
 
 // Prevent Facebook Pixel debug WebSocket connection on localhost
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   // Mock WebSocket for localhost debugging
   const OriginalWebSocket = window.WebSocket;
-  window.WebSocket = function(url, ...args) {
-    if (url.includes('localhost:12387')) {
+  window.WebSocket = function (url, ...args) {
+    if (url.includes("localhost:12387")) {
       return {
         close: () => {},
         send: () => {},
         addEventListener: () => {},
-        removeEventListener: () => {}
+        removeEventListener: () => {},
       };
     }
     return new OriginalWebSocket(url, ...args);
@@ -21,8 +21,11 @@ if (typeof window !== 'undefined') {
   // Suppress console errors for WebSocket
   const originalConsoleError = console.error;
   console.error = (...args) => {
-    const errorMessage = args[0]?.toString() || '';
-    if (errorMessage.includes('WebSocket') || errorMessage.includes('ws://localhost')) {
+    const errorMessage = args[0]?.toString() || "";
+    if (
+      errorMessage.includes("WebSocket") ||
+      errorMessage.includes("ws://localhost")
+    ) {
       return;
     }
     originalConsoleError.apply(console, args);
@@ -41,9 +44,9 @@ export default function Pixels({ pixelData }) {
       // Function to safely append scripts
       const appendScript = (scriptElement) => {
         const script = document.createElement("script");
-        
+
         // Copy all attributes
-        Array.from(scriptElement.attributes).forEach(attr => {
+        Array.from(scriptElement.attributes).forEach((attr) => {
           script.setAttribute(attr.name, attr.value);
         });
 
@@ -59,9 +62,11 @@ export default function Pixels({ pixelData }) {
 
         // Error handling
         script.onerror = (error) => {
-          if (!error?.message?.includes('WebSocket') && 
-              !error?.message?.includes('ws://localhost')) {
-            console.warn('Script loading error:', error);
+          if (
+            !error?.message?.includes("WebSocket") &&
+            !error?.message?.includes("ws://localhost")
+          ) {
+            console.warn("Script loading error:", error);
           }
         };
 
@@ -78,7 +83,7 @@ export default function Pixels({ pixelData }) {
       Array.from(noscripts).forEach((noscriptElement) => {
         const noscript = document.createElement("noscript");
         // Copy all attributes
-        Array.from(noscriptElement.attributes).forEach(attr => {
+        Array.from(noscriptElement.attributes).forEach((attr) => {
           noscript.setAttribute(attr.name, attr.value);
         });
         noscript.innerHTML = noscriptElement.innerHTML;
@@ -87,11 +92,11 @@ export default function Pixels({ pixelData }) {
     };
 
     // Initialize when document is ready
-    if (document.readyState === 'complete') {
+    if (document.readyState === "complete") {
       appendToHead();
     } else {
-      window.addEventListener('load', appendToHead);
-      return () => window.removeEventListener('load', appendToHead);
+      window.addEventListener("load", appendToHead);
+      return () => window.removeEventListener("load", appendToHead);
     }
   }, [pixelData]);
 

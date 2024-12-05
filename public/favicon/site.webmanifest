@@ -3,6 +3,7 @@
   "short_name": "Gamma",
   "description": "Gamma Online Store",
   "start_url": "/",
+  "permissions": ["notifications"],
   "icons": [
     {
       "src": "web-app-manifest-192x192.png",

@@ -54,6 +54,7 @@
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "use-intl": "^3.24.0",
+    "web-push": "^3.6.7",
     "zustand": "^5.0.1"
   },
   "devDependencies": {
@@ -64,6 +65,7 @@
     "@types/nodemailer": "^6.4.16",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
+    "@types/web-push": "^3.6.4",
     "eslint": "^8",
     "eslint-config-next": "15.0.2",
     "postcss": "^8",
