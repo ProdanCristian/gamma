@@ -94,11 +94,16 @@ export default function NotificationHandler() {
 
       if (!existingSubscription) {
         console.log("Creating new subscription...");
-        console.log("VAPID key:", process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY);
+        const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+        console.log("VAPID key:", vapidKey);
+
+        if (!vapidKey) {
+          throw new Error("VAPID key is not defined");
+        }
 
         const subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+          applicationServerKey: vapidKey,
         });
 
         console.log("New Push Subscription:", subscription);
@@ -111,7 +116,12 @@ export default function NotificationHandler() {
           body: JSON.stringify(subscription),
         });
 
-        console.log("Subscription sent to server:", await response.json());
+        if (!response.ok) {
+          throw new Error("Failed to save subscription");
+        }
+
+        const result = await response.json();
+        console.log("Server response:", result);
       }
     } catch (error) {
       console.error("Error registering push subscription:", error);
