@@ -19,6 +19,7 @@ export default function PWAInstallPrompt() {
   const [showAndroidInstall, setShowAndroidInstall] = useState(false);
   const [isPWA, setIsPWA] = useState(false);
   const [hasVisited, setHasVisited] = useState(false);
+  const [showManualIphoneInstall, setShowManualIphoneInstall] = useState(false);
 
   useEffect(() => {
     const hasVisitedBefore = Cookies.get("hasVisitedBefore");
@@ -98,7 +99,7 @@ export default function PWAInstallPrompt() {
 
   const handleInstallClick = async () => {
     if (deviceType === "ios") {
-      setShowIphoneInstall(true);
+      setShowManualIphoneInstall(true);
       return;
     }
 
@@ -131,7 +132,9 @@ export default function PWAInstallPrompt() {
     <>
       {!hasVisited && (
         <>
-          {showIphoneInstall && deviceType === "ios" && <IphoneInstall />}
+          {showIphoneInstall && deviceType === "ios" && (
+            <IphoneInstall onClose={() => setShowIphoneInstall(false)} />
+          )}
           {showAndroidInstall && deviceType === "android" && (
             <AndroidInstall onInstallClick={handleInstallClick} />
           )}
@@ -139,6 +142,10 @@ export default function PWAInstallPrompt() {
             <DesktopInstall onInstallClick={handleInstallClick} />
           )}
         </>
+      )}
+
+      {showManualIphoneInstall && deviceType === "ios" && (
+        <IphoneInstall onClose={() => setShowManualIphoneInstall(false)} />
       )}
 
       {deviceType === "ios" && (
