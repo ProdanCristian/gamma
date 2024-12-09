@@ -1,144 +1,107 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-
-
-interface SafariNavigator extends Navigator {
-  standalone?: boolean;
-}
+import { useEffect, useState } from "react";
+import { useServiceWorker } from "@/hooks/useServiceWorker";
 
 export default function NotificationHandler() {
   const t = useTranslations("");
-
-  const [showPrompt, setShowPrompt] = useState(() => {
-    if (typeof window !== "undefined") {
-      const storedPromptState = localStorage.getItem("notificationPromptState");
-      if (storedPromptState !== null) {
-        return JSON.parse(storedPromptState);
-      }
-      return window.matchMedia("(display-mode: standalone)").matches;
-    }
-    return false;
-  });
-  const [isPWA, setIsPWA] = useState(false);
+  const [shouldShow, setShouldShow] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { isReady, registration, error } = useServiceWorker();
 
   useEffect(() => {
-    const checkIfPWA = () => {
-      const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
-      const isIOSPWA = (window.navigator as SafariNavigator).standalone ?? false;
-
-      const isPWAValue = Boolean(isStandalone || isIOSPWA);
-      console.log("PWA status:", { isStandalone, isIOSPWA, isPWAValue });
-      return isPWAValue;
-    };
-
-    const updatePWAState = () => {
-      const newPWAState = checkIfPWA();
-      setIsPWA(newPWAState);
-    };
-
-    updatePWAState();
-
-    const mql = window.matchMedia("(display-mode: standalone)");
-    mql.addEventListener("change", updatePWAState);
-
-    return () => {
-      mql.removeEventListener("change", updatePWAState);
-    };
-  }, []);
-
-  const registerPushSubscription = async () => {
-    if (!isPWA) return;
-
-    try {
-      console.log("Registering push in PWA mode...");
-      const registration = await navigator.serviceWorker.ready;
-      console.log("Service worker is ready");
-
-      const existingSubscription =
-        await registration.pushManager.getSubscription();
-      console.log("Existing subscription:", existingSubscription);
-
-      if (!existingSubscription) {
-        console.log("Creating new subscription...");
-        const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-        console.log("VAPID key:", vapidKey);
-
-        if (!vapidKey) {
-          throw new Error("VAPID key is not defined");
-        }
-
-        const subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: vapidKey,
-        });
-
-        console.log("New Push Subscription:", subscription);
-
-        const response = await fetch("/api/push", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(subscription),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to save subscription");
-        }
-
-        const result = await response.json();
-        console.log("Server response:", result);
+    const checkNotificationStatus = async () => {
+      if (!isReady || !registration || error) {
+        setShouldShow(false);
+        return;
       }
-    } catch (error) {
-      console.error("Error registering push subscription:", error);
-    }
-  };
+
+      const notificationSupported = "Notification" in window;
+      if (!notificationSupported) {
+        setShouldShow(false);
+        return;
+      }
+
+      const hasSubscribed =
+        localStorage.getItem("pushNotificationSubscribed") === "true";
+      if (hasSubscribed) {
+        setShouldShow(false);
+        return;
+      }
+
+      // Check if already has a subscription
+      const subscription = await registration.pushManager.getSubscription();
+      if (subscription) {
+        localStorage.setItem("pushNotificationSubscribed", "true");
+        setShouldShow(false);
+        return;
+      }
+
+      console.log("Showing notification prompt");
+      setShouldShow(true);
+    };
+
+    checkNotificationStatus();
+  }, [isReady, registration, error]);
 
   const handleEnableNotifications = async () => {
+    if (!registration) return;
+
     try {
-      console.log("Requesting notification permission...");
+      setIsLoading(true);
+
+      // Request permission
       const permission = await Notification.requestPermission();
-      console.log("Notification permission status:", permission);
-
-      setShowPrompt(false);
-      localStorage.setItem("notificationPromptState", "false");
-
-      if (permission === "granted") {
-        await registerPushSubscription();
+      if (permission !== "granted") {
+        setShouldShow(false);
+        return;
       }
-    } catch (error) {
-      console.error("Error requesting notification permission:", error);
+
+      // Get VAPID key
+      const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+      if (!vapidPublicKey) {
+        throw new Error("VAPID public key not found");
+      }
+
+      // Subscribe to push notifications
+      const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: convertedVapidKey,
+      });
+
+      // Send subscription to server
+      const response = await fetch("/api/push", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(subscription),
+      });
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message || "Failed to save subscription");
+      }
+
+      localStorage.setItem("pushNotificationSubscribed", "true");
+      setShouldShow(false);
+    } catch (err) {
+      console.error("Error enabling notifications:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    const registerServiceWorker = async () => {
-      try {
-        if (!isPWA) return;
+  const handleDismiss = () => {
+    localStorage.setItem("pushNotificationSubscribed", "true");
+    setShouldShow(false);
+  };
 
-        const registration = await navigator.serviceWorker.register("/sw.js");
-
-        if (Notification.permission === "default" && isPWA) {
-          setShowPrompt(true);
-        } else if (Notification.permission === "granted" && isPWA) {
-          await registerPushSubscription();
-        }
-      } catch (error) {
-        console.error("Service Worker registration failed:", error);
-      }
-    };
-
-    if ("Notification" in window && "serviceWorker" in navigator) {
-      registerServiceWorker();
-    }
-  }, [isPWA]);
-
-  // Add console log before return condition
-  console.log("Current states - isPWA:", isPWA, "showPrompt:", showPrompt);
-
-  if (!isPWA || !showPrompt) return null;
+  if (!shouldShow) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-accent p-6 text-charade-950 shadow-lg z-50">
@@ -154,14 +117,52 @@ export default function NotificationHandler() {
           </div>
           <div className="flex gap-3">
             <button
-              onClick={() => handleEnableNotifications()}
-              className="px-6 py-2.5 bg-white text-charade-950 font-medium rounded-full hover:bg-opacity-90 transition-colors"
+              onClick={handleEnableNotifications}
+              disabled={isLoading}
+              className="px-6 py-2.5 bg-white text-charade-950 font-medium rounded-full hover:bg-opacity-90 transition-colors disabled:opacity-50 flex items-center gap-2"
             >
-              {t("notifications.enable")}
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  <span>{t("notifications.enabling")}</span>
+                </>
+              ) : (
+                t("notifications.enable")
+              )}
             </button>
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, "+")
+    .replace(/_/g, "/");
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
 }
