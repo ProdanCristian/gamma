@@ -15,49 +15,31 @@ export function useServiceWorker() {
 
     const registerSW = async () => {
       try {
-        // First check if there's already an active service worker
-        const existingRegistration = await navigator.serviceWorker.ready;
-        if (mounted) {
-          setRegistration(existingRegistration);
-          setIsReady(true);
-          return;
-        }
-
-        // If no active service worker, register a new one
         const registration = await navigator.serviceWorker.register("/sw.js");
         console.log("Service worker registered");
 
-        // Wait for the service worker to be ready
-        if (registration.installing || registration.waiting) {
-          await new Promise<void>((resolve) => {
-            const serviceWorker =
-              registration.installing || registration.waiting;
-            if (!serviceWorker) {
-              resolve();
-              return;
-            }
+        if (mounted) {
+          setRegistration(registration);
+          setIsReady(true);
+        }
 
-            serviceWorker.addEventListener("statechange", (e) => {
+        // Wait for the service worker to be active
+        if (registration.installing || registration.waiting) {
+          const serviceWorker = registration.installing || registration.waiting;
+          if (serviceWorker) {
+            serviceWorker.addEventListener("statechange", () => {
               if (serviceWorker.state === "activated" && mounted) {
                 console.log("Service worker activated");
                 setRegistration(registration);
                 setIsReady(true);
-                resolve();
               }
             });
-          });
-        } else if (registration.active && mounted) {
-          setRegistration(registration);
-          setIsReady(true);
+          }
         }
       } catch (err) {
         console.error("Service worker registration failed:", err);
         if (mounted) {
-          setError(
-            err instanceof Error
-              ? err
-              : new Error("Failed to register service worker")
-          );
+          setError(err instanceof Error ? err : new Error("Failed to register service worker"));
           setIsReady(false);
         }
       }
@@ -65,14 +47,6 @@ export function useServiceWorker() {
 
     // Start registration process
     registerSW();
-
-    // Listen for service worker controller changes
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (mounted) {
-        console.log("Service worker controller changed");
-        registerSW();
-      }
-    });
 
     return () => {
       mounted = false;

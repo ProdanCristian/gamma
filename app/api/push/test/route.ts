@@ -28,8 +28,9 @@ export async function POST(request: Request) {
       body: "This is a test push notification!",
       icon: "/icon-192x192.png",
       badge: "/icon-192x192.png",
+      image: "https://gamma.md/_next/image?url=https%3A%2F%2Fmedia.gamma.md%2Fdownload%2Fnoco%2Fpvszw82hcq9rw12%2Fm2as9zht2xzt7gy%2Fcd79df5hy7bgkwl%2Fimage-removebg_rtJIZ.png&w=1200&q=75",
       data: {
-        url: "https://gamma.md",
+        url: "https://gamma.md/ro/shop/discounts",
       },
     });
 
