@@ -144,49 +144,74 @@ export const authOptions: AuthOptions = {
           return rows.length > 0;
         }
 
-        if (
-          account?.provider === "facebook" ||
-          account?.provider === "google"
-        ) {
+        if (account?.provider === "facebook" || account?.provider === "google") {
           const firstName = user.firstName || "";
           const lastName = user.lastName || "";
 
-          if (rows.length === 0) {
-            const providerIdField =
-              account.provider === "google" ? "Google_id" : "Facebook_id";
-            const result = await db.query(
-              `INSERT INTO "nc_pka4___Utilizatori" 
-               ("Nume", "Prenume", "Email", "${providerIdField}", "Provider", "Is_verified", "created_at") 
-               VALUES ($1, $2, $3, $4, $5, $6, NOW()) 
-               RETURNING *`,
-              [
-                firstName,
-                lastName,
-                user.email,
-                account.providerAccountId,
-                account.provider,
-                true,
-              ]
-            );
-            user.id = result.rows[0].id.toString();
-          } else {
-            const providerIdField =
-              account.provider === "google" ? "Google_id" : "Facebook_id";
-            const result = await db.query(
-              `UPDATE "nc_pka4___Utilizatori" 
-               SET "${providerIdField}" = $1,
-                   "Provider" = $2
-               WHERE "Email" = $3 
-               RETURNING *`,
-              [account.providerAccountId, account.provider, user.email]
-            );
-            user.id = result.rows[0].id.toString();
-            user.firstName = result.rows[0].Nume;
-            user.lastName = result.rows[0].Prenume;
+          await db.query('BEGIN');
+
+          try {
+            if (rows.length === 0) {
+              const providerIdField =
+                account.provider === "google" ? "Google_id" : "Facebook_id";
+              const result = await db.query(
+                `INSERT INTO "nc_pka4___Utilizatori" 
+                 ("Nume", "Prenume", "Email", "${providerIdField}", "Provider", "Is_verified", "created_at") 
+                 VALUES ($1, $2, $3, $4, $5, $6, NOW()) 
+                 RETURNING *`,
+                [
+                  firstName,
+                  lastName,
+                  user.email,
+                  account.providerAccountId,
+                  account.provider,
+                  true,
+                ]
+              );
+              user.id = result.rows[0].id.toString();
+
+              // Update anonymous subscriptions for new social users
+              await db.query(
+                `UPDATE subscriptions 
+                 SET user_id = $1, 
+                     updated_at = CURRENT_TIMESTAMP
+                 WHERE user_id IS NULL`,
+                [result.rows[0].id]
+              );
+            } else {
+              const providerIdField =
+                account.provider === "google" ? "Google_id" : "Facebook_id";
+              const result = await db.query(
+                `UPDATE "nc_pka4___Utilizatori" 
+                 SET "${providerIdField}" = $1,
+                     "Provider" = $2
+                 WHERE "Email" = $3 
+                 RETURNING *`,
+                [account.providerAccountId, account.provider, user.email]
+              );
+              user.id = result.rows[0].id.toString();
+              user.firstName = result.rows[0].Nume;
+              user.lastName = result.rows[0].Prenume;
+
+              // Update anonymous subscriptions for existing users
+              await db.query(
+                `UPDATE subscriptions 
+                 SET user_id = $1, 
+                     updated_at = CURRENT_TIMESTAMP
+                 WHERE user_id IS NULL`,
+                [result.rows[0].id]
+              );
+            }
+
+            await db.query('COMMIT');
+          } catch (error) {
+            await db.query('ROLLBACK');
+            throw error;
           }
         }
         return true;
       } catch (error) {
+        console.error("SignIn error:", error);
         return false;
       }
     },

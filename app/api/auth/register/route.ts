@@ -30,29 +30,50 @@ export async function POST(req: Request) {
     const [firstName, ...lastNameParts] = fullName.split(" ");
     const lastName = lastNameParts.join(" ");
 
-    const result = await db.query(
-      `INSERT INTO "nc_pka4___Utilizatori" 
-       ("Email", "Password", "Nume", "Prenume", "Provider", "Is_verified", "created_at") 
-       VALUES ($1, $2, $3, $4, $5, $6, NOW()) 
-       RETURNING id, "Email", "Nume", "Prenume", "Is_verified"`,
-      [email, hashedPassword, firstName, lastName, "credentials", false]
-    );
+    // Start a transaction
+    await db.query('BEGIN');
 
-    const newUser = result.rows[0];
+    try {
+      const result = await db.query(
+        `INSERT INTO "nc_pka4___Utilizatori" 
+         ("Email", "Password", "Nume", "Prenume", "Provider", "Is_verified", "created_at") 
+         VALUES ($1, $2, $3, $4, $5, $6, NOW()) 
+         RETURNING id, "Email", "Nume", "Prenume", "Is_verified"`,
+        [email, hashedPassword, firstName, lastName, "credentials", false]
+      );
 
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Registration successful",
-        user: {
-          id: newUser.id,
-          email: newUser.Email,
-          firstName: newUser.Nume,
-          lastName: newUser.Prenume,
+      const newUser = result.rows[0];
+
+      // Update any existing anonymous subscriptions with the new user's ID
+      await db.query(
+        `UPDATE subscriptions 
+         SET user_id = $1, 
+             updated_at = CURRENT_TIMESTAMP
+         WHERE user_id IS NULL`,
+        [newUser.id]
+      );
+
+      // Commit the transaction
+      await db.query('COMMIT');
+
+      return NextResponse.json(
+        {
+          success: true,
+          message: "Registration successful",
+          user: {
+            id: newUser.id,
+            email: newUser.Email,
+            firstName: newUser.Nume,
+            lastName: newUser.Prenume,
+          },
         },
-      },
-      { status: 201 }
-    );
+        { status: 201 }
+      );
+    } catch (error) {
+      // Rollback the transaction if anything fails
+      await db.query('ROLLBACK');
+      throw error;
+    }
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
