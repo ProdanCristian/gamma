@@ -44,6 +44,9 @@ const IphoneInstall = ({ onClose }: { onClose?: () => void }) => {
             </div>
 
             <div className="flex flex-col items-center justify-between h-full relative pb-12">
+              <h2 className="text-xl sm:text-2xl font-bold text-center text-black">
+                {t("How_to_install")}
+              </h2>
               <div className="flex flex-col items-center space-y-4">
                 <h1 className="text-xl sm:text-2xl font-bold text-center text-black">
                   {t("Install_our_app")}
