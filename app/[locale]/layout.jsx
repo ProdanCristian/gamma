@@ -85,7 +85,7 @@ export default async function LocaleLayout({ children, params }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" id="theme-color" content="#ffffff" />
         <link rel="icon" href="/favicon/favicon.ico" sizes="any" />
-        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         {/* iOS PWA Splash Screens */}
         <link

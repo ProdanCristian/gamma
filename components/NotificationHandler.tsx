@@ -4,6 +4,11 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useServiceWorker } from "@/hooks/useServiceWorker";
 
+declare global {
+  interface Navigator {
+    standalone?: boolean;
+  }
+}
 export default function NotificationHandler() {
   const t = useTranslations("");
   const [shouldShow, setShouldShow] = useState(false);
@@ -11,38 +16,62 @@ export default function NotificationHandler() {
   const { isReady, registration, error } = useServiceWorker();
 
   useEffect(() => {
+    // Wait a bit for PWA context to be fully established
+    setTimeout(() => {
+      const isPWA = 
+        window.matchMedia('(display-mode: standalone)').matches || 
+        (window.navigator as Navigator).standalone || 
+        document.referrer.includes('android-app://') ||
+        window.location.href.includes('?mode=pwa');
+                  
+      console.log('Is PWA:', isPWA, {
+        standalone: window.matchMedia('(display-mode: standalone)').matches,
+        iosStandalone: (window.navigator as Navigator).standalone,
+        androidApp: document.referrer.includes('android-app://')
+      });
+
+      if (isPWA || process.env.NODE_ENV === 'development') {
+        checkNotificationStatus();
+      } else {
+        setShouldShow(false);
+      }
+    }, 1000);
+
     const checkNotificationStatus = async () => {
       if (!isReady || !registration || error) {
+        console.log('Not ready:', { isReady, registration, error });
         setShouldShow(false);
         return;
       }
 
       const notificationSupported = "Notification" in window;
+      console.log('Notification supported:', notificationSupported);
+      
       if (!notificationSupported) {
         setShouldShow(false);
         return;
       }
 
-      const hasSubscribed =
-        localStorage.getItem("pushNotificationSubscribed") === "true";
+      const hasSubscribed = localStorage.getItem("pushNotificationSubscribed") === "true";
+      console.log('Has subscribed:', hasSubscribed);
+      
       if (hasSubscribed) {
         setShouldShow(false);
         return;
       }
 
-      // Check if already has a subscription
       const subscription = await registration.pushManager.getSubscription();
+      console.log('Existing subscription:', subscription);
+      
       if (subscription) {
         localStorage.setItem("pushNotificationSubscribed", "true");
         setShouldShow(false);
         return;
       }
 
-      console.log("Showing notification prompt");
+      console.log('Setting shouldShow to true');
       setShouldShow(true);
     };
-
-    checkNotificationStatus();
   }, [isReady, registration, error]);
 
   const handleEnableNotifications = async () => {
