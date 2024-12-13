@@ -136,8 +136,7 @@ export async function POST(request: Request) {
       title: locale === "ro" ? "Actualizare comandă" : "Обновление заказа",
       body: `${statusMessages[locale][currentOrder.Status]} - ${currentOrder.Produs.Nume_Produs_RO}`,
       data: {
-        url: "/dashboard/orders",
-        orderId: currentOrder.Id,
+        url: "https://gamma.md/dashboard",
       },
     });
 
