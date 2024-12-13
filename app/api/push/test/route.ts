@@ -4,14 +4,21 @@ import db from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
-    // Configure VAPID keys
+    const { title, body, url } = await request.json();
+
+    if (!title || !body) {
+      return NextResponse.json(
+        { success: false, message: "Title and body are required" },
+        { status: 400 }
+      );
+    }
+
     webpush.setVapidDetails(
       "mailto:your-email@example.com",
       process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
       process.env.VAPID_PRIVATE_KEY!
     );
 
-    // Get all subscriptions from PostgreSQL
     const { rows: subscriptions } = await db.query(
       "SELECT endpoint, p256dh, auth FROM subscriptions"
     );
@@ -24,12 +31,12 @@ export async function POST(request: Request) {
     }
 
     const payload = JSON.stringify({
-      title: "Test Notification",
-      body: "This is a test push notification!",
+      title,
+      body,
       icon: "/icon-192x192.png",
       badge: "/icon-192x192.png",
       data: {
-        url: "https://gamma.md",
+        url: url || "https://gamma.md",
       },
     });
 
