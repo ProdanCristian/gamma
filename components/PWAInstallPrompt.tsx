@@ -79,21 +79,10 @@ export default function PWAInstallPrompt() {
 
     if (isIOS) {
       setDeviceType("ios");
-      setTimeout(() => {
-        setShowIphoneInstall(true);
-      }, 3500);
     } else if (isAndroid) {
       setDeviceType("android");
-      setTimeout(() => {
-        setShowAndroidInstall(true);
-      }, 4000);
     } else {
       setDeviceType("desktop");
-      if (deferredPrompt) {
-        setTimeout(() => {
-          setShowDesktopInstall(true);
-        }, 4000);
-      }
     }
   }, [isPWA, deferredPrompt, hasVisited]);
 
@@ -130,20 +119,6 @@ export default function PWAInstallPrompt() {
 
   return (
     <>
-      {!hasVisited && (
-        <>
-          {showIphoneInstall && deviceType === "ios" && (
-            <IphoneInstall onClose={() => setShowIphoneInstall(false)} />
-          )}
-          {showAndroidInstall && deviceType === "android" && (
-            <AndroidInstall onInstallClick={handleInstallClick} />
-          )}
-          {showDesktopInstall && deviceType === "desktop" && deferredPrompt && (
-            <DesktopInstall onInstallClick={handleInstallClick} />
-          )}
-        </>
-      )}
-
       {showManualIphoneInstall && deviceType === "ios" && (
         <IphoneInstall onClose={() => setShowManualIphoneInstall(false)} />
       )}
