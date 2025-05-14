@@ -44,9 +44,6 @@ const IphoneInstall = ({ onClose }: { onClose?: () => void }) => {
             </div>
 
             <div className="flex flex-col items-center justify-between h-full relative pb-12">
-              <h2 className="text-xl sm:text-2xl font-bold text-center text-black">
-                {t("How_to_install")}
-              </h2>
               <div className="flex flex-col items-center space-y-4">
                 <h1 className="text-xl sm:text-2xl font-bold text-center text-black">
                   {t("Install_our_app")}
@@ -65,6 +62,9 @@ const IphoneInstall = ({ onClose }: { onClose?: () => void }) => {
                   className="w-[130px] sm:w-[180px]"
                 />
                 <div className="flex flex-col space-y-2 sm:space-y-4">
+                  <h2 className="text-xl sm:text-2xl font-bold text-center text-black">
+                    {t("notifications.how_to_install")}
+                  </h2>
                   <div className="flex items-center gap-2 sm:gap-3">
                     <p className="text-base sm:text-lg bg-red-500 rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-white">
                       1

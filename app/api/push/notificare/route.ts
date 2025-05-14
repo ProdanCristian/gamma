@@ -4,11 +4,12 @@ import db from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
-    const { title, body, url } = await request.json();
+    const { notifications } = await request.json();
+    console.log('Received notifications:', notifications);
 
-    if (!title || !body) {
+    if (!notifications?.ro || !notifications?.ru) {
       return NextResponse.json(
-        { success: false, message: "Title and body are required" },
+        { success: false, message: "Notifications content required for both languages" },
         { status: 400 }
       );
     }
@@ -20,8 +21,9 @@ export async function POST(request: Request) {
     );
 
     const { rows: subscriptions } = await db.query(
-      "SELECT endpoint, p256dh, auth FROM subscriptions"
+      "SELECT endpoint, p256dh, auth, lang FROM subscriptions"
     );
+    console.log('Subscriptions found:', subscriptions);
 
     if (subscriptions.length === 0) {
       return NextResponse.json({
@@ -30,20 +32,28 @@ export async function POST(request: Request) {
       });
     }
 
-    const payload = JSON.stringify({
-      title,
-      body,
-      icon: "/icon-192x192.png",
-      badge: "/icon-192x192.png",
-      data: {
-        url: url || "https://gamma.md",
-      },
-    });
-
-    // Send to all subscriptions
     const results = await Promise.allSettled(
-      subscriptions.map((sub: any) =>
-        webpush.sendNotification(
+      subscriptions.map((sub: any) => {
+        const userLang = sub.lang || 'ro';
+        const notification = notifications[userLang];
+        console.log('Sending notification for lang:', userLang, notification);
+
+        if (!notification) {
+          console.error('No notification content for language:', userLang);
+          return Promise.reject('No notification content for language: ' + userLang);
+        }
+
+        const payload = JSON.stringify({
+          title: notification.title,
+          body: notification.body,
+          icon: "/icon-192x192.png",
+          badge: "/icon-192x192.png",
+          data: {
+            url: notification.url || "https://gamma.md",
+          },
+        });
+
+        return webpush.sendNotification(
           {
             endpoint: sub.endpoint,
             keys: {
@@ -52,9 +62,11 @@ export async function POST(request: Request) {
             },
           },
           payload
-        )
-      )
+        );
+      })
     );
+
+    console.log('Send results:', results);
 
     const successful = results.filter(
       (r: any) => r.status === "fulfilled"

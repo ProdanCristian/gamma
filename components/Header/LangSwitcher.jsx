@@ -20,8 +20,24 @@ export default function LangSwitcher() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const handleLanguageChange = (newLocale) => {
-    router.replace(pathname, { locale: newLocale });
+  const handleLanguageChange = async (newLocale) => {
+    try {
+      const response = await fetch('/api/subscriptions/update-lang', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ lang: newLocale })
+      });
+      
+      const result = await response.json();
+      console.log('Language update result:', result);
+      
+      router.replace(pathname, { locale: newLocale });
+    } catch (error) {
+      console.error('Failed to update subscription language:', error);
+      router.replace(pathname, { locale: newLocale });
+    }
   };
 
   return (

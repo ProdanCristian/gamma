@@ -541,10 +541,13 @@
     "currency": "lei"
   },
   "notifications": {
+    "send": "Trimite",
     "enabling": "Se activează",
     "title": "Activați notificările",
     "description": "Fiți la curent cu statusul livrării comenzilor, oferte noi și promoții exclusive",
     "enable": "Activați notificările",
-    "how_to_install": "Cum să instalați aplicația"
+    "how_to_install": "Cum să instalați aplicația",
+    "verify": "Verifică",
+    "enter_access_code": "Introduceți codul de acces"
   }
 }
